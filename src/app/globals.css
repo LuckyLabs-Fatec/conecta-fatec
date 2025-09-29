@@ -3,13 +3,17 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --palette-red-50: #EFD5D7;
+  --palette-red-100: #EDB8BA;
+  --palette-red-200: #DB857F;
+  --palette-red-300: #D06059;
+  --palette-red-400: #D94234;
+  --palette-red-500: #DA3115;
+  --palette-red-600: #CB2616;
+  --palette-red-700: #B91611;
+  --palette-red-800: #AD0F0A;
+  --palette-red-900: #9F0000;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +26,9 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+button {
+  cursor: pointer;
 }
