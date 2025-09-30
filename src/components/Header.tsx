@@ -8,7 +8,7 @@ export const Header = () => (
       <Image src="/logo.svg" alt="Logo" width={40} height={40} className="inline-block mr-2" />
       <h1 className="text-2xl font-bold">Fatec Conecta</h1>
     </span>
-    <Link href="/login">
+    <Link href="/autenticacao">
       <Button label="Login" onClick={() => {}} variant="secondary" size="medium" />
     </Link>
   </header>
