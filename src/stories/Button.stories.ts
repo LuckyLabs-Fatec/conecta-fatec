@@ -27,6 +27,7 @@ export const Primary: Story = {
         label: 'Primary Button',
         variant: 'primary',
         onClick: () => {},
+        size: 'medium',
     },
 };
 
@@ -35,6 +36,7 @@ export const Secondary: Story = {
         label: 'Secondary Button',
         variant: 'secondary',
         onClick: () => {},
+        size: 'medium',
     },
 };
 
@@ -43,5 +45,6 @@ export const Disabled: Story = {
         label: 'Disabled Button',
         disabled: true,
         onClick: () => {},
+        size: 'medium',
     },
 };
