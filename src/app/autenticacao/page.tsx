@@ -2,6 +2,7 @@
 import { Field } from "@base-ui-components/react/field"
 import { Form } from "@base-ui-components/react/form"
 import { LoginAside } from "@/components/LoginAside"
+import Link from "next/dist/client/link";
 
 export default function LoginPage () {
     return (
@@ -14,9 +15,9 @@ export default function LoginPage () {
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">Login</h2>
                             <p className="text-gray-600">
                                 Se você ainda não possui uma conta! Pode{' '}
-                                <a href="/cadastro" className="text-[#CB2616] hover:text-red-700 font-medium underline">
+                                <Link href="/cadastro/usuario" className="text-[#CB2616] hover:text-red-700 font-medium underline">
                                     se cadastrar aqui!
-                                </a>
+                                </Link>
                             </p>
                         </header>
 
