@@ -1,7 +1,7 @@
 'use client';
-import { Field } from "@base-ui-components/react/field"
 import { Form } from "@base-ui-components/react/form"
 import { LoginAside } from "@/components/LoginAside"
+import { Input } from "@/components/Input"
 import Link from "next/dist/client/link";
 
 export default function LoginPage () {
@@ -22,33 +22,23 @@ export default function LoginPage () {
                         </header>
 
                         <Form className="flex flex-col gap-6">
-                            <Field.Root className="flex flex-col gap-2">
-                                <Field.Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                    Email
-                                </Field.Label>
-                                <Field.Control 
-                                    type="email" 
-                                    id="email" 
-                                    name="email" 
-                                    placeholder="Digite seu email" 
-                                    required 
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none transition-colors"
-                                />
-                            </Field.Root>
+                            <Input
+                                label="Email"
+                                id="email"
+                                type="email"
+                                name="email"
+                                placeholder="Digite seu email"
+                                required={true}
+                            />
 
-                            <Field.Root className="flex flex-col gap-2">
-                                <Field.Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                                    Senha
-                                </Field.Label>
-                                <Field.Control 
-                                    type="password" 
-                                    id="password" 
-                                    name="password" 
-                                    placeholder="Digite sua senha" 
-                                    required 
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none transition-colors"
-                                />
-                            </Field.Root>
+                            <Input
+                                label="Senha"
+                                id="password"
+                                type="password"
+                                name="password"
+                                placeholder="Digite sua senha"
+                                required={true}
+                            />
 
                             <div className="flex items-center justify-between">
                                 <label className="flex items-center">
