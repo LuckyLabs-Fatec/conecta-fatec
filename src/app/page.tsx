@@ -102,7 +102,7 @@ export default function LandingPage() {
             />
           </Link>
           <span id="mission-cta-desc" className="sr-only">
-            Comece a fazer a diferença sugerindo ideias de melhoria para sua comunidade
+            Comece a fazer a diferença relatando um problema da sua comunidade
           </span>
         </section>
 
@@ -161,7 +161,7 @@ export default function LandingPage() {
           className="flex flex-col items-center bg-gray-100 text-center p-8 gap-6"
           aria-labelledby="cta-title"
         >
-          <h2 id="cta-title" className="text-3xl font-bold">Faça Parte da Mudança</h2>
+          <h2 id="cta-title" className="text-3xl font-bold text-gray-800">Faça Parte da Mudança</h2>
           <p className="text-gray-500 text-xl max-w-3xl">
             Sua voz importa! Compartilhe suas ideias de melhoria para a comunidade e ajude os estudantes da Fatec a criar soluções que fazem a diferença. Juntos, construímos uma sociedade mais justa e eficaz.
           </p>
@@ -186,8 +186,7 @@ export default function LandingPage() {
         aria-label="Informações do rodapé"
       >
         <p>
-          <span aria-label="Copyright">&copy;</span> 2025 Fatec Conecta - Uma iniciativa Lucky Labs. 
-          Todos os direitos reservados.
+          <span aria-label="Copyright">&copy;</span> 2025 Fatec Conecta - Uma parceria entre Lucky Labs e Fatec Votorantim.
         </p>
       </footer>
     </>

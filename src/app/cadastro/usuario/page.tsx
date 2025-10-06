@@ -15,14 +15,14 @@ export default function RegisterPage() {
         agreeToTerms: false
     });
 
-    const [errors, setErrors] = useState<{[key: string]: string}>({});
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({
             ...prev,
             [field]: e.target.value
         }));
-        
+
         // Clear error when user starts typing
         if (errors[field]) {
             setErrors(prev => ({
@@ -34,50 +34,60 @@ export default function RegisterPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        const newErrors: {[key: string]: string} = {};
-        
+
+        const newErrors: { [key: string]: string } = {};
+
         // Validation
         if (!formData.name.trim()) {
             newErrors.name = 'Nome completo é obrigatório';
         }
-        
+
         if (!formData.email.trim()) {
             newErrors.email = 'Email é obrigatório';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Email inválido';
         }
-        
+
         if (!formData.password) {
             newErrors.password = 'Senha é obrigatória';
         } else if (formData.password.length < 8) {
             newErrors.password = 'Senha deve ter pelo menos 8 caracteres';
         }
-        
+
         if (formData.password !== formData.confirmPassword) {
             newErrors.confirmPassword = 'Senhas não coincidem';
         }
-        
+
         if (!formData.agreeToTerms) {
             newErrors.terms = 'Você deve aceitar os termos e condições';
         }
-        
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
-        
+
         // Submit form
         console.log('Registering user:', formData);
+        // Salva dados (incluindo senha) no localStorage para mock
+        const { confirmPassword, ...userData } = formData;
+        try {
+            localStorage.setItem('fatecUser', JSON.stringify(userData));
+            console.log('Usuário registrado com sucesso no localStorage');
+            // Opcional: redirecionar após cadastro
+            // window.location.href = '/autenticacao';
+        } catch (err) {
+            console.error('Erro ao salvar no localStorage', err);
+        }
     };
 
     return (
         <main className="flex min-h-screen">
-            <LoginAside 
+            <LoginAside
                 title="Junte-se ao Fatec Conecta"
                 description="Faça parte de uma comunidade que transforma problemas em soluções. Registre-se e comece a fazer a diferença hoje mesmo."
             />
-            
+
             <section className="w-full md:w-1/2 flex items-center justify-center p-8 bg-gray-50">
                 <div className="w-full max-w-md">
                     <div className="bg-white rounded-lg shadow-lg p-8">
@@ -85,13 +95,14 @@ export default function RegisterPage() {
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">Criar Conta</h2>
                             <p className="text-gray-600">
                                 Já possui uma conta?{' '}
-                                <Link 
-                                    href="/autenticacao" 
+                                <Link
+                                    href="/autenticacao"
                                     className="text-[#CB2616] hover:text-red-700 font-medium underline"
                                 >
                                     Faça login aqui!
                                 </Link>
                             </p>
+                            <p className="text-red-600">TELA AINDA EM DESENVOLVIMENTO, NÃO USE SENHAS REAIS.</p>
                         </header>
 
                         <Form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -117,7 +128,6 @@ export default function RegisterPage() {
                                 value={formData.email}
                                 onChange={handleInputChange('email')}
                                 error={errors.email}
-                                description="Utilizaremos seu email para enviar atualizações sobre seus relatos"
                             />
 
                             <Input
@@ -128,7 +138,6 @@ export default function RegisterPage() {
                                 placeholder="(11) 99999-9999"
                                 value={formData.phone}
                                 onChange={handleInputChange('phone')}
-                                description="Opcional - Para contato em caso de necessidade"
                             />
 
                             <Input
@@ -158,8 +167,8 @@ export default function RegisterPage() {
 
                             <div className="space-y-4">
                                 <label className="flex items-start gap-3">
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         checked={formData.agreeToTerms}
                                         onChange={(e) => {
                                             setFormData(prev => ({
@@ -178,16 +187,16 @@ export default function RegisterPage() {
                                     />
                                     <span className="text-sm text-gray-600 leading-relaxed">
                                         Eu aceito os{' '}
-                                        <Link 
-                                            href="/termos" 
+                                        <Link
+                                            href="/termos"
                                             className="text-[#CB2616] hover:text-red-700 underline"
                                             target="_blank"
                                         >
                                             termos e condições
                                         </Link>
                                         {' '}e a{' '}
-                                        <Link 
-                                            href="/privacidade" 
+                                        <Link
+                                            href="/privacidade"
                                             className="text-[#CB2616] hover:text-red-700 underline"
                                             target="_blank"
                                         >
@@ -202,15 +211,15 @@ export default function RegisterPage() {
                                 )}
                             </div>
 
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="w-full bg-[#CB2616] hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#CB2616] focus:ring-offset-2"
                             >
                                 CRIAR CONTA
                             </button>
                         </Form>
 
-                        <footer className="mt-8 pt-6 border-t border-gray-200">
+                        {/* <footer className="mt-8 pt-6 border-t border-gray-200">
                             <div className="text-center">
                                 <p className="text-sm text-gray-600 mb-4">
                                     Ao criar uma conta, você se torna parte da solução
@@ -221,9 +230,10 @@ export default function RegisterPage() {
                                     <span>Dados protegidos</span>
                                     <span>•</span>
                                     <span>LGPD compliant</span>
-                                </div>
+                                </div> 
                             </div>
-                        </footer>
+                        </footer> 
+                        */}
                     </div>
 
                     <div className="mt-6 text-center">

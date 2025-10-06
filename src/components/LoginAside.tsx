@@ -19,7 +19,7 @@ export const LoginAside = ({
 }: LoginAsideProps) => {
   return (
     <aside 
-      className="hidden md:flex md:w-1/2 bg-[#CB2616] p-8 h-screen text-white flex-col items-center justify-center gap-6"
+      className="hidden md:flex md:w-1/2 bg-[#b20000] p-8 h-screen text-white flex-col items-center justify-center gap-6"
       aria-label="Seção de identidade visual do Fatec Conecta"
     >
       <div className="text-center">
