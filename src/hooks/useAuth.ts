@@ -1,12 +1,17 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+export type UserRole = 'comunidade' | 'mediador' | 'coordenacao';
+
 interface User {
     id: string;
     name: string;
     email: string;
     avatar: string;
     loginTime: string;
+    role: UserRole;
+    department?: string; // Para coordenação
+    specialization?: string; // Para mediador
 }
 
 export const useAuth = () => {
@@ -42,11 +47,34 @@ export const useAuth = () => {
         setUser(null);
     };
 
+    const hasPermission = (requiredRole: UserRole | UserRole[]) => {
+        if (!user) return false;
+        
+        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+        return roles.includes(user.role);
+    };
+
+    const canAccessIdeaValidation = () => {
+        return hasPermission(['mediador', 'coordenacao']);
+    };
+
+    const canAssignToClasses = () => {
+        return hasPermission('coordenacao');
+    };
+
+    const canSuggestIdeas = () => {
+        return hasPermission('comunidade');
+    };
+
     return {
         user,
         isLoading,
         login,
         logout,
-        isAuthenticated: !!user
+        isAuthenticated: !!user,
+        hasPermission,
+        canAccessIdeaValidation,
+        canAssignToClasses,
+        canSuggestIdeas
     };
 };

@@ -47,9 +47,16 @@ export const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/sugerir-melhoria" className="hover:text-red-200 transition-colors">
-            Sugerir Melhoria
-          </Link>
+          {isAuthenticated && user?.role === 'comunidade' && (
+            <Link href="/sugerir-melhoria" className="hover:text-red-200 transition-colors">
+              Sugerir Melhoria
+            </Link>
+          )}
+          {isAuthenticated && (user?.role === 'mediador' || user?.role === 'coordenacao') && (
+            <Link href="/validar-ideias" className="hover:text-red-200 transition-colors">
+              Validar Ideias
+            </Link>
+          )}
           <Link href="/acompanhar-projetos" className="hover:text-red-200 transition-colors">
             Acompanhar Projetos
           </Link>

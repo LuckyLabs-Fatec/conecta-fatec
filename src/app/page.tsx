@@ -4,8 +4,11 @@ import { Header } from "@/components/Header";
 import { Step } from "@/components/Step";
 import { Lightbulb, CheckCircle, Code } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function LandingPage() {
+  const { user, canSuggestIdeas, canAccessIdeaValidation } = useAuth();
+  
   return (
     <>
       <Header />
@@ -32,18 +35,54 @@ export default function LandingPage() {
               Conectamos problemas reais com soluções acadêmicas desenvolvidas pelos alunos da Fatec Votorantim.
             </p>
             <nav className="flex gap-4 flex-wrap justify-center" aria-label="Ações principais">
-              <Link href="/sugerir-melhoria">
-                <Button 
-                  label="Sugira uma ideia de melhoria" 
-                  onClick={() => {}} 
-                  variant="primary" 
-                  size="large"
-                  aria-describedby="sugira-ideia-desc"
-                />
-              </Link>
-              <span id="sugira-ideia-desc" className="sr-only">
-                Acesse o formulário para sugerir melhorias para sua comunidade
-              </span>
+              {canSuggestIdeas() && (
+                <>
+                  <Link href="/sugerir-melhoria">
+                    <Button 
+                      label="Sugira uma ideia de melhoria" 
+                      onClick={() => {}} 
+                      variant="primary" 
+                      size="large"
+                      aria-describedby="sugira-ideia-desc"
+                    />
+                  </Link>
+                  <span id="sugira-ideia-desc" className="sr-only">
+                    Acesse o formulário para sugerir melhorias para sua comunidade
+                  </span>
+                </>
+              )}
+              {canAccessIdeaValidation() && (
+                <>
+                  <Link href="/validar-ideias">
+                    <Button 
+                      label="Validar Ideias" 
+                      onClick={() => {}} 
+                      variant="primary" 
+                      size="large"
+                      aria-describedby="validar-ideias-desc"
+                    />
+                  </Link>
+                  <span id="validar-ideias-desc" className="sr-only">
+                    Acesse o painel para analisar e aprovar ideias da comunidade
+                  </span>
+                </>
+              )}
+              {!user && (
+                <>
+                  <Link href="/sugerir-melhoria">
+                    <Button 
+                      label="Sugira uma ideia de melhoria" 
+                      onClick={() => {}} 
+                      variant="primary" 
+                      size="large"
+                      aria-describedby="sugira-ideia-desc-guest"
+                    />
+                  </Link>
+                  <span id="sugira-ideia-desc-guest" className="sr-only">
+                    Acesse o formulário para sugerir melhorias para sua comunidade
+                  </span>
+                </>
+              )}
               <Button 
                 label="Conheça o projeto" 
                 onClick={() => {}} 

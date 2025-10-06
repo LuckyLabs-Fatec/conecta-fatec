@@ -172,17 +172,15 @@ export default function SuggestImprovementPage() {
         <>
             <Header />
             <main className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-2xl mx-auto px-4">
-                    <div className="bg-white rounded-lg shadow-lg p-8">
-                        <header className="mb-8">
-                            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                                Sugira uma Ideia de Melhoria
-                            </h1>
-                            <p className="text-gray-600">
-                                Compartilhe suas ideias para melhorar a comunidade. 
-                                Suas sugestões serão analisadas pelos estudantes da Fatec Votorantim para desenvolvimento de projetos inovadores.
-                            </p>
-                        </header>
+                <div className="max-w-4xl mx-auto px-4">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                            Sugira uma Ideia de Melhoria
+                        </h1>
+                        <p className="text-gray-600">
+                            Compartilhe sua ideia de melhoria para a comunidade. Estudantes da Fatec Votorantim podem transformar sua sugestão em um projeto real!
+                        </p>
+                    </div>
 
                         <ProgressBar />
 
@@ -293,7 +291,6 @@ export default function SuggestImprovementPage() {
                             </a>
                         </p>
                     </div>
-                </div>
             </main>
         </>
     );
