@@ -3,6 +3,7 @@ import { Button } from "@/components/Button";
 import { Header } from "@/components/Header";
 import { Step } from "@/components/Step";
 import { Lightbulb, CheckCircle, Code } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
   return (
@@ -31,15 +32,17 @@ export default function LandingPage() {
               Conectamos problemas reais com soluções acadêmicas desenvolvidas pelos alunos da Fatec Votorantim.
             </p>
             <nav className="flex gap-4 flex-wrap justify-center" aria-label="Ações principais">
-              <Button 
-                label="Relate um problema" 
-                onClick={() => {}} 
-                variant="primary" 
-                size="large"
-                aria-describedby="relate-problema-desc"
-              />
-              <span id="relate-problema-desc" className="sr-only">
-                Acesse o formulário para relatar problemas da sua comunidade
+              <Link href="/sugerir-melhoria">
+                <Button 
+                  label="Sugira uma ideia de melhoria" 
+                  onClick={() => {}} 
+                  variant="primary" 
+                  size="large"
+                  aria-describedby="sugira-ideia-desc"
+                />
+              </Link>
+              <span id="sugira-ideia-desc" className="sr-only">
+                Acesse o formulário para sugerir melhorias para sua comunidade
               </span>
               <Button 
                 label="Conheça o projeto" 
@@ -89,15 +92,17 @@ export default function LandingPage() {
               </p>
             </article>
           </div>
-          <Button 
-            label="Relate um problema" 
-            onClick={() => {}} 
-            variant="primary" 
-            size="large"
-            aria-describedby="mission-cta-desc"
-          />
+          <Link href="/sugerir-melhoria">
+            <Button 
+              label="Sugira uma ideia de melhoria" 
+              onClick={() => {}} 
+              variant="primary" 
+              size="large"
+              aria-describedby="mission-cta-desc"
+            />
+          </Link>
           <span id="mission-cta-desc" className="sr-only">
-            Comece a fazer a diferença relatando um problema da sua comunidade
+            Comece a fazer a diferença sugerindo ideias de melhoria para sua comunidade
           </span>
         </section>
 
@@ -114,22 +119,22 @@ export default function LandingPage() {
             <div role="listitem">
               <Step 
                 icon={<Lightbulb size={32} color="#DA3115" aria-hidden="true" />} 
-                title="Relate o Problema" 
-                description="A comunidade compartilha desafios e reclamações cotidianas em nossa plataforma." 
+                title="Sugira Melhorias" 
+                description="A comunidade compartilha ideias de melhorias e desafios cotidianos em nossa plataforma." 
               />
             </div>
             <div role="listitem">
               <Step 
                 icon={<CheckCircle size={32} color="#DA3115" aria-hidden="true" />} 
                 title="Análise Acadêmica" 
-                description="Estudantes da Fatec Votorantim analisam os problemas e identificam oportunidades de projetos." 
+                description="Estudantes da Fatec Votorantim analisam as sugestões e identificam oportunidades de projetos." 
               />
             </div>
             <div role="listitem">
               <Step 
                 icon={<Code size={32} color="#DA3115" aria-hidden="true" />} 
                 title="Desenvolvimento de Soluções" 
-                description="Alunos desenvolvem projetos estudantis inovadores para resolver os desafios apresentados." 
+                description="Alunos desenvolvem projetos estudantis inovadores para implementar as melhorias sugeridas." 
               />
             </div>
           </div>
@@ -141,17 +146,19 @@ export default function LandingPage() {
         >
           <h2 id="cta-title" className="text-3xl font-bold">Faça Parte da Mudança</h2>
           <p className="text-gray-500 text-xl max-w-3xl">
-            Sua voz importa! Relate os problemas da sua comunidade e ajude os estudantes da Fatec a criar soluções que fazem a diferença. Juntos, construímos uma sociedade mais justa e eficaz.
+            Sua voz importa! Compartilhe suas ideias de melhoria para a comunidade e ajude os estudantes da Fatec a criar soluções que fazem a diferença. Juntos, construímos uma sociedade mais justa e eficaz.
           </p>
-          <Button 
-            label="Relate um Problema" 
-            onClick={() => {}} 
-            variant="primary" 
-            size="large"
-            aria-describedby="final-cta-desc"
-          />
+          <Link href="/sugerir-melhoria">
+            <Button 
+              label="Sugira uma Ideia de Melhoria" 
+              onClick={() => {}} 
+              variant="primary" 
+              size="large"
+              aria-describedby="final-cta-desc"
+            />
+          </Link>
           <span id="final-cta-desc" className="sr-only">
-            Acesse o formulário para iniciar o processo de relato de problemas comunitários
+            Acesse o formulário para iniciar o processo de sugestão de melhorias comunitárias
           </span>
         </section>
       </main>

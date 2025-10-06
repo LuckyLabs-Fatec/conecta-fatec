@@ -2,13 +2,13 @@
 import { useState } from 'react';
 import { Form } from "@base-ui-components/react/form"
 import { Header } from "@/components/Header"
-import { ProblemDetailsStep } from "@/components/ProblemDetailsStep"
+import { ImprovementDetailsStep } from "@/components/ImprovementDetailsStep"
 import { LocationStep } from "@/components/LocationStep"
 import { PriorityImpactStep } from "@/components/PriorityImpactStep"
 import { ContactInfoStep } from "@/components/ContactInfoStep"
 import { ChevronLeft, ChevronRight, Send } from "lucide-react";
 
-interface ProblemFormData {
+interface ImprovementFormData {
     category: string;
     title: string;
     description: string;
@@ -30,11 +30,9 @@ interface ProblemFormData {
     };
 }
 
-
-
-export default function RelateProblemPage() {
+export default function SuggestImprovementPage() {
     const [currentStep, setCurrentStep] = useState(1);
-    const [formData, setFormData] = useState<ProblemFormData>({
+    const [formData, setFormData] = useState<ImprovementFormData>({
         category: '',
         title: '',
         description: '',
@@ -121,7 +119,7 @@ export default function RelateProblemPage() {
                 if (!formData.location.neighborhood.trim()) newErrors.neighborhood = 'Bairro é obrigatório';
                 break;
             case 3:
-                if (!formData.affectedPeople.trim()) newErrors.affectedPeople = 'Informe quantas pessoas são afetadas';
+                if (!formData.affectedPeople.trim()) newErrors.affectedPeople = 'Informe quantas pessoas serão beneficiadas';
                 break;
             case 4:
                 if (!formData.contactInfo.name.trim()) newErrors.name = 'Nome é obrigatório';
@@ -146,7 +144,7 @@ export default function RelateProblemPage() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (validateStep(currentStep)) {
-            console.log('Submitting problem:', formData);
+            console.log('Submitting improvement suggestion:', formData);
             // Here you would submit to your backend
         }
     };
@@ -178,28 +176,33 @@ export default function RelateProblemPage() {
                     <div className="bg-white rounded-lg shadow-lg p-8">
                         <header className="mb-8">
                             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                                Relatar Problema da Comunidade
+                                Sugira uma Ideia de Melhoria
                             </h1>
                             <p className="text-gray-600">
-                                Ajude-nos a identificar e resolver problemas da sua comunidade. 
-                                Suas informações serão analisadas pelos estudantes da Fatec Votorantim.
+                                Compartilhe suas ideias para melhorar a comunidade. 
+                                Suas sugestões serão analisadas pelos estudantes da Fatec Votorantim para desenvolvimento de projetos inovadores.
                             </p>
                         </header>
 
                         <ProgressBar />
 
                         <Form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Step 1: Problem Details */}
+                            {/* Step 1: Improvement Details */}
                             {currentStep === 1 && (
-                                <ProblemDetailsStep
-                                    formData={{
-                                        category: formData.category,
-                                        title: formData.title,
-                                        description: formData.description,
-                                    }}
-                                    errors={errors}
-                                    onChange={handleInputChange}
-                                />
+                                <div className="space-y-6" role="group" aria-labelledby="improvement-details-heading">
+                                    <h2 id="improvement-details-heading" className="text-xl font-semibold text-gray-800 mb-4">
+                                        Detalhes da Sua Ideia
+                                    </h2>
+                                    <ImprovementDetailsStep
+                                        formData={{
+                                            category: formData.category,
+                                            title: formData.title,
+                                            description: formData.description,
+                                        }}
+                                        errors={errors}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
                             )}
 
                             {/* Step 2: Location */}
@@ -213,18 +216,23 @@ export default function RelateProblemPage() {
 
                             {/* Step 3: Priority and Impact */}
                             {currentStep === 3 && (
-                                <PriorityImpactStep
-                                    formData={{
-                                        priority: formData.priority,
-                                        affectedPeople: formData.affectedPeople,
-                                        frequency: formData.frequency,
-                                        images: formData.images,
-                                    }}
-                                    errors={errors}
-                                    onChange={handleInputChange}
-                                    onImageUpload={handleImageUpload}
-                                    onRemoveImage={removeImage}
-                                />
+                                <div className="space-y-6" role="group" aria-labelledby="impact-priority-heading">
+                                    <h2 id="impact-priority-heading" className="text-xl font-semibold text-gray-800 mb-4">
+                                        Impacto e Benefícios
+                                    </h2>
+                                    <PriorityImpactStep
+                                        formData={{
+                                            priority: formData.priority,
+                                            affectedPeople: formData.affectedPeople,
+                                            frequency: formData.frequency,
+                                            images: formData.images,
+                                        }}
+                                        errors={errors}
+                                        onChange={handleInputChange}
+                                        onImageUpload={handleImageUpload}
+                                        onRemoveImage={removeImage}
+                                    />
+                                </div>
                             )}
 
                             {/* Step 4: Contact Information */}
@@ -270,7 +278,7 @@ export default function RelateProblemPage() {
                                         className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors"
                                     >
                                         <Send size={16} />
-                                        Enviar Relato
+                                        Enviar Sugestão
                                     </button>
                                 )}
                             </div>
