@@ -21,11 +21,11 @@ export default function LandingPage() {
           <div 
             className="absolute inset-0 bg-cover bg-center opacity-50"
             style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')"
+              backgroundImage: "url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')"
             }}
             aria-hidden="true"
             role="img"
-            aria-label="Imagem de fundo com peças de quebra-cabeça conectadas, simbolizando a união entre comunidade e universidade"
+            aria-label="Imagem de fundo com estudantes colaborando em projetos, simbolizando a inovação e parceria entre comunidade e universidade"
           />
           <div className="absolute inset-0 bg-black opacity-40" aria-hidden="true" />
           <div className="relative z-10 flex flex-col items-center gap-6 max-w-4xl mx-auto">
