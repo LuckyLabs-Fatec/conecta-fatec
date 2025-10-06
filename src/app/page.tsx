@@ -138,6 +138,23 @@ export default function LandingPage() {
               />
             </div>
           </div>
+          <div className="mt-8">
+            <p className="text-white text-lg mb-4">
+              Acompanhe o progresso dos projetos em desenvolvimento e veja como suas ideias se transformam em soluções reais.
+            </p>
+            <Link href="/acompanhar-projetos">
+              <Button 
+                label="Acompanhar Projetos" 
+                onClick={() => {}} 
+                variant="secondary" 
+                size="large"
+                aria-describedby="track-projects-desc"
+              />
+            </Link>
+            <span id="track-projects-desc" className="sr-only">
+              Veja o andamento dos projetos em desenvolvimento pelos estudantes da Fatec
+            </span>
+          </div>
         </section>
 
         <section 

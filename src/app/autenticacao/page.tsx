@@ -1,10 +1,73 @@
 'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Form } from "@base-ui-components/react/form"
 import { LoginAside } from "@/components/LoginAside"
 import { Input } from "@/components/Input"
-import Link from "next/dist/client/link";
+import Link from "next/link";
 
 export default function LoginPage () {
+    const router = useRouter();
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [errors, setErrors] = useState<{[key: string]: string}>({});
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: e.target.value
+        }));
+        
+        // Clear errors when user starts typing
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: '' }));
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        
+        // Simple validation
+        const newErrors: {[key: string]: string} = {};
+        if (!formData.email.trim()) newErrors.email = 'Email é obrigatório';
+        if (!formData.password.trim()) newErrors.password = 'Senha é obrigatória';
+        
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setIsLoading(false);
+            return;
+        }
+
+        // Simulate login - accept any email/password combination
+        try {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Create user data
+            const userData = {
+                id: '1',
+                name: formData.email.split('@')[0].charAt(0).toUpperCase() + formData.email.split('@')[0].slice(1),
+                email: formData.email,
+                avatar: `https://doodleipsum.com/700/avatar?i=fd7c77f6b306c724bb34cc62124ff04e`,
+                loginTime: new Date().toISOString()
+            };
+            
+            // Store in localStorage
+            localStorage.setItem('fatec-conecta-user', JSON.stringify(userData));
+            
+            // Redirect to home page
+            router.push('/');
+        } catch {
+            setErrors({ general: 'Erro ao fazer login. Tente novamente.' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <main className="flex min-h-screen">
             <LoginAside />
@@ -21,7 +84,13 @@ export default function LoginPage () {
                             </p>
                         </header>
 
-                        <Form className="flex flex-col gap-6">
+                        {errors.general && (
+                            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-sm text-red-600">{errors.general}</p>
+                            </div>
+                        )}
+
+                        <Form onSubmit={handleSubmit} className="flex flex-col gap-6">
                             <Input
                                 label="Email"
                                 id="email"
@@ -29,6 +98,9 @@ export default function LoginPage () {
                                 name="email"
                                 placeholder="Digite seu email"
                                 required={true}
+                                value={formData.email}
+                                onChange={handleInputChange('email')}
+                                error={errors.email}
                             />
 
                             <Input
@@ -38,6 +110,9 @@ export default function LoginPage () {
                                 name="password"
                                 placeholder="Digite sua senha"
                                 required={true}
+                                value={formData.password}
+                                onChange={handleInputChange('password')}
+                                error={errors.password}
                             />
 
                             <div className="flex items-center justify-between">
@@ -55,9 +130,10 @@ export default function LoginPage () {
 
                             <button 
                                 type="submit" 
-                                className="w-full bg-[#CB2616] hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#CB2616] focus:ring-offset-2"
+                                disabled={isLoading}
+                                className="w-full bg-[#CB2616] hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#CB2616] focus:ring-offset-2"
                             >
-                                ENTRAR
+                                {isLoading ? 'Entrando...' : 'ENTRAR'}
                             </button>
                         </Form>
 
