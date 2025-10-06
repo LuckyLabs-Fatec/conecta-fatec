@@ -24,7 +24,8 @@ export const useAuth = () => {
             try {
                 const userData = localStorage.getItem('fatec-conecta-user');
                 if (userData) {
-                    setUser(JSON.parse(userData));
+                    const parsedUser = JSON.parse(userData);
+                    setUser(parsedUser);
                 }
             } catch (error) {
                 console.error('Error parsing user data:', error);

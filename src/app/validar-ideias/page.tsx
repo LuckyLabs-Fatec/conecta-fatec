@@ -146,7 +146,7 @@ const categoryConfig = {
 };
 
 export default function ValidateIdeasPage() {
-    const { user, canAccessIdeaValidation, canAssignToClasses } = useAuth();
+    const { user, isLoading, canAccessIdeaValidation, canAssignToClasses } = useAuth();
     const router = useRouter();
     const [ideas, setIdeas] = useState<IdeaSuggestion[]>([]);
     const [filteredIdeas, setFilteredIdeas] = useState<IdeaSuggestion[]>([]);
@@ -159,15 +159,17 @@ export default function ValidateIdeasPage() {
     });
 
     useEffect(() => {
-        if (!canAccessIdeaValidation()) {
-            router.push('/');
-            return;
+        if (!isLoading) {
+            if (!canAccessIdeaValidation()) {
+                router.push('/');
+                return;
+            }
+            
+            // Load ideas
+            setIdeas(mockIdeas);
+            setFilteredIdeas(mockIdeas);
         }
-        
-        // Load ideas
-        setIdeas(mockIdeas);
-        setFilteredIdeas(mockIdeas);
-    }, [canAccessIdeaValidation, router]);
+    }, [isLoading, user?.role, canAccessIdeaValidation, router]);
 
     useEffect(() => {
         let filtered = ideas;
@@ -528,6 +530,17 @@ export default function ValidateIdeasPage() {
             </div>
         );
     };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#CB2616] mx-auto mb-4"></div>
+                    <p className="text-gray-600">Carregando...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!canAccessIdeaValidation()) {
         return null;
