@@ -1,118 +1,62 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
 import { LoginAside } from "@/components/LoginAside"
 import { Input } from "@/components/Input"
 import { useAuth, UserRole } from "@/hooks/useAuth"
 import Link from "next/link";
+import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';
 
 export default function RegisterPage() {
     const router = useRouter();
     const { login } = useAuth();
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        password: '',
-        confirmPassword: '',
-        userType: 'comunidade' as UserRole,
-        department: '',
-        specialization: '',
-        agreeToTerms: false
-    });
     const [isLoading, setIsLoading] = useState(false);
 
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-    const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: e.target.value
-        }));
-
-        // Clear error when user starts typing
-        if (errors[field]) {
-            setErrors(prev => ({
-                ...prev,
-                [field]: ''
-            }));
+    const { register, handleSubmit, watch, formState: { errors } } = useForm({
+        resolver: zodResolver(registerSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            phone: '',
+            password: '',
+            confirmPassword: '',
+            userType: 'comunidade',
+            department: '',
+            specialization: '',
+            agreeToTerms: false
         }
-    };
+    });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const userType = watch('userType');
+
+    const onSubmit = async (data: RegisterSchema) => {
         setIsLoading(true);
-
-        const newErrors: { [key: string]: string } = {};
-
-        // Validation
-        if (!formData.name.trim()) {
-            newErrors.name = 'Nome completo é obrigatório';
-        }
-
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email é obrigatório';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email inválido';
-        }
-
-        if (!formData.password) {
-            newErrors.password = 'Senha é obrigatória';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'Senha deve ter pelo menos 8 caracteres';
-        }
-
-        if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Senhas não coincidem';
-        }
-
-        // Validate type-specific fields
-        if (formData.userType === 'coordenacao' && !formData.department.trim()) {
-            newErrors.department = 'Departamento é obrigatório para coordenação';
-        }
-
-        if (formData.userType === 'mediador' && !formData.specialization.trim()) {
-            newErrors.specialization = 'Especialização é obrigatória para mediadores';
-        }
-
-        if (!formData.agreeToTerms) {
-            newErrors.terms = 'Você deve aceitar os termos e condições';
-        }
-
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            setIsLoading(false);
-            return;
-        }
-
         try {
             // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Create user data
+            await new Promise(resolve => setTimeout(resolve, 1200));
+
             const userData = {
                 id: Date.now().toString(),
-                name: formData.name,
-                email: formData.email,
+                name: data.name,
+                email: data.email,
                 avatar: `https://doodleipsum.com/700/avatar?i=${Math.random()}`,
                 loginTime: new Date().toISOString(),
-                role: formData.userType,
-                ...(formData.userType === 'coordenacao' && { department: formData.department }),
-                ...(formData.userType === 'mediador' && { specialization: formData.specialization })
+                role: data.userType as UserRole,
+                ...(data.userType === 'coordenacao' && { department: data.department }),
+                ...(data.userType === 'mediador' && { specialization: data.specialization })
             };
 
-            // Use login from useAuth hook
             login(userData);
 
-            // Redirect based on user role
-            const redirectPath = formData.userType === 'mediador' || formData.userType === 'coordenacao' 
+            const redirectPath = data.userType === 'mediador' || data.userType === 'coordenacao' 
                 ? '/validar-ideias' 
                 : '/';
             router.push(redirectPath);
         } catch (error) {
             console.error('Erro ao criar conta:', error);
-            setErrors({ general: 'Erro ao criar conta. Tente novamente.' });
         } finally {
             setIsLoading(false);
         }
@@ -149,22 +93,14 @@ export default function RegisterPage() {
                             </div>
                         </header>
 
-                        {errors.general && (
-                            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                <p className="text-sm text-red-600">{errors.general}</p>
-                            </div>
-                        )}
-
-                        <Form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                        <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                             <div>
                                 <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mb-2">
                                     Tipo de Usuário *
                                 </label>
                                 <select
                                     id="userType"
-                                    name="userType"
-                                    value={formData.userType}
-                                    onChange={handleInputChange('userType')}
+                                    {...register('userType')}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                     required
                                 >
@@ -178,62 +114,53 @@ export default function RegisterPage() {
                                 label="Nome completo"
                                 id="name"
                                 type="text"
-                                name="name"
                                 placeholder="Digite seu nome completo"
                                 required={true}
-                                value={formData.name}
-                                onChange={handleInputChange('name')}
-                                error={errors.name}
+                                {...register('name')}
+                                error={errors.name?.message}
                             />
 
                             <Input
                                 label="Email"
                                 id="email"
                                 type="email"
-                                name="email"
                                 placeholder="Digite seu email"
                                 required={true}
-                                value={formData.email}
-                                onChange={handleInputChange('email')}
-                                error={errors.email}
+                                {...register('email')}
+                                error={errors.email?.message}
                             />
 
                             <Input
                                 label="Telefone"
                                 id="phone"
                                 type="tel"
-                                name="phone"
                                 placeholder="(11) 99999-9999"
-                                value={formData.phone}
-                                onChange={handleInputChange('phone')}
+                                {...register('phone')}
+                                error={errors.phone?.message}
                             />
 
-                            {formData.userType === 'coordenacao' && (
+                            {userType === 'coordenacao' && (
                                 <Input
                                     label="Departamento"
                                     id="department"
                                     type="text"
-                                    name="department"
                                     placeholder="Ex: Análise e Desenvolvimento de Sistemas"
                                     required={true}
-                                    value={formData.department}
-                                    onChange={handleInputChange('department')}
-                                    error={errors.department}
+                                    {...register('department')}
+                                    error={errors.department?.message}
                                     description="Informe o departamento que você representa"
                                 />
                             )}
 
-                            {formData.userType === 'mediador' && (
+                            {userType === 'mediador' && (
                                 <Input
                                     label="Especialização"
                                     id="specialization"
                                     type="text"
-                                    name="specialization"
                                     placeholder="Ex: Tecnologia e Inovação, Sustentabilidade"
                                     required={true}
-                                    value={formData.specialization}
-                                    onChange={handleInputChange('specialization')}
-                                    error={errors.specialization}
+                                    {...register('specialization')}
+                                    error={errors.specialization?.message}
                                     description="Informe sua área de especialização"
                                 />
                             )}
@@ -242,12 +169,10 @@ export default function RegisterPage() {
                                 label="Senha"
                                 id="password"
                                 type="password"
-                                name="password"
                                 placeholder="Digite sua senha"
                                 required={true}
-                                value={formData.password}
-                                onChange={handleInputChange('password')}
-                                error={errors.password}
+                                {...register('password')}
+                                error={errors.password?.message}
                                 description="Mínimo 8 caracteres"
                             />
 
@@ -255,33 +180,18 @@ export default function RegisterPage() {
                                 label="Confirmar senha"
                                 id="confirmPassword"
                                 type="password"
-                                name="confirmPassword"
                                 placeholder="Digite novamente sua senha"
                                 required={true}
-                                value={formData.confirmPassword}
-                                onChange={handleInputChange('confirmPassword')}
-                                error={errors.confirmPassword}
+                                {...register('confirmPassword')}
+                                error={errors.confirmPassword?.message}
                             />
 
                             <div className="space-y-4">
                                 <label className="flex items-start gap-3">
                                     <input
                                         type="checkbox"
-                                        checked={formData.agreeToTerms}
-                                        onChange={(e) => {
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                agreeToTerms: e.target.checked
-                                            }));
-                                            if (errors.terms) {
-                                                setErrors(prev => ({
-                                                    ...prev,
-                                                    terms: ''
-                                                }));
-                                            }
-                                        }}
+                                        {...register('agreeToTerms')}
                                         className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded mt-0.5"
-                                        required
                                     />
                                     <span className="text-sm text-gray-600 leading-relaxed">
                                         Eu aceito os{' '}
@@ -302,9 +212,9 @@ export default function RegisterPage() {
                                         </Link>
                                     </span>
                                 </label>
-                                {errors.terms && (
+                                {errors.agreeToTerms && (
                                     <p className="text-sm text-red-600" role="alert">
-                                        {errors.terms}
+                                        {errors.agreeToTerms.message}
                                     </p>
                                 )}
                             </div>

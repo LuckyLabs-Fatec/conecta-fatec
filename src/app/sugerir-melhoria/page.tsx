@@ -1,138 +1,56 @@
+
 'use client';
 import { useState } from 'react';
+import { useForm, type Resolver } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
 import { Header } from "@/components/Header"
-import { ImprovementDetailsStep } from "@/components/ImprovementDetailsStep"
-import { LocationStep } from "@/components/LocationStep"
-import { PriorityImpactStep } from "@/components/PriorityImpactStep"
-import { ContactInfoStep } from "@/components/ContactInfoStep"
+import { ImprovementDetailsStepAdapter } from '@/components/adapters/ImprovementDetailsStepAdapter'
+import { LocationStepAdapter } from '@/components/adapters/LocationStepAdapter'
+import { PriorityImpactStepAdapter } from '@/components/adapters/PriorityImpactStepAdapter'
+import { ContactInfoStepAdapter } from '@/components/adapters/ContactInfoStepAdapter'
 import { ChevronLeft, ChevronRight, Send } from "lucide-react";
-
-interface ImprovementFormData {
-    category: string;
-    title: string;
-    description: string;
-    location: {
-        address: string;
-        neighborhood: string;
-        city: string;
-        coordinates?: { lat: number; lng: number };
-    };
-    priority: 'baixa' | 'media' | 'alta' | 'urgente';
-    affectedPeople: string;
-    frequency: 'unica' | 'semanal' | 'diaria' | 'constante';
-    images: File[];
-    contactInfo: {
-        name: string;
-        email: string;
-        phone?: string;
-        allowContact: boolean;
-    };
-}
+import { suggestionSchema, SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
 
 export default function SuggestImprovementPage() {
     const [currentStep, setCurrentStep] = useState(1);
-    const [formData, setFormData] = useState<ImprovementFormData>({
-        category: '',
-        title: '',
-        description: '',
-        location: {
-            address: '',
-            neighborhood: '',
-            city: 'Votorantim'
-        },
-        priority: 'media',
-        affectedPeople: '',
-        frequency: 'unica',
-        images: [],
-        contactInfo: {
-            name: '',
-            email: '',
-            phone: '',
-            allowContact: true
+    const totalSteps = 4;
+
+    const { handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<SuggestionSchema>({
+        resolver: zodResolver(suggestionSchema) as Resolver<SuggestionSchema>,
+        defaultValues: {
+            category: '',
+            title: '',
+            description: '',
+            location: { address: '', neighborhood: '', city: 'Votorantim' },
+            priority: 'media',
+            affectedPeople: '',
+            frequency: 'unica',
+            images: [],
+            contactInfo: { name: '', email: '', phone: '', allowContact: true }
         }
     });
 
-    const [errors, setErrors] = useState<{[key: string]: string}>({});
-    const totalSteps = 4;
+    const watchAll = watch();
 
-    const handleInputChange = (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        if (subField) {
-            if (field === 'location') {
-                setFormData(prev => ({
-                    ...prev,
-                    location: {
-                        ...prev.location,
-                        [subField]: e.target.value
-                    }
-                }));
-            } else if (field === 'contactInfo') {
-                setFormData(prev => ({
-                    ...prev,
-                    contactInfo: {
-                        ...prev.contactInfo,
-                        [subField]: e.target.value
-                    }
-                }));
-            }
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [field]: e.target.value
-            }));
-        }
-        
-        // Clear errors
-        if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: '' }));
-        }
-    };
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files);
-            setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...files].slice(0, 5) // Max 5 images
-            }));
-        }
-    };
-
-    const removeImage = (index: number) => {
-        setFormData(prev => ({
-            ...prev,
-            images: prev.images.filter((_, i) => i !== index)
-        }));
-    };
-
-    const validateStep = (step: number): boolean => {
-        const newErrors: {[key: string]: string} = {};
-
+    const validateStep = async (step: number): Promise<boolean> => {
         switch (step) {
             case 1:
-                if (!formData.category) newErrors.category = 'Selecione uma categoria';
-                if (!formData.title.trim()) newErrors.title = 'Título é obrigatório';
-                if (!formData.description.trim()) newErrors.description = 'Descrição é obrigatória';
-                break;
+                return await trigger(['category', 'title', 'description']);
             case 2:
-                if (!formData.location.address.trim()) newErrors.address = 'Endereço é obrigatório';
-                if (!formData.location.neighborhood.trim()) newErrors.neighborhood = 'Bairro é obrigatório';
-                break;
+                return await trigger(['location.address', 'location.neighborhood']);
             case 3:
-                if (!formData.affectedPeople.trim()) newErrors.affectedPeople = 'Informe quantas pessoas serão beneficiadas';
-                break;
+                return await trigger(['affectedPeople']);
             case 4:
-                if (!formData.contactInfo.name.trim()) newErrors.name = 'Nome é obrigatório';
-                if (!formData.contactInfo.email.trim()) newErrors.email = 'Email é obrigatório';
-                break;
+                return await trigger(['contactInfo.name', 'contactInfo.email']);
+            default:
+                return true;
         }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
-    const nextStep = () => {
-        if (validateStep(currentStep)) {
+    const nextStep = async () => {
+        const ok = await validateStep(currentStep);
+        if (ok) {
             setCurrentStep(prev => Math.min(prev + 1, totalSteps));
         }
     };
@@ -141,12 +59,21 @@ export default function SuggestImprovementPage() {
         setCurrentStep(prev => Math.max(prev - 1, 1));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (validateStep(currentStep)) {
-            console.log('Submitting improvement suggestion:', formData);
-            // Here you would submit to your backend
-        }
+    const onSubmit = (data: SuggestionSchema) => {
+        console.log('Submitting improvement suggestion:', data);
+        // Here you would submit to your backend
+    };
+
+    const handleImageUpload = (files: FileList | null) => {
+        if (!files) return;
+        const arr: File[] = Array.from(files).slice(0, 5);
+        setValue('images', arr, { shouldValidate: true });
+    };
+
+    const removeImage = (index: number) => {
+        const current: File[] = (watchAll.images as unknown as File[]) || [];
+        const next: File[] = current.filter((_, i) => i !== index);
+        setValue('images', next, { shouldValidate: true });
     };
 
     const ProgressBar = () => (
@@ -184,31 +111,31 @@ export default function SuggestImprovementPage() {
 
                         <ProgressBar />
 
-                        <Form onSubmit={handleSubmit} className="space-y-6">
+                        <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             {/* Step 1: Improvement Details */}
                             {currentStep === 1 && (
                                 <div className="space-y-6" role="group" aria-labelledby="improvement-details-heading">
                                     <h2 id="improvement-details-heading" className="text-xl font-semibold text-gray-800 mb-4">
                                         Detalhes da Sua Ideia
                                     </h2>
-                                    <ImprovementDetailsStep
-                                        formData={{
-                                            category: formData.category,
-                                            title: formData.title,
-                                            description: formData.description,
+                                    <ImprovementDetailsStepAdapter
+                                        setValue={setValue}
+                                        values={{
+                                            category: watchAll.category,
+                                            title: watchAll.title,
+                                            description: watchAll.description,
                                         }}
                                         errors={errors}
-                                        onChange={handleInputChange}
                                     />
                                 </div>
                             )}
 
                             {/* Step 2: Location */}
                             {currentStep === 2 && (
-                                <LocationStep
-                                    formData={{ location: formData.location }}
+                                <LocationStepAdapter
+                                    setValue={setValue}
+                                    values={{ location: watchAll.location }}
                                     errors={errors}
-                                    onChange={handleInputChange}
                                 />
                             )}
 
@@ -218,15 +145,15 @@ export default function SuggestImprovementPage() {
                                     <h2 id="impact-priority-heading" className="text-xl font-semibold text-gray-800 mb-4">
                                         Impacto e Benefícios
                                     </h2>
-                                    <PriorityImpactStep
-                                        formData={{
-                                            priority: formData.priority,
-                                            affectedPeople: formData.affectedPeople,
-                                            frequency: formData.frequency,
-                                            images: formData.images,
+                                    <PriorityImpactStepAdapter
+                                        setValue={setValue}
+                                        values={{
+                                            priority: watchAll.priority,
+                                            affectedPeople: watchAll.affectedPeople,
+                                            frequency: watchAll.frequency,
+                                            images: watchAll.images,
                                         }}
                                         errors={errors}
-                                        onChange={handleInputChange}
                                         onImageUpload={handleImageUpload}
                                         onRemoveImage={removeImage}
                                     />
@@ -235,17 +162,10 @@ export default function SuggestImprovementPage() {
 
                             {/* Step 4: Contact Information */}
                             {currentStep === 4 && (
-                                <ContactInfoStep
-                                    formData={{ contactInfo: formData.contactInfo }}
+                                <ContactInfoStepAdapter
+                                    setValue={setValue}
+                                    values={{ contactInfo: watchAll.contactInfo }}
                                     errors={errors}
-                                    onChange={handleInputChange}
-                                    onAllowContactChange={(checked) => setFormData(prev => ({
-                                        ...prev,
-                                        contactInfo: {
-                                            ...prev.contactInfo,
-                                            allowContact: checked
-                                        }
-                                    }))}
                                 />
                             )}
 
