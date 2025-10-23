@@ -35,115 +35,8 @@ interface Project {
     }>;
 }
 
-// Mock data for demonstration
-const mockProjects: Project[] = [
-    {
-        id: '1',
-        title: 'Aplicativo para Coleta Seletiva',
-        description: 'Desenvolvimento de aplicativo mobile para facilitar a coleta seletiva no bairro, com mapeamento de pontos de coleta e agendamento.',
-        category: 'ambiente',
-        location: {
-            address: 'Rua das Flores, 123',
-            neighborhood: 'Centro',
-            city: 'Votorantim'
-        },
-        status: 'em_desenvolvimento',
-        priority: 'alta',
-        student: {
-            name: 'Ana Silva',
-            course: 'Análise e Desenvolvimento de Sistemas',
-            semester: '4º semestre'
-        },
-        startDate: '2024-03-15',
-        expectedEndDate: '2024-07-15',
-        progress: 65,
-        affectedPeople: 'Aproximadamente 500 famílias do bairro Centro',
-        images: [
-            'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop',
-            'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=300&h=200&fit=crop'
-        ],
-        updates: [
-            {
-                id: '1',
-                date: '2024-06-01',
-                message: 'Concluído o desenvolvimento da interface principal do aplicativo',
-                author: 'Ana Silva'
-            },
-            {
-                id: '2',
-                date: '2024-05-15',
-                message: 'Mapeamento de pontos de coleta finalizado',
-                author: 'Ana Silva'
-            }
-        ]
-    },
-    {
-        id: '2',
-        title: 'Sistema de Monitoramento de Iluminação Pública',
-        description: 'Criação de sistema IoT para monitoramento automático de falhas na iluminação pública com notificações em tempo real.',
-        category: 'infraestrutura',
-        location: {
-            address: 'Av. Principal',
-            neighborhood: 'Vila Nova',
-            city: 'Votorantim'
-        },
-        status: 'testando',
-        priority: 'media',
-        student: {
-            name: 'Carlos Oliveira',
-            course: 'Sistemas Embarcados',
-            semester: '6º semestre'
-        },
-        startDate: '2024-02-01',
-        expectedEndDate: '2024-08-01',
-        progress: 85,
-        affectedPeople: 'Todos os moradores da Vila Nova (cerca de 1.200 pessoas)',
-        images: [
-            'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=300&h=200&fit=crop'
-        ],
-        updates: [
-            {
-                id: '1',
-                date: '2024-06-10',
-                message: 'Iniciados os testes de campo com sensores instalados',
-                author: 'Carlos Oliveira'
-            }
-        ]
-    },
-    {
-        id: '3',
-        title: 'Plataforma de Carona Solidária',
-        description: 'Desenvolvimento de plataforma web para conectar pessoas da comunidade que oferecem e precisam de carona.',
-        category: 'transporte',
-        location: {
-            address: 'Toda a cidade',
-            neighborhood: 'Todos os bairros',
-            city: 'Votorantim'
-        },
-        status: 'concluido',
-        priority: 'media',
-        student: {
-            name: 'Marina Santos',
-            course: 'Análise e Desenvolvimento de Sistemas',
-            semester: '5º semestre'
-        },
-        startDate: '2024-01-10',
-        expectedEndDate: '2024-05-10',
-        progress: 100,
-        affectedPeople: 'Potencialmente toda a população de Votorantim',
-        images: [
-            'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300&h=200&fit=crop'
-        ],
-        updates: [
-            {
-                id: '1',
-                date: '2024-05-10',
-                message: 'Projeto concluído e disponibilizado para a comunidade!',
-                author: 'Marina Santos'
-            }
-        ]
-    }
-];
+// Base da API mockada
+const API_BASE = '/api/projetos';
 
 const statusConfig = {
     em_analise: { label: 'Em Análise', color: 'bg-gray-100 text-gray-800', dotColor: 'bg-gray-400' },
@@ -173,7 +66,6 @@ const categoryConfig = {
 
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<Project[]>([]);
-    const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [filters, setFilters] = useState({
         status: '',
@@ -181,35 +73,45 @@ export default function ProjectsPage() {
         priority: '',
         search: ''
     });
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(6);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Simulate loading projects
-        setProjects(mockProjects);
-        setFilteredProjects(mockProjects);
-    }, []);
+        const controller = new AbortController();
+        const fetchProjects = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const params = new URLSearchParams({
+                    page: String(page),
+                    pageSize: String(pageSize),
+                });
+                if (filters.status) params.set('status', filters.status);
+                if (filters.category) params.set('category', filters.category);
+                if (filters.priority) params.set('priority', filters.priority);
+                if (filters.search) params.set('search', filters.search);
 
-    useEffect(() => {
-        let filtered = projects;
-
-        if (filters.status) {
-            filtered = filtered.filter(p => p.status === filters.status);
-        }
-        if (filters.category) {
-            filtered = filtered.filter(p => p.category === filters.category);
-        }
-        if (filters.priority) {
-            filtered = filtered.filter(p => p.priority === filters.priority);
-        }
-        if (filters.search) {
-            filtered = filtered.filter(p => 
-                p.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                p.description.toLowerCase().includes(filters.search.toLowerCase()) ||
-                p.student.name.toLowerCase().includes(filters.search.toLowerCase())
-            );
-        }
-
-        setFilteredProjects(filtered);
-    }, [projects, filters]);
+                const res = await fetch(`${API_BASE}?${params.toString()}`, { signal: controller.signal });
+                if (!res.ok) throw new Error('Falha ao carregar projetos');
+                const data = await res.json();
+                setProjects(data.data as Project[]);
+                setTotal(data.total as number);
+                setTotalPages(data.totalPages as number);
+            } catch (e: unknown) {
+                if (e instanceof DOMException && e.name === 'AbortError') return;
+                const message = e instanceof Error ? e.message : 'Erro ao buscar projetos';
+                setError(message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProjects();
+        return () => controller.abort();
+    }, [page, pageSize, filters]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('pt-BR');
@@ -401,7 +303,7 @@ export default function ProjectsPage() {
                                     type="text"
                                     placeholder="Buscar por projeto, estudante..."
                                     value={filters.search}
-                                    onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, search: e.target.value })); }}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 />
                             </div>
@@ -414,7 +316,7 @@ export default function ProjectsPage() {
                                 <select
                                     id="status-select"
                                     value={filters.status}
-                                    onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, status: e.target.value })); }}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 >
                                     <option value="">Todos os status</option>
@@ -429,7 +331,7 @@ export default function ProjectsPage() {
                                 <select
                                     id="category-select"
                                     value={filters.category}
-                                    onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, category: e.target.value })); }}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 >
                                     <option value="">Todas as categorias</option>
@@ -444,7 +346,7 @@ export default function ProjectsPage() {
                                 <select
                                     id="priority-select"
                                     value={filters.priority}
-                                    onChange={(e) => setFilters(prev => ({ ...prev, priority: e.target.value }))}
+                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, priority: e.target.value })); }}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 >
                                     <option value="">Todas as prioridades</option>
@@ -457,10 +359,10 @@ export default function ProjectsPage() {
 
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">
-                                {filteredProjects.length} projeto(s) encontrado(s)
+                                {total} projeto(s) encontrado(s)
                             </span>
                             <button
-                                onClick={() => setFilters({ status: '', category: '', priority: '', search: '' })}
+                                onClick={() => { setPage(1); setFilters({ status: '', category: '', priority: '', search: '' }); }}
                                 className="text-sm text-[#CB2616] hover:text-red-700 font-medium"
                             >
                                 Limpar filtros
@@ -469,12 +371,54 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Projects Grid */}
-                    {filteredProjects.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredProjects.map(project => (
-                                <ProjectCard key={project.id} project={project} />
-                            ))}
-                        </div>
+                    {loading ? (
+                        <div className="text-center py-12 text-gray-500">Carregando projetos...</div>
+                    ) : error ? (
+                        <div className="text-center py-12 text-red-600">{error}</div>
+                    ) : projects.length > 0 ? (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {projects.map(project => (
+                                    <ProjectCard key={project.id} project={project} />
+                                ))}
+                            </div>
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between mt-6">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            disabled={page === 1}
+                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                            className="px-3 py-2 border rounded-lg text-sm disabled:opacity-50"
+                                        >
+                                            Anterior
+                                        </button>
+                                        <span className="text-sm text-gray-600">
+                                            Página {page} de {totalPages}
+                                        </span>
+                                        <button
+                                            disabled={page === totalPages}
+                                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                            className="px-3 py-2 border rounded-lg text-sm disabled:opacity-50"
+                                        >
+                                            Próxima
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-sm">
+                                        <span>Itens por página</span>
+                                        <select
+                                            value={pageSize}
+                                            onChange={(e) => { setPage(1); setPageSize(Number(e.target.value)); }}
+                                            className="px-2 py-1 border rounded-lg"
+                                        >
+                                            {[6, 9, 12, 24].map(size => (
+                                                <option key={size} value={size}>{size}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <div className="text-center py-12">
                             <div className="text-gray-400 mb-4">
