@@ -6,6 +6,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, User, AlertCircle, CheckCircle, XCircle, Eye, Filter, Search, Users, BookOpen } from "lucide-react";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { reviewSchema, type ReviewSchema } from "@/domain/ideas/schemas/review.schema";
 
 interface IdeaSuggestion {
     id: string;
@@ -18,7 +21,7 @@ interface IdeaSuggestion {
         city: string;
     };
     priority: 'baixa' | 'media' | 'alta' | 'urgente';
-    status: 'pendente' | 'aprovada' | 'rejeitada' | 'em_analise' | 'atribuida';
+    status: 'pendente' | 'aprovada' | 'rejeitada' | 'em_analise' | 'atribuida' | 'aguardando_info';
     submittedBy: {
         name: string;
         email: string;
@@ -122,6 +125,7 @@ const mockIdeas: IdeaSuggestion[] = [
 const statusConfig = {
     pendente: { label: 'Pendente', color: 'bg-gray-100 text-gray-800', icon: AlertCircle },
     em_analise: { label: 'Em Análise', color: 'bg-blue-100 text-blue-800', icon: Eye },
+    aguardando_info: { label: 'Aguardando Info', color: 'bg-yellow-100 text-yellow-800', icon: AlertCircle },
     aprovada: { label: 'Aprovada', color: 'bg-green-100 text-green-800', icon: CheckCircle },
     rejeitada: { label: 'Rejeitada', color: 'bg-red-100 text-red-800', icon: XCircle },
     atribuida: { label: 'Atribuída', color: 'bg-purple-100 text-purple-800', icon: BookOpen },
@@ -283,24 +287,35 @@ export default function ValidateIdeasPage() {
     };
 
     const IdeaModal = ({ idea, onClose }: { idea: IdeaSuggestion; onClose: () => void }) => {
-        const [action, setAction] = useState<'approve' | 'reject' | 'assign' | null>(null);
-        const [notes, setNotes] = useState('');
+        const [action, setAction] = useState<'approve' | 'reject' | 'assign' | 'request_info' | null>(null);
+        const reviewForm = useForm<ReviewSchema>({
+            resolver: zodResolver(reviewSchema),
+            defaultValues: { action: 'approve', message: '' },
+            mode: 'onChange',
+        });
         const [assignmentData, setAssignmentData] = useState({
             class: '',
             semester: '',
             course: '',
             professor: ''
         });
-
-        const handleSubmit = () => {
-            if (action === 'assign' && canAssignToClasses()) {
-                handleClassAssignment(idea.id, assignmentData);
-            } else if (action === 'approve') {
-                handleStatusChange(idea.id, 'aprovada', notes);
-            } else if (action === 'reject') {
-                handleStatusChange(idea.id, 'rejeitada', notes);
+        
+        // Reset form when action changes
+        useEffect(() => {
+            if (action === 'approve' || action === 'reject' || action === 'request_info') {
+                reviewForm.reset({ action, message: '' });
             }
-        };
+        }, [action, reviewForm]);
+
+        const submitReview = reviewForm.handleSubmit((values) => {
+            if (values.action === 'approve') {
+                handleStatusChange(idea.id, 'aprovada', values.message);
+            } else if (values.action === 'reject') {
+                handleStatusChange(idea.id, 'rejeitada', values.message);
+            } else if (values.action === 'request_info') {
+                handleStatusChange(idea.id, 'aguardando_info', values.message);
+            }
+        });
 
         return (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -424,6 +439,12 @@ export default function ValidateIdeasPage() {
                                             variant="secondary"
                                             size="medium"
                                         />
+                                        <Button
+                                            label="Solicitar Informações"
+                                            onClick={() => setAction('request_info')}
+                                            variant="secondary"
+                                            size="medium"
+                                        />
                                         {canAssignToClasses() && idea.status === 'aprovada' && (
                                             <Button
                                                 label="Atribuir à Turma"
@@ -435,24 +456,30 @@ export default function ValidateIdeasPage() {
                                     </div>
                                 )}
 
-                                {(action === 'approve' || action === 'reject') && (
+                                {(action === 'approve' || action === 'reject' || action === 'request_info') && (
                                     <div className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                {action === 'approve' ? 'Notas de Aprovação' : 'Motivo da Rejeição'}
+                                                {action === 'approve'
+                                                    ? 'Notas de Aprovação'
+                                                    : action === 'reject'
+                                                    ? 'Motivo da Rejeição'
+                                                    : 'Solicitação de Informações'}
                                             </label>
                                             <textarea
-                                                value={notes}
-                                                onChange={(e) => setNotes(e.target.value)}
+                                                {...reviewForm.register('message')}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                                 rows={4}
-                                                placeholder={action === 'approve' ? 'Adicione observações sobre a aprovação...' : 'Explique o motivo da rejeição...'}
+                                                placeholder={action === 'approve' ? 'Adicione observações sobre a aprovação...' : action === 'reject' ? 'Explique o motivo da rejeição...' : 'Descreva quais informações complementares são necessárias...'}
                                             />
+                                            {reviewForm.formState.errors.message && (
+                                                <p className="mt-1 text-xs text-red-600">{reviewForm.formState.errors.message.message}</p>
+                                            )}
                                         </div>
                                         <div className="flex gap-3">
                                             <Button
-                                                label={action === 'approve' ? 'Confirmar Aprovação' : 'Confirmar Rejeição'}
-                                                onClick={handleSubmit}
+                                                label={action === 'approve' ? 'Confirmar Aprovação' : action === 'reject' ? 'Confirmar Rejeição' : 'Solicitar Informações'}
+                                                onClick={submitReview}
                                                 variant="primary"
                                                 size="medium"
                                             />
@@ -510,7 +537,7 @@ export default function ValidateIdeasPage() {
                                         <div className="flex gap-3">
                                             <Button
                                                 label="Atribuir à Turma"
-                                                onClick={handleSubmit}
+                                                onClick={() => handleClassAssignment(idea.id, assignmentData)}
                                                 variant="primary"
                                                 size="medium"
                                             />
