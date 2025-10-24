@@ -4,6 +4,11 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/Button";
 import { Calendar, MapPin, Users, Eye, Filter, Search } from "lucide-react";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { projectsFiltersSchema, type ProjectsFiltersFormValues } from "@/domain/projects/schemas/filters.schema";
+import { usePagination } from "@/hooks/usePagination";
+import { Pagination } from "@/components/Pagination";
 
 interface Project {
     id: string;
@@ -67,16 +72,21 @@ const categoryConfig = {
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-    const [filters, setFilters] = useState({
-        status: '',
-        category: '',
-        priority: '',
-        search: ''
+    const form = useForm<ProjectsFiltersFormValues>({
+        resolver: zodResolver(projectsFiltersSchema),
+        defaultValues: { status: '', category: '', priority: '', search: '' },
+        mode: 'onChange',
     });
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(6);
-    const [total, setTotal] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+    const filters = form.watch();
+    const {
+        page,
+        setPage,
+        pageSize,
+        setPageSize,
+        total,
+        totalPages,
+        setTotals,
+    } = usePagination({ initialPage: 1, initialPageSize: 6, pageSizeOptions: [6, 9, 12, 24] });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -99,8 +109,7 @@ export default function ProjectsPage() {
                 if (!res.ok) throw new Error('Falha ao carregar projetos');
                 const data = await res.json();
                 setProjects(data.data as Project[]);
-                setTotal(data.total as number);
-                setTotalPages(data.totalPages as number);
+                setTotals(Number(data.total), Number(data.totalPages));
             } catch (e: unknown) {
                 if (e instanceof DOMException && e.name === 'AbortError') return;
                 const message = e instanceof Error ? e.message : 'Erro ao buscar projetos';
@@ -111,7 +120,7 @@ export default function ProjectsPage() {
         };
         fetchProjects();
         return () => controller.abort();
-    }, [page, pageSize, filters]);
+    }, [page, pageSize, filters.status, filters.category, filters.priority, filters.search, setTotals]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('pt-BR');
@@ -302,10 +311,12 @@ export default function ProjectsPage() {
                                     id="search-input"
                                     type="text"
                                     placeholder="Buscar por projeto, estudante..."
-                                    value={filters.search}
-                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, search: e.target.value })); }}
+                                    {...form.register('search', { onChange: () => setPage(1) })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 />
+                                {form.formState.errors.search && (
+                                    <p className="mt-1 text-xs text-red-600">{form.formState.errors.search.message}</p>
+                                )}
                             </div>
 
                             <div>
@@ -315,8 +326,7 @@ export default function ProjectsPage() {
                                 </label>
                                 <select
                                     id="status-select"
-                                    value={filters.status}
-                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, status: e.target.value })); }}
+                                    {...form.register('status', { onChange: () => setPage(1) })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 >
                                     <option value="">Todos os status</option>
@@ -330,8 +340,7 @@ export default function ProjectsPage() {
                                 <label htmlFor="category-select" className="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
                                 <select
                                     id="category-select"
-                                    value={filters.category}
-                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, category: e.target.value })); }}
+                                    {...form.register('category', { onChange: () => setPage(1) })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 >
                                     <option value="">Todas as categorias</option>
@@ -345,8 +354,7 @@ export default function ProjectsPage() {
                                 <label htmlFor="priority-select" className="block text-sm font-medium text-gray-700 mb-2">Prioridade</label>
                                 <select
                                     id="priority-select"
-                                    value={filters.priority}
-                                    onChange={(e) => { setPage(1); setFilters(prev => ({ ...prev, priority: e.target.value })); }}
+                                    {...form.register('priority', { onChange: () => setPage(1) })}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                 >
                                     <option value="">Todas as prioridades</option>
@@ -362,7 +370,7 @@ export default function ProjectsPage() {
                                 {total} projeto(s) encontrado(s)
                             </span>
                             <button
-                                onClick={() => { setPage(1); setFilters({ status: '', category: '', priority: '', search: '' }); }}
+                                onClick={() => { setPage(1); form.reset(); }}
                                 className="text-sm text-[#CB2616] hover:text-red-700 font-medium"
                             >
                                 Limpar filtros
@@ -384,39 +392,15 @@ export default function ProjectsPage() {
                             </div>
                             {/* Pagination */}
                             {totalPages > 1 && (
-                                <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between mt-6">
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            disabled={page === 1}
-                                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                                            className="px-3 py-2 border rounded-lg text-sm disabled:opacity-50"
-                                        >
-                                            Anterior
-                                        </button>
-                                        <span className="text-sm text-gray-600">
-                                            Página {page} de {totalPages}
-                                        </span>
-                                        <button
-                                            disabled={page === totalPages}
-                                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                            className="px-3 py-2 border rounded-lg text-sm disabled:opacity-50"
-                                        >
-                                            Próxima
-                                        </button>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <span>Itens por página</span>
-                                        <select
-                                            value={pageSize}
-                                            onChange={(e) => { setPage(1); setPageSize(Number(e.target.value)); }}
-                                            className="px-2 py-1 border rounded-lg"
-                                        >
-                                            {[6, 9, 12, 24].map(size => (
-                                                <option key={size} value={size}>{size}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
+                                <Pagination
+                                    className="mt-6"
+                                    page={page}
+                                    totalPages={totalPages}
+                                    pageSize={pageSize}
+                                    onPageChange={(p) => setPage(p)}
+                                    onPageSizeChange={(s) => setPageSize(s)}
+                                    pageSizeOptions={[6, 9, 12, 24]}
+                                />
                             )}
                         </>
                     ) : (
