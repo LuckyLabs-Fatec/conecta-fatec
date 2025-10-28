@@ -7,17 +7,17 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function LandingPage() {
   const { user, canSuggestIdeas, canAccessIdeaValidation } = useAuth();
-
+  
   return (
     <>
       <Header />
       <main>
-        <section
+        <section 
           className="relative flex flex-col items-center justify-center text-center p-8 gap-6 min-h-[500px] bg-black"
           aria-labelledby="hero-title"
           role="banner"
         >
-          <div
+          <div 
             className="absolute inset-0 bg-cover bg-center opacity-50"
             style={{
               backgroundImage: "url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')"
@@ -30,17 +30,17 @@ export default function LandingPage() {
           <div className="relative z-10 flex flex-col items-center gap-6 max-w-4xl mx-auto">
             <h1 id="hero-title" className="text-white text-4xl font-bold">Fatec Conecta</h1>
             <p className="text-white text-xl">
-              Transforme os desafios da sua comunidade em projetos estudantis inovadores.
+              Transforme os desafios da sua comunidade em projetos estudantis inovadores. 
               Conectamos problemas reais com soluções acadêmicas desenvolvidas pelos alunos da Fatec Votorantim.
             </p>
             <nav className="flex gap-4 flex-wrap justify-center" aria-label="Ações principais">
               {canSuggestIdeas() && (
                 <>
-                  <Link href="/simple-form">
-                    <Button
-                      label="Sugira uma ideia de melhoria"
-                      onClick={() => { }}
-                      variant="primary"
+                  <Link href="/sugerir-melhoria">
+                    <Button 
+                      label="Sugira uma ideia de melhoria" 
+                      onClick={() => {}} 
+                      variant="primary" 
                       size="large"
                       aria-describedby="sugira-ideia-desc"
                     />
@@ -53,10 +53,10 @@ export default function LandingPage() {
               {canAccessIdeaValidation() && (
                 <>
                   <Link href="/validar-ideias">
-                    <Button
-                      label="Validar Ideias"
-                      onClick={() => { }}
-                      variant="primary"
+                    <Button 
+                      label="Validar Ideias" 
+                      onClick={() => {}} 
+                      variant="primary" 
                       size="large"
                       aria-describedby="validar-ideias-desc"
                     />
@@ -68,11 +68,11 @@ export default function LandingPage() {
               )}
               {!user && (
                 <>
-                  <Link href="/simple-form">
-                    <Button
-                      label="Sugira uma ideia de melhoria"
-                      onClick={() => { }}
-                      variant="primary"
+                  <Link href="/sugerir-melhoria">
+                    <Button 
+                      label="Sugira uma ideia de melhoria" 
+                      onClick={() => {}} 
+                      variant="primary" 
                       size="large"
                       aria-describedby="sugira-ideia-desc-guest"
                     />
@@ -82,21 +82,12 @@ export default function LandingPage() {
                   </span>
                 </>
               )}
-              <Button
-                label="Conheça o projeto"
-                onClick={() => { }}
-                variant="secondary"
-                size="large"
-                aria-describedby="conheca-projeto-desc"
-              />
-              <span id="conheca-projeto-desc" className="sr-only">
-                Saiba mais sobre os objetivos e funcionamento do Fatec Conecta
-              </span>
+              
             </nav>
           </div>
         </section>
-
-        <section
+        
+        <section 
           className="flex flex-col items-center bg-gray-100 text-center p-8 gap-6"
           aria-labelledby="mission-title"
         >
@@ -104,12 +95,12 @@ export default function LandingPage() {
           <p className="text-gray-500 text-xl max-w-4xl">
             Com investimento da Lucky Labs, o Fatec Conecta cria um espaço colaborativo onde a comunidade pode expor desafios cotidianos, e estudantes da Fatec Votorantim desenvolvem soluções inovadoras. Contribuímos para os Objetivos de Desenvolvimento Sustentável da ONU: ODS-16 (Paz, Justiça e Instituições Eficazes) e ODS-17 (Parcerias e Meios de Implementação).
           </p>
-          <div
+          <div 
             className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"
             role="list"
             aria-label="Objetivos de Desenvolvimento Sustentável da ONU"
           >
-            <article
+            <article 
               className="bg-white p-4 rounded-lg shadow-md"
               role="listitem"
               aria-labelledby="ods-16-title"
@@ -119,7 +110,7 @@ export default function LandingPage() {
                 Paz, Justiça e Instituições Eficazes
               </p>
             </article>
-            <article
+            <article 
               className="bg-white p-4 rounded-lg shadow-md"
               role="listitem"
               aria-labelledby="ods-17-title"
@@ -130,11 +121,11 @@ export default function LandingPage() {
               </p>
             </article>
           </div>
-          <Link href="/simple-form">
-            <Button
-              label="Sugira uma ideia de melhoria"
-              onClick={() => { }}
-              variant="primary"
+          <Link href="/sugerir-melhoria">
+            <Button 
+              label="Sugira uma ideia de melhoria" 
+              onClick={() => {}} 
+              variant="primary" 
               size="large"
               aria-describedby="mission-cta-desc"
             />
@@ -144,46 +135,57 @@ export default function LandingPage() {
           </span>
         </section>
 
-        <section
-          className="flex flex-col items-center bg-[#313131] text-center p-8 gap-6"
+        <section 
+          className="flex flex-col items-center bg-neutral-900 text-center p-10 gap-8"
           aria-labelledby="how-it-works-title"
         >
-          <h2 id="how-it-works-title" className="text-white text-2xl font-bold">Como Funciona</h2>
-          <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl"
-            role="list"
-            aria-label="Processo de funcionamento do Fatec Conecta"
+          <h2 id="how-it-works-title" className="text-neutral-50 text-2xl font-bold">Como Funciona</h2>
+          <ol 
+            className="relative w-full max-w-4xl text-left border-l border-neutral-700 pl-6 md:pl-10 space-y-10 md:space-y-12"
+            aria-label="Linha do tempo do processo Fatec Conecta"
           >
-            <div role="listitem">
-              <Step
-                icon={<Lightbulb size={32} color="#DA3115" aria-hidden="true" />}
-                title="Sugira Melhorias"
-                description="A comunidade compartilha ideias de melhorias e desafios cotidianos em nossa plataforma."
-              />
-            </div>
-            <div role="listitem">
-              <Step
-                icon={<CheckCircle size={32} color="#DA3115" aria-hidden="true" />}
-                title="Análise Acadêmica"
-                description="Estudantes da Fatec Votorantim analisam as sugestões e identificam oportunidades de projetos."
-              />
-            </div>
-            <div role="listitem">
-              <Step
-                icon={<Code size={32} color="#DA3115" aria-hidden="true" />}
-                title="Desenvolvimento de Soluções"
-                description="Alunos desenvolvem projetos estudantis inovadores para implementar as melhorias sugeridas."
-              />
-            </div>
-          </div>
+            <li className="relative">
+              <header className="flex items-center gap-3 text-neutral-200">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-[#DA3115] text-neutral-50 shadow-sm">
+                  <ClipboardList size={18} className="text-neutral-50" aria-hidden="true" />
+                </span>
+                <h3 className="font-semibold text-neutral-100">Sugestão da Comunidade</h3>
+              </header>
+              <p className="mt-2 text-neutral-300 leading-relaxed">
+                Cidadãos e organizações locais enviam ideias de melhoria e relatam desafios reais da cidade.
+              </p>
+            </li>
+            <li className="relative">
+              <header className="flex items-center gap-3 text-neutral-200">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-[#DA3115] text-neutral-50 shadow-sm">
+                  <Library size={18} className="text-neutral-50" aria-hidden="true" />
+                </span>
+                <h3 className="font-semibold text-neutral-100">Análise Acadêmica</h3>
+              </header>
+              <p className="mt-2 text-neutral-300 leading-relaxed">
+                Mediação e coordenação analisam e priorizam as sugestões. As turmas transformam as ideias em escopo de projeto.
+              </p>
+            </li>
+            <li className="relative">
+              <header className="flex items-center gap-3 text-neutral-200">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-[#DA3115] text-neutral-50 shadow-sm">
+                  <Hammer size={18} className="text-neutral-50" aria-hidden="true" />
+                </span>
+                <h3 className="font-semibold text-neutral-100">Desenvolvimento de Soluções</h3>
+              </header>
+              <p className="mt-2 text-neutral-300 leading-relaxed">
+                Estudantes desenvolvem protótipos e soluções aplicadas, acompanhando resultados e impacto na comunidade.
+              </p>
+            </li>
+          </ol>
           <div className="mt-8">
             <p className="text-neutral-200 text-lg mb-4">
               Acompanhe o progresso dos projetos em desenvolvimento e veja como suas ideias se transformam em soluções reais.
             </p>
             <Link href="/acompanhar-projetos">
-              <Button
-                label="Acompanhar Projetos"
-                onClick={() => { }}
+              <Button 
+                label="Acompanhar Projetos" 
+                onClick={() => {}} 
                 variant="secondary"
                 size="large"
                 aria-describedby="track-projects-desc"
@@ -195,7 +197,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section
+        <section 
           className="flex flex-col items-center bg-gray-100 text-center p-8 gap-6"
           aria-labelledby="cta-title"
         >
@@ -203,11 +205,11 @@ export default function LandingPage() {
           <p className="text-gray-500 text-xl max-w-3xl">
             Sua voz importa! Compartilhe suas ideias de melhoria para a comunidade e ajude os estudantes da Fatec a criar soluções que fazem a diferença. Juntos, construímos uma sociedade mais justa e eficaz.
           </p>
-          <Link href="/simple-form">
-            <Button
-              label="Sugira uma Ideia de Melhoria"
-              onClick={() => { }}
-              variant="primary"
+          <Link href="/sugerir-melhoria">
+            <Button 
+              label="Sugira uma Ideia de Melhoria" 
+              onClick={() => {}} 
+              variant="primary" 
               size="large"
               aria-describedby="final-cta-desc"
             />
@@ -217,8 +219,8 @@ export default function LandingPage() {
           </span>
         </section>
       </main>
-
-      <footer
+      
+      <footer 
         className="bg-gray-800 text-white text-center p-4"
         role="contentinfo"
         aria-label="Informações do rodapé"
