@@ -9,8 +9,9 @@ import { Input } from "@/components/Input"
 import Link from "next/link";
 import { useAuth, UserRole } from "@/hooks/useAuth";
 import { loginSchema, LoginSchema } from '@/domain/auth/schemas/login.schema';
+import { loginUser, mapBackendRoleToUserType } from '@/domain/auth/api';
 
-export default function LoginPage () {
+export default function LoginPage() {
     const router = useRouter();
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
@@ -31,24 +32,22 @@ export default function LoginPage () {
     const onSubmit = async (data: LoginSchema) => {
         setIsLoading(true);
         try {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 800));
+            const res = await loginUser({ email: data.email, password: data.password });
+            const role: UserRole = mapBackendRoleToUserType(res.user.perfil);
 
             const userData = {
-                id: '1',
-                name: data.email.split('@')[0].charAt(0).toUpperCase() + data.email.split('@')[0].slice(1),
-                email: data.email,
+                id: String(res.user.id_usuario),
+                name: res.user.nome,
+                email: res.user.email,
                 avatar: `https://doodleipsum.com/700/avatar?i=fd7c77f6b306c724bb34cc62124ff04e`,
                 loginTime: new Date().toISOString(),
-                role: data.userType as UserRole,
-                ...(data.userType === 'coordenacao' && { department: 'Análise e Desenvolvimento de Sistemas' }),
-                ...(data.userType === 'mediador' && { specialization: 'Tecnologia e Inovação' })
-            };
+                role
+            } as const;
 
             login(userData);
 
-            const redirectPath = data.userType === 'mediador' || data.userType === 'coordenacao' 
-                ? '/validar-ideias' 
+            const redirectPath = role === 'mediador' || role === 'coordenacao'
+                ? '/validar-ideias'
                 : '/';
             router.push(redirectPath);
         } catch (err) {
@@ -122,8 +121,8 @@ export default function LoginPage () {
 
                             <div className="flex items-center justify-between">
                                 <label className="flex items-center">
-                                    <input 
-                                        type="checkbox" 
+                                    <input
+                                        type="checkbox"
                                         className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
                                     />
                                     <span className="ml-2 text-sm text-gray-600">Lembre-se de mim</span>
@@ -133,8 +132,8 @@ export default function LoginPage () {
                                 </a>
                             </div>
 
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 disabled={isLoading}
                                 className="w-full bg-[#CB2616] hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#CB2616] focus:ring-offset-2"
                             >
@@ -145,7 +144,7 @@ export default function LoginPage () {
                         <footer className="mt-8 pt-6 border-t border-gray-200">
                             <div className="text-center">
                                 <p className="text-sm text-gray-600 mb-4">Novo no Fatec Conecta?</p>
-                                <a 
+                                <a
                                     href="/cadastro"
                                     className="inline-block px-6 py-2 border border-[#CB2616] text-[#CB2616] rounded-lg hover:bg-red-50 transition-colors font-medium"
                                 >
