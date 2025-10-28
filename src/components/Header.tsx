@@ -36,14 +36,7 @@ export const Header = () => {
     <header className="bg-[#CB2616] text-white p-4 flex items-center justify-between">
       <div className="flex items-center gap-8">
         <Link href="/" className="flex items-center">
-          <Image 
-            src="/logo.svg" 
-            alt="Fatec Conecta - Conectando comunidade e universidade para soluções inovadoras" 
-            width={40} 
-            height={40} 
-            className="inline-block mr-2" 
-          />
-          <h1 className="text-2xl font-bold">Fatec Conecta</h1>
+          <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-montserrat), sans-serif', color: '#FCFCFC' }}>Fatec Conecta</h1>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
