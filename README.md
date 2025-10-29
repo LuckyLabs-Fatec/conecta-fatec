@@ -38,6 +38,7 @@ Projeto desenvolvido durante o PI do curso de Desenvolvimento de Software Multip
 3. Abra [http://localhost:6006](http://localhost:6006) no seu navegador para ver o Storybook.
 
 ## Estrutura do Projeto
+[Atomic Design](https://medium.com/design-bootcamp/atomic-design-building-better-digital-products-piece-by-piece-8cd9eee04f44)
 - `src/app`: Contém as páginas da aplicação.
 - `src/components`: Contém os componentes reutilizáveis da aplicação.
 - `src/stories`: Contém os arquivos de Storybook para os componentes.
