@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormSetValue, FieldPath, FieldPathValue, FieldErrors } from 'react-hook-form';
-import { PriorityImpactStep } from '@/components/PriorityImpactStep';
+import { PriorityImpactStep } from '@/components';
 import { SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
 
 interface Props {

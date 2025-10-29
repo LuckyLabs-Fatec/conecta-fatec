@@ -48,3 +48,6 @@ export const ProtectedRoute = ({
 
     return <>{children}</>;
 };
+
+// Deprecated: ProtectedRoute has been removed as it's unused in the app.
+export {};

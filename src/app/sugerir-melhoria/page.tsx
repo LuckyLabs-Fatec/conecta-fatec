@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
-import { Header } from "@/components/Header"
+import { Header } from "@/components"
 import { ImprovementDetailsStepAdapter } from '@/components/adapters/ImprovementDetailsStepAdapter'
 import { LocationStepAdapter } from '@/components/adapters/LocationStepAdapter'
 import { PriorityImpactStepAdapter } from '@/components/adapters/PriorityImpactStepAdapter'

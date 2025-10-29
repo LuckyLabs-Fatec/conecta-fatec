@@ -1,14 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Header } from "@/components/Header";
-import { Button } from "@/components/Button";
+import { Header } from "@/components";
+import { Button } from "@/components";
 import { Calendar, MapPin, Users, Eye, Filter, Search } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { projectsFiltersSchema, type ProjectsFiltersFormValues } from "@/domain/projects/schemas/filters.schema";
 import { usePagination } from "@/hooks/usePagination";
-import { Pagination } from "@/components/Pagination";
+import { Pagination } from "@/components";
 
 interface Project {
     id: string;

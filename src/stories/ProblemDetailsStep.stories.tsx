@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { ProblemDetailsStep } from '../components/ProblemDetailsStep';
 
 const meta: Meta<typeof ProblemDetailsStep> = {
-  title: 'Components/Form Steps/ProblemDetailsStep',
+  title: 'Organisms/Form Steps/ProblemDetailsStep',
   component: ProblemDetailsStep,
   parameters: {
     layout: 'padded',

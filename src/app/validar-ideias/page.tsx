@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Header } from "@/components/Header";
-import { Button } from "@/components/Button";
+import { Header } from "@/components";
+import { Button } from "@/components";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, User, AlertCircle, CheckCircle, XCircle, Eye, Filter, Search, Users, BookOpen } from "lucide-react";

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { PriorityImpactStep } from '../components/PriorityImpactStep';
 
 const meta: Meta<typeof PriorityImpactStep> = {
-  title: 'Components/Form Steps/PriorityImpactStep',
+  title: 'Organisms/Form Steps/PriorityImpactStep',
   component: PriorityImpactStep,
   parameters: {
     layout: 'padded',

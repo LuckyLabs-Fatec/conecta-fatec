@@ -1,5 +1,5 @@
 'use client';
-import { Header } from "@/components/Header";
+import { Header } from "@/components";
 import Link from "next/link";
 
 export default function PrivacyPage() {

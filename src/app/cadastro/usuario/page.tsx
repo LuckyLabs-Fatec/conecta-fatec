@@ -4,8 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
-import { LoginAside } from "@/components/LoginAside"
-import { Input } from "@/components/Input"
+import { LoginAside, Input } from "@/components"
 import { useAuth, UserRole } from "@/hooks/useAuth"
 import Link from "next/link";
 import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';

@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/Header';
-import { Button } from '@/components/Button';
+import { Header } from '@/components';
+import { Button } from '@/components';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { assignmentSchema, type AssignmentSchema } from '@/domain/projects/schemas/assignment.schema';

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { LocationStep } from '../components/LocationStep';
 
 const meta: Meta<typeof LocationStep> = {
-  title: 'Components/Form Steps/LocationStep',
+  title: 'Organisms/Form Steps/LocationStep',
   component: LocationStep,
   parameters: {
     layout: 'padded',

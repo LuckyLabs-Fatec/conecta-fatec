@@ -1,6 +1,6 @@
 'use client';
-import { Button } from "@/components/Button";
-import { Header } from "@/components/Header";
+import { Button } from "@/components";
+import { Header } from "@/components";
 import { ClipboardList, Library, Hammer } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";

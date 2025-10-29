@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { LoginAside } from '@/components/LoginAside';
+import { LoginAside } from '@/components';
 
 const meta = {
-    title: 'LoginAside',
+    title: 'Organisms/LoginAside',
     component: LoginAside,
     tags: ['autodocs'],
     parameters: {
@@ -22,30 +22,11 @@ const meta = {
             control: { type: 'text' },
             description: 'Descrição do projeto exibida abaixo do título',
         },
-        logoSrc: {
-            control: { type: 'text' },
-            description: 'Caminho da imagem do logo',
-        },
-        logoAlt: {
-            control: { type: 'text' },
-            description: 'Texto alternativo para o logo (acessibilidade)',
-        },
-        logoWidth: {
-            control: { type: 'number', min: 40, max: 200, step: 10 },
-            description: 'Largura do logo em pixels',
-        },
-        logoHeight: {
-            control: { type: 'number', min: 40, max: 200, step: 10 },
-            description: 'Altura do logo em pixels',
-        },
     },
     args: {
         title: 'Fatec Conecta',
         description: 'Conectando a comunidade com soluções acadêmicas inovadoras. Transforme problemas reais em projetos estudantis.',
-        logoSrc: '/logo.svg',
-        logoAlt: 'Logo Fatec Conecta',
-        logoWidth: 80,
-        logoHeight: 80,
+        
     },
 } satisfies Meta<typeof LoginAside>;
 
@@ -58,20 +39,6 @@ export const WithCustomContent: Story = {
     args: {
         title: 'Projeto Conecta',
         description: 'Uma plataforma inovadora que conecta estudantes, comunidade e instituições para criar soluções sustentáveis e eficazes.',
-    },
-};
-
-export const WithLargerLogo: Story = {
-    args: {
-        logoWidth: 120,
-        logoHeight: 120,
-    },
-};
-
-export const WithSmallerLogo: Story = {
-    args: {
-        logoWidth: 60,
-        logoHeight: 60,
     },
 };
 

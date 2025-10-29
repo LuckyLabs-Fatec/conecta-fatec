@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 
-import { Step } from '@/components/Step';
+import { Step } from '@/components';
 
 import { Lightbulb } from 'lucide-react';
 
 const meta = {
-    title: 'Step',
+    title: 'Molecules/Step',
     component: Step,
     tags: ['autodocs'],
     argTypes: {

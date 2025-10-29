@@ -5,8 +5,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { reviewSchema, type ReviewSchema } from '@/domain/ideas/schemas/review.schema';
-import { Header } from '@/components/Header';
-import { Button } from '@/components/Button';
+import { Header } from '@/components';
+import { Button } from '@/components';
 
 interface Idea {
   id: string;
