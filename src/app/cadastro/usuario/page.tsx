@@ -9,7 +9,6 @@ import { Input } from "@/components/Input"
 import { useAuth, UserRole } from "@/hooks/useAuth"
 import Link from "next/link";
 import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';
-import { registerUser, loginUser, mapUserTypeToBackendRole, mapBackendRoleToUserType } from '@/domain/auth/api';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -36,30 +35,25 @@ export default function RegisterPage() {
     const onSubmit = async (data: RegisterSchema) => {
         setIsLoading(true);
         try {
-            // Create user in backend
-            await registerUser({
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1200));
+
+            const userData = {
+                id: Date.now().toString(),
                 name: data.name,
                 email: data.email,
-                password: data.password,
-                role: mapUserTypeToBackendRole(data.userType as UserRole)
-            });
-
-            // Auto-login after registration (by email)
-            const loginRes = await loginUser({ email: data.email, password: data.password });
-            const role: UserRole = mapBackendRoleToUserType(loginRes.user.perfil);
-
-            login({
-                id: String(loginRes.user.id_usuario),
-                name: loginRes.user.nome,
-                email: loginRes.user.email,
                 avatar: `https://doodleipsum.com/700/avatar?i=${Math.random()}`,
                 loginTime: new Date().toISOString(),
-                role,
-                ...(role === 'coordenacao' && { department: data.department }),
-                ...(role === 'mediador' && { specialization: data.specialization })
-            });
+                role: data.userType as UserRole,
+                ...(data.userType === 'coordenacao' && { department: data.department }),
+                ...(data.userType === 'mediador' && { specialization: data.specialization })
+            };
 
-            const redirectPath = role === 'mediador' || role === 'coordenacao' ? '/validar-ideias' : '/';
+            login(userData);
+
+            const redirectPath = data.userType === 'mediador' || data.userType === 'coordenacao' 
+                ? '/validar-ideias' 
+                : '/';
             router.push(redirectPath);
         } catch (error) {
             console.error('Erro ao criar conta:', error);
