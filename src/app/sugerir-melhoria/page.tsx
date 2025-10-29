@@ -115,9 +115,6 @@ export default function SuggestImprovementPage() {
                             {/* Step 1: Improvement Details */}
                             {currentStep === 1 && (
                                 <div className="space-y-6" role="group" aria-labelledby="improvement-details-heading">
-                                    <h2 id="improvement-details-heading" className="text-xl font-semibold text-gray-800 mb-4">
-                                        Detalhes da Sua Ideia
-                                    </h2>
                                     <ImprovementDetailsStepAdapter
                                         setValue={setValue}
                                         values={{
