@@ -145,7 +145,7 @@ export default function LoginPage () {
                             <div className="text-center">
                                 <p className="text-sm text-gray-600 mb-4">Novo no Fatec Conecta?</p>
                                 <a 
-                                    href="/cadastro"
+                                    href="/cadastro/usuario"
                                     className="inline-block px-6 py-2 border border-[#CB2616] text-[#CB2616] rounded-lg hover:bg-red-50 transition-colors font-medium"
                                 >
                                     Criar Conta
