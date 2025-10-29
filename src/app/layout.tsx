@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans, Montserrat } from "next/font/google";
 import "./globals.css";
-import { ToastProvider } from "@/components";
+import { ToastProvider, VLibrasWidget } from "@/components";
 
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
@@ -28,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${notoSans.variable} ${montserrat.variable} antialiased`}>
+        <VLibrasWidget />
         <ToastProvider>
           {children}
         </ToastProvider>
