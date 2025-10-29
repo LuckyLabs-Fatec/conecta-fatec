@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { reviewSchema } from '@/domain/ideas/schemas/review.schema';
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const id = params.id;
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const body = await request.json();
   const parsed = reviewSchema.safeParse(body);
   if (!parsed.success) {

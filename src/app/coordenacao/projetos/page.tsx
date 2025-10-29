@@ -1,4 +1,7 @@
 'use client';
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,6 +24,17 @@ interface CoordProjeto {
 }
 
 export default function CoordenacaoProjetosPage() {
+  return (
+    <>
+      <Header />
+      <Suspense fallback={<main className="min-h-screen flex items-center justify-center"><p className="text-gray-600">Carregando...</p></main>}>
+        <CoordenacaoProjetosContent />
+      </Suspense>
+    </>
+  );
+}
+
+function CoordenacaoProjetosContent() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
@@ -52,7 +66,6 @@ export default function CoordenacaoProjetosPage() {
         if (!res.ok) throw new Error('Falha ao carregar');
         const data: CoordProjeto[] = await res.json();
         setItems(data);
-        // Se houver query ?assign=ID, pré-seleciona para abrir o modal
         const assignId = params.get('assign');
         if (assignId) {
           const found = data.find(d => d.id === assignId);
@@ -122,70 +135,67 @@ export default function CoordenacaoProjetosPage() {
   }
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 py-8">
-        <section className="max-w-5xl mx-auto px-4">
-          <h1 className="text-2xl font-bold mb-4">Coordenação — Projetos</h1>
-          {result && <div className="mb-4 text-sm text-gray-700">{result}</div>}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {items.map((p) => (
-              <article key={p.id} className="bg-white border rounded p-4 flex flex-col gap-2">
-                <header className="flex items-center justify-between">
-                  <h2 className="font-semibold">{p.titulo}</h2>
-                  <span className="text-xs px-2 py-1 rounded bg-neutral-100 border">{p.status}</span>
-                </header>
-                <p className="text-sm text-neutral-700">{p.descricao}</p>
-                <div className="mt-2 flex gap-2 flex-wrap">
-                  <Button label="Validar Ideia" onClick={() => act(p.id, 'validar')} variant="primary" size="small" />
-                  <Button label="Direcionar p/ Curso" onClick={() => setSelected(p)} variant="secondary" size="small" />
-                  <Button label="Enviar ao Backlog" onClick={() => act(p.id, 'backlog')} variant="secondary" size="small" />
-                </div>
-              </article>
-            ))}
-          </div>
-
-          {selected && (
-            <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-lg max-w-lg w-full p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Direcionar para Curso — {selected.titulo}</h3>
-                  <button className="text-xl" onClick={() => setSelected(null)}>×</button>
-                </div>
-                <form onSubmit={submitAssign} className="space-y-3">
-                  <div>
-                    <label htmlFor="curso" className="block text-sm font-medium text-gray-700 mb-1">Curso</label>
-                    <input id="curso" {...assignForm.register('curso')} className="w-full px-3 py-2 border rounded" />
-                    {assignForm.formState.errors.curso && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.curso.message}</p>}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label htmlFor="turma" className="block text-sm font-medium text-gray-700 mb-1">Turma</label>
-                      <input id="turma" {...assignForm.register('turma')} className="w-full px-3 py-2 border rounded" />
-                      {assignForm.formState.errors.turma && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.turma.message}</p>}
-                    </div>
-                    <div>
-                      <label htmlFor="semestre" className="block text-sm font-medium text-gray-700 mb-1">Semestre</label>
-                      <input id="semestre" {...assignForm.register('semestre')} className="w-full px-3 py-2 border rounded" />
-                      {assignForm.formState.errors.semestre && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.semestre.message}</p>}
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="professor" className="block text-sm font-medium text-gray-700 mb-1">Professor</label>
-                    <input id="professor" {...assignForm.register('professor')} className="w-full px-3 py-2 border rounded" />
-                    {assignForm.formState.errors.professor && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.professor.message}</p>}
-                  </div>
-                  <div className="flex gap-2 justify-end pt-2">
-                    <Button label="Cancelar" onClick={() => setSelected(null)} variant="secondary" size="medium" />
-                    <Button label="Direcionar" onClick={() => {}} variant="primary" size="medium" />
-                    <button type="submit" className="hidden" />
-                  </div>
-                </form>
+    <main className="min-h-screen bg-gray-50 py-8">
+      <section className="max-w-5xl mx-auto px-4">
+        <h1 className="text-2xl font-bold mb-4">Coordenação — Projetos</h1>
+        {result && <div className="mb-4 text-sm text-gray-700">{result}</div>}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {items.map((p) => (
+            <article key={p.id} className="bg-white border rounded p-4 flex flex-col gap-2">
+              <header className="flex items-center justify-between">
+                <h2 className="font-semibold">{p.titulo}</h2>
+                <span className="text-xs px-2 py-1 rounded bg-neutral-100 border">{p.status}</span>
+              </header>
+              <p className="text-sm text-neutral-700">{p.descricao}</p>
+              <div className="mt-2 flex gap-2 flex-wrap">
+                <Button label="Validar Ideia" onClick={() => act(p.id, 'validar')} variant="primary" size="small" />
+                <Button label="Direcionar p/ Curso" onClick={() => setSelected(p)} variant="secondary" size="small" />
+                <Button label="Enviar ao Backlog" onClick={() => act(p.id, 'backlog')} variant="secondary" size="small" />
               </div>
+            </article>
+          ))}
+        </div>
+
+        {selected && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-lg w-full p-6">
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-lg font-semibold">Direcionar para Curso — {selected.titulo}</h3>
+                <button className="text-xl" onClick={() => setSelected(null)}>×</button>
+              </div>
+              <form onSubmit={submitAssign} className="space-y-3">
+                <div>
+                  <label htmlFor="curso" className="block text-sm font-medium text-gray-700 mb-1">Curso</label>
+                  <input id="curso" {...assignForm.register('curso')} className="w-full px-3 py-2 border rounded" />
+                  {assignForm.formState.errors.curso && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.curso.message}</p>}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="turma" className="block text-sm font-medium text-gray-700 mb-1">Turma</label>
+                    <input id="turma" {...assignForm.register('turma')} className="w-full px-3 py-2 border rounded" />
+                    {assignForm.formState.errors.turma && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.turma.message}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="semestre" className="block text-sm font-medium text-gray-700 mb-1">Semestre</label>
+                    <input id="semestre" {...assignForm.register('semestre')} className="w-full px-3 py-2 border rounded" />
+                    {assignForm.formState.errors.semestre && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.semestre.message}</p>}
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="professor" className="block text-sm font-medium text-gray-700 mb-1">Professor</label>
+                  <input id="professor" {...assignForm.register('professor')} className="w-full px-3 py-2 border rounded" />
+                  {assignForm.formState.errors.professor && <p className="text-xs text-red-600 mt-1">{assignForm.formState.errors.professor.message}</p>}
+                </div>
+                <div className="flex gap-2 justify-end pt-2">
+                  <Button label="Cancelar" onClick={() => setSelected(null)} variant="secondary" size="medium" />
+                  <Button label="Direcionar" onClick={() => {}} variant="primary" size="medium" />
+                  <button type="submit" className="hidden" />
+                </div>
+              </form>
             </div>
-          )}
-        </section>
-      </main>
-    </>
+          </div>
+        )}
+      </section>
+    </main>
   );
 }
