@@ -46,7 +46,7 @@ const seed: Project[] = [
     priority: 'alta',
     student: {
       name: 'Ana Silva',
-      course: 'Análise e Desenvolvimento de Sistemas',
+      course: 'Desenvolvimento de Software Multiplataforma',
       semester: '4º semestre',
     },
     startDate: '2024-03-15',
@@ -92,7 +92,7 @@ const seed: Project[] = [
     priority: 'media',
     student: {
       name: 'Marina Santos',
-      course: 'Análise e Desenvolvimento de Sistemas',
+      course: 'Desenvolvimento de Software Multiplataforma',
       semester: '5º semestre',
     },
     startDate: '2024-01-10',

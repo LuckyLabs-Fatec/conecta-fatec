@@ -143,7 +143,7 @@ export default function RegisterPage() {
                                     label="Departamento"
                                     id="department"
                                     type="text"
-                                    placeholder="Ex: Análise e Desenvolvimento de Sistemas"
+                                    placeholder="Ex: Desenvolvimento de Software Multiplataforma"
                                     required={true}
                                     {...register('department')}
                                     error={errors.department?.message}

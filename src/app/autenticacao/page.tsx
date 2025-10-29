@@ -40,7 +40,7 @@ export default function LoginPage () {
                 avatar: `https://doodleipsum.com/700/avatar?i=fd7c77f6b306c724bb34cc62124ff04e`,
                 loginTime: new Date().toISOString(),
                 role: data.userType as UserRole,
-                ...(data.userType === 'coordenacao' && { department: 'Análise e Desenvolvimento de Sistemas' }),
+                ...(data.userType === 'coordenacao' && { department: 'Desenvolvimento de Software Multiplataforma' }),
                 ...(data.userType === 'mediador' && { specialization: 'Tecnologia e Inovação' })
             };
 

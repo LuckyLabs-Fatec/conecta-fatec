@@ -89,9 +89,9 @@ const mockIdeas: IdeaSuggestion[] = [
         ],
         mediatorNotes: 'Ideia muito relevante para saúde pública. Recomendo aprovação.',
         assignedTo: {
-            class: '4º ADS',
+            class: '4º DSM',
             semester: '4º semestre',
-            course: 'Análise e Desenvolvimento de Sistemas',
+            course: 'Desenvolvimento de Software Multiplataforma',
             professor: 'Prof. Dr. Ricardo Silva'
         },
         coordinatorNotes: 'Projeto aprovado para desenvolvimento na disciplina de Projeto Integrador.'
@@ -505,10 +505,10 @@ export default function ValidateIdeasPage() {
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
                                                 >
                                                     <option value="">Selecione a turma</option>
-                                                    <option value="3º ADS">3º ADS</option>
-                                                    <option value="4º ADS">4º ADS</option>
-                                                    <option value="5º ADS">5º ADS</option>
-                                                    <option value="6º ADS">6º ADS</option>
+                                                    <option value="3º DSM">3º DSM</option>
+                                                    <option value="4º DSM">4º DSM</option>
+                                                    <option value="5º DSM">5º DSM</option>
+                                                    <option value="6º DSM">6º DSM</option>
                                                 </select>
                                             </div>
                                             <div>
@@ -519,7 +519,7 @@ export default function ValidateIdeasPage() {
                                                     value={assignmentData.course}
                                                     onChange={(e) => setAssignmentData(prev => ({ ...prev, course: e.target.value }))}
                                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
-                                                    placeholder="Ex: Análise e Desenvolvimento de Sistemas"
+                                                    placeholder="Ex: Desenvolvimento de Software Multiplataforma"
                                                 />
                                             </div>
                                         </div>
