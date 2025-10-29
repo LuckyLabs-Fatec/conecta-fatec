@@ -8,7 +8,7 @@ type FormValues = {
   description: string;
   email: string;
 };
-import { Input, Header } from "@/components";
+import { Input, Header, useToast } from "@/components";
 
 export default function SimpleFormPage() {
   return (
@@ -27,12 +27,13 @@ export default function SimpleFormPage() {
 
 function RHFForm() {
   const router = useRouter();
+  const { show } = useToast();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     mode: 'onBlur'
   });
 
   const onSubmit = () => {
-    window.alert('Ideia enviada com sucesso!');
+    show({ message: 'Ideia enviada com sucesso!', kind: 'success' });
     router.push('/acompanhar-projetos');
   };
 

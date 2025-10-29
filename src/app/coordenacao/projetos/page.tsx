@@ -1,12 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Header } from '@/components';
 import { Button } from '@/components';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { assignmentSchema, type AssignmentSchema } from '@/domain/projects/schemas/assignment.schema';
+import { useToast } from '@/components';
 
 interface CoordProjeto {
   id: string;
@@ -22,6 +23,8 @@ interface CoordProjeto {
 export default function CoordenacaoProjetosPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const params = useSearchParams();
+  const { show } = useToast();
 
   const [items, setItems] = useState<CoordProjeto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +52,12 @@ export default function CoordenacaoProjetosPage() {
         if (!res.ok) throw new Error('Falha ao carregar');
         const data: CoordProjeto[] = await res.json();
         setItems(data);
+        // Se houver query ?assign=ID, pré-seleciona para abrir o modal
+        const assignId = params.get('assign');
+        if (assignId) {
+          const found = data.find(d => d.id === assignId);
+          if (found) setSelected(found);
+        }
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : 'Erro ao buscar dados';
         setError(msg);
@@ -58,7 +67,7 @@ export default function CoordenacaoProjetosPage() {
     };
     load();
     return () => controller.abort();
-  }, []);
+  }, [params]);
 
   const act = async (id: string, action: 'validar' | 'backlog') => {
     setResult(null);
@@ -67,9 +76,13 @@ export default function CoordenacaoProjetosPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action }),
     });
-    if (!res.ok) throw new Error('Falha na ação');
+    if (!res.ok) {
+      show({ message: 'Falha na ação', kind: 'error' });
+      throw new Error('Falha na ação');
+    }
     const json = await res.json();
     setResult(`Projeto ${id}: ${json.status}`);
+    show({ message: `Projeto ${id}: ${json.status}`, kind: 'success' });
   };
 
   const submitAssign = assignForm.handleSubmit(async (values) => {
@@ -82,10 +95,12 @@ export default function CoordenacaoProjetosPage() {
     });
     if (!res.ok) {
       setResult('Falha ao direcionar');
+      show({ message: 'Falha ao direcionar', kind: 'error' });
       return;
     }
     const json = await res.json();
     setResult(`Projeto ${selected.id}: ${json.status} para ${json.curso}`);
+    show({ message: `Projeto ${selected.id}: ${json.status} para ${json.curso}`, kind: 'success' });
     assignForm.reset();
     setSelected(null);
   });

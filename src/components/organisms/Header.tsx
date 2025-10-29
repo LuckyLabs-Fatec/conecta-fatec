@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "../atoms/Button";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { ChevronDown, User, LogOut, Settings } from "lucide-react";
+import { ChevronDown, User, LogOut, Settings, School } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export const Header = () => {
@@ -50,6 +50,11 @@ export const Header = () => {
               Validar Ideias
             </Link>
           )}
+          {isAuthenticated && user?.role === 'coordenacao' && (
+            <Link href="/coordenacao/projetos" className="hover:text-red-200 transition-colors">
+              Direcionar para Curso
+            </Link>
+          )}
           <Link href="/acompanhar-projetos" className="hover:text-red-200 transition-colors">
             Acompanhar Projetos
           </Link>
@@ -91,6 +96,12 @@ export const Header = () => {
                   <Settings size={16} />
                   <span>Configurações</span>
                 </button>
+                {user.role === 'coordenacao' && (
+                  <Link href="/coordenacao/projetos" className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
+                    <School size={16} />
+                    <span>Direcionar para Curso</span>
+                  </Link>
+                )}
                 <hr className="my-1" />
                 <button 
                   onClick={handleLogout}

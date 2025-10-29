@@ -2,6 +2,7 @@
 export { Button } from './atoms/Button';
 export { Input } from './atoms/Input';
 export type { InputProps } from './atoms/Input';
+export { ToastProvider, useToast } from './atoms/Toast';
 
 // Molecules
 export { Step } from './molecules/Step';
