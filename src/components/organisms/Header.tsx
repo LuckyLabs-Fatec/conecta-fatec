@@ -92,10 +92,10 @@ export const Header = () => {
                   <User size={16} />
                   <span>Meu Perfil</span>
                 </Link>
-                <button className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
+                <Link href="/configuracoes" onClick={() => setIsDropdownOpen(false)} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
                   <Settings size={16} />
                   <span>Configurações</span>
-                </button>
+                </Link>
                 {user.role === 'coordenacao' && (
                   <Link href="/coordenacao/projetos" className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
                     <School size={16} />
