@@ -32,3 +32,17 @@ body {
 button {
   cursor: pointer;
 }
+
+/* Accessibility helpers */
+body.a11y-large-font {
+  font-size: 112.5%; /* ~18px base if default is 16px */
+}
+
+body.a11y-high-contrast {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+body.a11y-high-contrast a {
+  text-decoration: underline;
+}

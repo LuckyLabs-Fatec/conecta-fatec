@@ -88,10 +88,10 @@ export const Header = () => {
               </div>
               
               <div className="py-1">
-                <button className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
+                <Link href="/perfil" onClick={() => setIsDropdownOpen(false)} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
                   <User size={16} />
                   <span>Meu Perfil</span>
-                </button>
+                </Link>
                 <button className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
                   <Settings size={16} />
                   <span>Configurações</span>

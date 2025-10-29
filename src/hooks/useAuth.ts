@@ -48,6 +48,15 @@ export const useAuth = () => {
         setUser(null);
     };
 
+    const updateUser = (partial: Partial<User>) => {
+        setUser((prev) => {
+            if (!prev) return prev;
+            const next = { ...prev, ...partial } as User;
+            localStorage.setItem('fatec-conecta-user', JSON.stringify(next));
+            return next;
+        });
+    };
+
     const hasPermission = (requiredRole: UserRole | UserRole[]) => {
         if (!user) return false;
         
@@ -72,6 +81,7 @@ export const useAuth = () => {
         isLoading,
         login,
         logout,
+        updateUser,
         isAuthenticated: !!user,
         hasPermission,
         canAccessIdeaValidation,
