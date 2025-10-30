@@ -12,10 +12,13 @@ importers:
         specifier: 1.0.0-beta.3
         version: 1.0.0-beta.3(@types/react@19.1.15)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@hookform/resolvers':
-        specifier: ^5.2.2
+        specifier: 5.2.2
         version: 5.2.2(react-hook-form@7.65.0(react@19.1.0))
+      '@moreiraste/react-vlibras':
+        specifier: 2.4.5
+        version: 2.4.5
       lucide-react:
-        specifier: ^0.544.0
+        specifier: 0.544.0
         version: 0.544.0(react@19.1.0)
       next:
         specifier: 15.5.4
@@ -27,10 +30,10 @@ importers:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
       react-hook-form:
-        specifier: ^7.65.0
+        specifier: 7.65.0
         version: 7.65.0(react@19.1.0)
       zod:
-        specifier: ^4.1.12
+        specifier: 4.1.12
         version: 4.1.12
     devDependencies:
       '@eslint/eslintrc':
@@ -1058,6 +1061,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@moreiraste/react-vlibras@2.4.5':
+    resolution: {integrity: sha512-JwFLu0kNE5j8BhuaWJqceAaSdleKFc4mADn4DIdAzmB5O0nal1gEFx4czPcB+5MP+ARoUy9N6L3fhzuPXhUsUA==}
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
@@ -2622,6 +2628,10 @@ packages:
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
+
+  helmet@6.2.0:
+    resolution: {integrity: sha512-DWlwuXLLqbrIOltR6tFQXShj/+7Cyp0gLi6uAb8qMdFh/YBBFbKSgQ6nbXmScYd8emMctuthmgIa7tUfo9Rtyg==}
+    engines: {node: '>=14.0.0'}
 
   hmac-drbg@1.0.1:
     resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
@@ -5137,6 +5147,10 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@moreiraste/react-vlibras@2.4.5':
+    dependencies:
+      helmet: 6.2.0
+
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
       '@emnapi/core': 1.5.0
@@ -7050,6 +7064,8 @@ snapshots:
       function-bind: 1.1.2
 
   he@1.2.0: {}
+
+  helmet@6.2.0: {}
 
   hmac-drbg@1.0.1:
     dependencies:
