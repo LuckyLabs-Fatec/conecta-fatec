@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
 import { LoginAside, Input } from "@/components"
-import { useAuth, UserRole } from "@/hooks/useAuth"
+import { useAuth } from "@/hooks/useAuth"
 import Link from "next/link";
 import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';
 
@@ -14,7 +14,7 @@ export default function RegisterPage() {
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
 
-    const { register, handleSubmit, watch, formState: { errors } } = useForm({
+    const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             name: '',
@@ -22,14 +22,9 @@ export default function RegisterPage() {
             phone: '',
             password: '',
             confirmPassword: '',
-            userType: 'comunidade',
-            department: '',
-            specialization: '',
             agreeToTerms: false
         }
     });
-
-    const userType = watch('userType');
 
     const onSubmit = async (data: RegisterSchema) => {
         setIsLoading(true);
@@ -43,16 +38,12 @@ export default function RegisterPage() {
                 email: data.email,
                 avatar: `https://doodleipsum.com/700/avatar?i=${Math.random()}`,
                 loginTime: new Date().toISOString(),
-                role: data.userType as UserRole,
-                ...(data.userType === 'coordenacao' && { department: data.department }),
-                ...(data.userType === 'mediador' && { specialization: data.specialization })
+                role: 'comunidade' as const
             };
 
             login(userData);
 
-            const redirectPath = data.userType === 'mediador' || data.userType === 'coordenacao' 
-                ? '/validar-ideias' 
-                : '/';
+            const redirectPath = '/';
             router.push(redirectPath);
         } catch (error) {
             console.error('Erro ao criar conta:', error);
@@ -93,21 +84,7 @@ export default function RegisterPage() {
                         </header>
 
                         <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-                            <div>
-                                <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Tipo de Usuário *
-                                </label>
-                                <select
-                                    id="userType"
-                                    {...register('userType')}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
-                                    required
-                                >
-                                    <option value="comunidade">Membro da Comunidade</option>
-                                    <option value="mediador">Mediador</option>
-                                    <option value="coordenacao">Coordenação</option>
-                                </select>
-                            </div>
+                            {/* Removido: seleção de tipo de usuário no cadastro. Novas contas são "comunidade". */}
 
                             <Input
                                 label="Nome completo"
@@ -138,31 +115,7 @@ export default function RegisterPage() {
                                 error={errors.phone?.message}
                             />
 
-                            {userType === 'coordenacao' && (
-                                <Input
-                                    label="Departamento"
-                                    id="department"
-                                    type="text"
-                                    placeholder="Ex: Desenvolvimento de Software Multiplataforma"
-                                    required={true}
-                                    {...register('department')}
-                                    error={errors.department?.message}
-                                    description="Informe o departamento que você representa"
-                                />
-                            )}
-
-                            {userType === 'mediador' && (
-                                <Input
-                                    label="Especialização"
-                                    id="specialization"
-                                    type="text"
-                                    placeholder="Ex: Tecnologia e Inovação, Sustentabilidade"
-                                    required={true}
-                                    {...register('specialization')}
-                                    error={errors.specialization?.message}
-                                    description="Informe sua área de especialização"
-                                />
-                            )}
+                            {/* Removidos campos condicionais de coordenação e mediador. */}
 
                             <Input
                                 label="Senha"

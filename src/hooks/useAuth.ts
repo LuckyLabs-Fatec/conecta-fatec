@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-export type UserRole = 'comunidade' | 'mediador' | 'coordenacao';
+export type UserRole = 'comunidade' | 'mediador' | 'coordenacao' | 'estudante';
 
 interface User {
     id: string;
@@ -73,7 +73,7 @@ export const useAuth = () => {
     };
 
     const canSuggestIdeas = () => {
-        return hasPermission('comunidade');
+        return hasPermission(['comunidade', 'estudante']);
     };
 
     return {

@@ -8,20 +8,17 @@ import { LoginAside, Input } from "@/components"
 import Link from "next/link";
 import { useAuth, UserRole } from "@/hooks/useAuth";
 import { loginSchema, LoginSchema } from '@/domain/auth/schemas/login.schema';
+import { resolveMockUser } from '@/domain/auth/mockUsers';
 
 export default function LoginPage () {
     const router = useRouter();
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+    const [authError, setAuthError] = useState<string | null>(null);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors }
-    } = useForm({
+    const { register, handleSubmit, setError, formState: { errors } } = useForm({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            userType: 'comunidade',
             email: '',
             password: ''
         }
@@ -31,22 +28,34 @@ export default function LoginPage () {
         setIsLoading(true);
         try {
             // Simulate API delay
+            setAuthError(null);
             await new Promise(resolve => setTimeout(resolve, 800));
+
+            const mock = resolveMockUser(data.email, data.password);
+            if (!mock) {
+                setAuthError('Email ou senha inválidos. Consulte as credenciais em MOCK_LOGINS.md.');
+                setError('email', { type: 'manual', message: ' ' });
+                setError('password', { type: 'manual', message: 'Email ou senha inválidos' });
+                return;
+            }
+
+            const role: UserRole = mock.role;
+            const name = mock.name;
 
             const userData = {
                 id: '1',
-                name: data.email.split('@')[0].charAt(0).toUpperCase() + data.email.split('@')[0].slice(1),
+                name,
                 email: data.email,
                 avatar: `https://doodleipsum.com/700/avatar?i=fd7c77f6b306c724bb34cc62124ff04e`,
                 loginTime: new Date().toISOString(),
-                role: data.userType as UserRole,
-                ...(data.userType === 'coordenacao' && { department: 'Desenvolvimento de Software Multiplataforma' }),
-                ...(data.userType === 'mediador' && { specialization: 'Tecnologia e Inovação' })
+                role,
+                ...(mock.department && { department: mock.department }),
+                ...(mock.specialization && { specialization: mock.specialization })
             };
 
             login(userData);
 
-            const redirectPath = data.userType === 'mediador' || data.userType === 'coordenacao' 
+            const redirectPath = role === 'mediador' || role === 'coordenacao' 
                 ? '/validar-ideias' 
                 : '/';
             router.push(redirectPath);
@@ -83,21 +92,12 @@ export default function LoginPage () {
                         </header>
 
                         <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-                            <div>
-                                <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Tipo de Usuário
-                                </label>
-                                <select
-                                    id="userType"
-                                    {...register('userType')}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
-                                >
-                                    <option value="comunidade">Membro da Comunidade</option>
-                                    <option value="mediador">Mediador</option>
-                                    <option value="coordenacao">Coordenação</option>
-                                </select>
-                                {errors.userType && <p className="text-sm text-red-600 mt-1">{errors.userType.message}</p>}
-                            </div>
+                            {authError && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3">
+                                    {authError}
+                                </div>
+                            )}
+                            {/* Removido: seleção de tipo de usuário. O perfil é determinado por email/senha mock. */}
 
                             <Input
                                 label="Email"
