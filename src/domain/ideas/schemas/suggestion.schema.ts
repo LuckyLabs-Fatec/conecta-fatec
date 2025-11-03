@@ -5,9 +5,9 @@ export const suggestionSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório'),
   description: z.string().min(1, 'Descrição é obrigatória'),
   location: z.object({
-    address: z.string().min(1, 'Endereço é obrigatório'),
-    neighborhood: z.string().min(1, 'Bairro é obrigatório'),
-    city: z.string().min(1).optional(),
+    address: z.string().optional(),
+    neighborhood: z.string().optional(),
+    city: z.string().optional(),
     coordinates: z
       .object({ lat: z.number(), lng: z.number() })
       .optional(),

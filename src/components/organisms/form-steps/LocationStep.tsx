@@ -23,30 +23,31 @@ export const LocationStep = ({ formData, errors, onChange }: LocationStepProps) 
         </div>
 
         <Input
-            label="Endereço completo"
+            label="Endereço completo (opcional)"
             id="address"
             placeholder="Rua, número (se houver)"
-            required={true}
+            required={false}
             value={formData.location.address}
             onChange={onChange('location', 'address')}
             error={errors.address}
-            description="Seja o mais específico possível"
+            description="Se não souber com precisão, pode deixar em branco."
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-                label="Bairro"
+                label="Bairro (opcional)"
                 id="neighborhood"
                 placeholder="Nome do bairro"
-                required={true}
+                required={false}
                 value={formData.location.neighborhood}
                 onChange={onChange('location', 'neighborhood')}
                 error={errors.neighborhood}
             />
 
             <Input
-                label="Cidade"
+                label="Cidade (opcional)"
                 id="city"
+                required={false}
                 value={formData.location.city}
                 onChange={onChange('location', 'city')}
                 disabled={true}

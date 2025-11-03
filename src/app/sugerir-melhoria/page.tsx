@@ -37,7 +37,7 @@ export default function SuggestImprovementPage() {
             case 1:
                 return await trigger(['category', 'title', 'description']);
             case 2:
-                return await trigger(['location.address', 'location.neighborhood']);
+                return true; // todos os campos de localização são opcionais
             case 3:
                 return await trigger(['affectedPeople']);
             case 4:

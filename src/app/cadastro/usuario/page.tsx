@@ -73,14 +73,6 @@ export default function RegisterPage() {
                                     Faça login aqui!
                                 </Link>
                             </p>
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <h3 className="font-semibold text-blue-800 mb-2">Tipos de Usuário:</h3>
-                                <ul className="text-sm text-blue-700 space-y-1">
-                                    <li><strong>Membro da Comunidade:</strong> Pode sugerir ideias de melhoria</li>
-                                    <li><strong>Mediador:</strong> Analisa e faz triagem das ideias</li>
-                                    <li><strong>Coordenação:</strong> Atribui projetos aprovados às turmas</li>
-                                </ul>
-                            </div>
                         </header>
 
                         <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
