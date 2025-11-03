@@ -93,7 +93,7 @@ export default function LandingPage() {
         >
           <h2 id="mission-title" className="text-3xl font-bold">Nossa Missão</h2>
           <p className="text-gray-500 text-xl max-w-4xl">
-            Com investimento da Lucky Labs, o Fatec Conecta cria um espaço colaborativo onde a comunidade pode expor desafios cotidianos, e estudantes da Fatec Votorantim desenvolvem soluções inovadoras. Contribuímos para os Objetivos de Desenvolvimento Sustentável da ONU: ODS-16 (Paz, Justiça e Instituições Eficazes) e ODS-17 (Parcerias e Meios de Implementação).
+            O Fatec Conecta cria um espaço colaborativo onde a comunidade pode expor desafios cotidianos, e estudantes da Fatec Votorantim desenvolvem soluções inovadoras. Contribuímos para os Objetivos de Desenvolvimento Sustentável da ONU: ODS-16 (Paz, Justiça e Instituições Eficazes) e ODS-17 (Parcerias e Meios de Implementação).
           </p>
           <div 
             className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"
