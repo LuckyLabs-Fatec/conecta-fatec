@@ -45,6 +45,11 @@ export const Header = () => {
               Sugerir Melhoria
             </Link>
           )}
+          {isAuthenticated && user?.role === 'estudante' && (
+            <Link href="/backlog" className="hover:text-red-200 transition-colors">
+              Backlog
+            </Link>
+          )}
           {isAuthenticated && (user?.role === 'mediador' || user?.role === 'coordenacao') && (
             <Link href="/validar-ideias" className="hover:text-red-200 transition-colors">
               Validar Ideias
