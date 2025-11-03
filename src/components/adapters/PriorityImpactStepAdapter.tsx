@@ -15,7 +15,7 @@ export const PriorityImpactStepAdapter = ({ setValue, values, errors, onImageUpl
   const onChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const value = (e.target as HTMLInputElement).value;
     let path: FieldPath<SuggestionSchema> | null = null;
-    if (field === 'priority' || field === 'affectedPeople' || field === 'frequency') {
+    if (field === 'affectedPeople' || field === 'frequency') {
       path = field as FieldPath<SuggestionSchema>;
     }
     if (path) {
@@ -24,12 +24,10 @@ export const PriorityImpactStepAdapter = ({ setValue, values, errors, onImageUpl
   };
 
   const formData: {
-    priority: 'baixa' | 'media' | 'alta' | 'urgente';
     affectedPeople: string;
     frequency: 'unica' | 'semanal' | 'diaria' | 'constante';
     images: File[];
   } = {
-    priority: (values.priority as 'baixa' | 'media' | 'alta' | 'urgente') ?? 'media',
     affectedPeople: (values.affectedPeople as string) ?? '',
     frequency: (values.frequency as 'unica' | 'semanal' | 'diaria' | 'constante') ?? 'unica',
     images: (values.images as File[]) ?? []

@@ -1,4 +1,5 @@
 import { Field } from "@base-ui-components/react/field";
+import { Input as BaseInput } from "@base-ui-components/react/input";
 import { forwardRef } from "react";
 
 export interface InputProps {
@@ -62,7 +63,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
         </Field.Description>
       )}
       
-      <Field.Control
+      <BaseInput
         ref={ref}
         type={type}
         id={id}

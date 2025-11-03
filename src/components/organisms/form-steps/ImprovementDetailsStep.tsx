@@ -1,4 +1,6 @@
 import { Input } from "../../atoms/Input";
+import { CategorySelectorMobile } from "@/components/molecules/CategorySelectorMobile";
+import { CategorySelectorDesktop } from "@/components/molecules/CategorySelectorDesktop";
 
 interface ImprovementDetailsStepProps {
     formData: {
@@ -21,7 +23,13 @@ const IMPROVEMENT_CATEGORIES = [
     { value: 'outros', label: 'Outros', description: 'Outras ideias de melhoria' }
 ];
 
-export const ImprovementDetailsStep = ({ formData, errors, onChange }: ImprovementDetailsStepProps) => (
+export const ImprovementDetailsStep = ({ formData, errors, onChange }: ImprovementDetailsStepProps) => {
+    const handleCategoryChange = (val: string) => {
+        const e = { target: { value: val } } as unknown as React.ChangeEvent<HTMLInputElement>;
+        onChange('category')(e);
+    };
+
+    return (
     <div className="space-y-6" role="group" aria-labelledby="improvement-details-heading">
         <h2 id="improvement-details-heading" className="text-xl font-semibold text-gray-800 mb-4">
             Detalhes da Sua Ideia
@@ -32,34 +40,20 @@ export const ImprovementDetailsStep = ({ formData, errors, onChange }: Improveme
                 <legend className="block text-sm font-medium text-gray-700 mb-3">
                     Categoria da melhoria *
                 </legend>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup" aria-required="true">
-                    {IMPROVEMENT_CATEGORIES.map(category => (
-                        <label
-                            key={category.value}
-                            className={`relative flex flex-col p-4 border-2 rounded-lg cursor-pointer transition-colors
-                                ${formData.category === category.value
-                                    ? 'border-[#CB2616] bg-red-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                        >
-                            <input
-                                type="radio"
-                                name="category"
-                                value={category.value}
-                                checked={formData.category === category.value}
-                                onChange={onChange('category')}
-                                className="sr-only"
-                                aria-describedby={`category-${category.value}-desc`}
-                            />
-                            <span className="font-medium text-gray-800">{category.label}</span>
-                            <span id={`category-${category.value}-desc`} className="text-sm text-gray-500">
-                                {category.description}
-                            </span>
-                            <span className="sr-only">Selecionar categoria {category.label}</span>
-                        </label>
-                    ))}
-                </div>
+
+                {/* Mobile and Desktop selectors as separate molecules */}
+                                <CategorySelectorMobile
+                                    categories={IMPROVEMENT_CATEGORIES}
+                                    value={formData.category}
+                                    onChange={handleCategoryChange}
+                                />
+                                <CategorySelectorDesktop
+                                    categories={IMPROVEMENT_CATEGORIES}
+                                    value={formData.category}
+                                    onChange={handleCategoryChange}
+                                />
             </fieldset>
+
             {errors.category && (
                 <p className="text-sm text-red-600 mt-1" role="alert" aria-live="polite">
                     {errors.category}
@@ -102,4 +96,5 @@ export const ImprovementDetailsStep = ({ formData, errors, onChange }: Improveme
             </p>
         </div>
     </div>
-);
+    );
+};

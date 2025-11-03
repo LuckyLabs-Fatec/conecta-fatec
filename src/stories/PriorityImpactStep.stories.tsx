@@ -8,13 +8,13 @@ const meta: Meta<typeof PriorityImpactStep> = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Terceiro passo do formulário de relato de problemas, onde o usuário define a prioridade, impacto e pode adicionar fotos.',
+  component: 'Terceiro passo do formulário de relato de problemas, onde o usuário informa impacto e pode adicionar fotos.',
       },
     },
   },
   argTypes: {
     formData: {
-      description: 'Dados do formulário com prioridade, pessoas afetadas, frequência e imagens',
+  description: 'Dados do formulário com pessoas afetadas, frequência e imagens',
       control: { type: 'object' },
     },
     errors: {
@@ -43,7 +43,6 @@ type Story = StoryObj<typeof PriorityImpactStep>;
 export const Default: Story = {
   args: {
     formData: {
-      priority: 'media',
       affectedPeople: '',
       frequency: 'unica',
       images: [],
@@ -64,7 +63,6 @@ export const Default: Story = {
 export const WithHighPriority: Story = {
   args: {
     formData: {
-      priority: 'alta',
       affectedPeople: 'Cerca de 200 moradores da rua e pedestres que passam pelo local diariamente',
       frequency: 'constante',
       images: [],
@@ -85,7 +83,6 @@ export const WithHighPriority: Story = {
 export const WithUrgentPriority: Story = {
   args: {
     formData: {
-      priority: 'urgente',
       affectedPeople: 'Estudantes e motoristas - risco de acidentes graves',
       frequency: 'diaria',
       images: [],
@@ -106,7 +103,6 @@ export const WithUrgentPriority: Story = {
 export const WithErrors: Story = {
   args: {
     formData: {
-      priority: 'media',
       affectedPeople: '',
       frequency: 'unica',
       images: [],
@@ -129,7 +125,6 @@ export const WithErrors: Story = {
 export const LowPriorityComplete: Story = {
   args: {
     formData: {
-      priority: 'baixa',
       affectedPeople: 'Alguns moradores da região, não é urgente mas seria bom resolver',
       frequency: 'semanal',
       images: [],

@@ -12,7 +12,6 @@ export const suggestionSchema = z.object({
       .object({ lat: z.number(), lng: z.number() })
       .optional(),
   }),
-  priority: z.enum(['baixa', 'media', 'alta', 'urgente']).default('media'),
   affectedPeople: z.string().min(1, 'Informe quantas pessoas serão beneficiadas'),
   frequency: z.enum(['unica', 'semanal', 'diaria', 'constante']).default('unica'),
   images: z.array(z.instanceof(File)).max(5).optional(),

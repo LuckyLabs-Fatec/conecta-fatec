@@ -1,9 +1,10 @@
-import { Camera } from "lucide-react";
+import { Camera, ChevronDown, Check } from "lucide-react";
 import Image from "next/image";
+import { Field } from "@base-ui-components/react/field";
+import { Select } from "@base-ui-components/react/select";
 
 interface PriorityImpactStepProps {
     formData: {
-        priority: 'baixa' | 'media' | 'alta' | 'urgente';
         affectedPeople: string;
         frequency: 'unica' | 'semanal' | 'diaria' | 'constante';
         images: File[];
@@ -14,57 +15,19 @@ interface PriorityImpactStepProps {
     onRemoveImage: (index: number) => void;
 }
 
-const PRIORITY_LEVELS = [
-    { value: 'baixa', label: 'Baixa', description: 'Problema que pode aguardar solução', color: 'bg-green-100 text-green-800' },
-    { value: 'media', label: 'Média', description: 'Problema que precisa de atenção', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'alta', label: 'Alta', description: 'Problema que requer solução rápida', color: 'bg-orange-100 text-orange-800' },
-    { value: 'urgente', label: 'Urgente', description: 'Problema que oferece risco imediato', color: 'bg-red-100 text-red-800' }
-];
+// Removido: UI de seleção de nível de prioridade
 
-export const PriorityImpactStep = ({ formData, errors, onChange, onImageUpload, onRemoveImage }: PriorityImpactStepProps) => (
+export const PriorityImpactStep = ({ formData, errors, onChange, onImageUpload, onRemoveImage }: PriorityImpactStepProps) => {
+    const handleFrequencyChange = (val: string) => {
+        const e = { target: { value: val } } as unknown as React.ChangeEvent<HTMLSelectElement>;
+        onChange('frequency')(e);
+    };
+
+    return (
     <div className="space-y-6" role="group" aria-labelledby="priority-impact-heading">
         <h2 id="priority-impact-heading" className="text-xl font-semibold text-gray-800 mb-4">
-            Impacto e Prioridade
+            Impacto
         </h2>
-
-        <div>
-            <fieldset>
-                <legend className="block text-sm font-medium text-gray-700 mb-3">
-                    Nível de prioridade *
-                </legend>
-                <div className="space-y-3" role="radiogroup" aria-required="true">
-                    {PRIORITY_LEVELS.map(priority => (
-                        <label
-                            key={priority.value}
-                            className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-colors
-                                ${formData.priority === priority.value
-                                    ? 'border-[#CB2616] bg-red-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                        >
-                            <input
-                                type="radio"
-                                name="priority"
-                                value={priority.value}
-                                checked={formData.priority === priority.value}
-                                onChange={onChange('priority')}
-                                className="sr-only"
-                                aria-describedby={`priority-${priority.value}-desc`}
-                            />
-                            <div className="flex items-center gap-3">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${priority.color}`}>
-                                    {priority.label}
-                                </span>
-                                <span id={`priority-${priority.value}-desc`} className="text-sm text-gray-600">
-                                    {priority.description}
-                                </span>
-                            </div>
-                            <span className="sr-only">Selecionar prioridade {priority.label}</span>
-                        </label>
-                    ))}
-                </div>
-            </fieldset>
-        </div>
 
         <div>
             <label htmlFor="affectedPeople" className="block text-sm font-medium text-gray-700 mb-2">
@@ -88,21 +51,68 @@ export const PriorityImpactStep = ({ formData, errors, onChange, onImageUpload, 
         </div>
 
         <div>
-            <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-2">
-                Frequência do problema
-            </label>
-            <select
-                id="frequency"
-                value={formData.frequency}
-                onChange={onChange('frequency')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none transition-colors"
-                aria-describedby="frequency-help"
-            >
-                <option value="unica">Ocorrência única</option>
-                <option value="semanal">Acontece semanalmente</option>
-                <option value="diaria">Acontece diariamente</option>
-                <option value="constante">Problema constante</option>
-            </select>
+            <Field.Root>
+                <Field.Label className="block text-sm font-medium text-gray-700 mb-2">
+                    Frequência do problema
+                </Field.Label>
+
+                <Select.Root<string>
+                    name="frequency"
+                    value={formData.frequency}
+                    onValueChange={handleFrequencyChange}
+                    required={false}
+                    modal
+                    items={[
+                        { value: 'unica', label: 'Ocorrência única' },
+                        { value: 'semanal', label: 'Acontece semanalmente' },
+                        { value: 'diaria', label: 'Acontece diariamente' },
+                        { value: 'constante', label: 'Problema constante' }
+                    ] as Array<{label: React.ReactNode; value: string}>}
+                >
+                    <Select.Trigger
+                        className="w-full flex items-center justify-between gap-2 px-4 py-3 border rounded-lg bg-white text-left outline-none transition-all duration-200
+                                   focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616]
+                                   border-gray-300 hover:border-gray-400"
+                        aria-describedby="frequency-help"
+                    >
+                        <Select.Value>
+                            {(v) => ({
+                                unica: 'Ocorrência única',
+                                semanal: 'Acontece semanalmente',
+                                diaria: 'Acontece diariamente',
+                                constante: 'Problema constante',
+                            } as Record<string, string>)[String(v)]}
+                        </Select.Value>
+                        <ChevronDown size={16} className="text-gray-500" aria-hidden="true" />
+                    </Select.Trigger>
+
+                    <Select.Portal>
+                        <Select.Backdrop className="fixed inset-0 bg-black/20" />
+                        <Select.Positioner className="z-50">
+                            <Select.Popup className="mt-1 w-[var(--trigger-width)] max-h-60 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg p-1">
+                                {[
+                                    { value: 'unica', label: 'Ocorrência única' },
+                                    { value: 'semanal', label: 'Acontece semanalmente' },
+                                    { value: 'diaria', label: 'Acontece diariamente' },
+                                    { value: 'constante', label: 'Problema constante' }
+                                ].map((opt) => (
+                                    <Select.Item
+                                        key={opt.value}
+                                        value={opt.value}
+                                        className="group flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-800
+                                                   data-[highlighted]:bg-gray-100 data-[selected]:bg-red-50"
+                                    >
+                                        <Select.ItemIndicator aria-hidden="true" className="opacity-0 group-data-[selected]:opacity-100">
+                                            <Check size={16} className="text-[#CB2616]" />
+                                        </Select.ItemIndicator>
+                                        <Select.ItemText>{opt.label}</Select.ItemText>
+                                    </Select.Item>
+                                ))}
+                            </Select.Popup>
+                        </Select.Positioner>
+                    </Select.Portal>
+                </Select.Root>
+            </Field.Root>
         </div>
 
         {/* Image Upload */}
@@ -160,4 +170,5 @@ export const PriorityImpactStep = ({ formData, errors, onChange, onImageUpload, 
             )}
         </div>
     </div>
-);
+    );
+};

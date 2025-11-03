@@ -23,7 +23,6 @@ export default function SuggestImprovementPage() {
             title: '',
             description: '',
             location: { address: '', neighborhood: '', city: 'Votorantim' },
-            priority: 'media',
             affectedPeople: '',
             frequency: 'unica',
             images: [],
@@ -145,7 +144,6 @@ export default function SuggestImprovementPage() {
                                     <PriorityImpactStepAdapter
                                         setValue={setValue}
                                         values={{
-                                            priority: watchAll.priority,
                                             affectedPeople: watchAll.affectedPeople,
                                             frequency: watchAll.frequency,
                                             images: watchAll.images,
