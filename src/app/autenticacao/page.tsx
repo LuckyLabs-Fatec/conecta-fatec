@@ -89,7 +89,6 @@ export default function LoginPage () {
                                     {authError}
                                 </div>
                             )}
-                            {/* Removido: seleção de tipo de usuário. O perfil é determinado por email/senha mock. */}
 
                             <Input
                                 label="Email"
