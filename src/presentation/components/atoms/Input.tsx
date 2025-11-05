@@ -36,7 +36,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
 }, ref) => {
   const baseInputClasses = `
     w-full px-4 py-3 border rounded-lg outline-none transition-all duration-200
-    focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616]
+    focus:ring-2 focus:ring-[var(--cps-blue-hover-text)] focus:border-[var(--cps-blue-hover-text)]
     disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500
     ${error 
       ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
@@ -81,7 +81,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       />
       
       {error && (
-        <Field.Error 
+        <Field.Error
           id={`${id}-error`}
           className="text-sm text-red-600"
           role="alert"
