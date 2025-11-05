@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
-import { LoginAside, Input } from "@/components"
+import { LoginAside, Input, Button } from "@/components"
 import { useAuth } from "@/hooks/useAuth"
 import Link from "next/link";
 import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';
@@ -68,7 +68,7 @@ export default function RegisterPage() {
                                 Já possui uma conta?{' '}
                                 <Link
                                     href="/autenticacao"
-                                    className="text-[#CB2616] hover:text-red-700 font-medium underline"
+                                    className="text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-title-hover)] font-medium underline"
                                 >
                                     Faça login aqui!
                                 </Link>
@@ -76,8 +76,6 @@ export default function RegisterPage() {
                         </header>
 
                         <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-                            {/* Removido: seleção de tipo de usuário no cadastro. Novas contas são "comunidade". */}
-
                             <Input
                                 label="Nome completo"
                                 id="name"
@@ -107,7 +105,6 @@ export default function RegisterPage() {
                                 error={errors.phone?.message}
                             />
 
-                            {/* Removidos campos condicionais de coordenação e mediador. */}
 
                             <Input
                                 label="Senha"
@@ -135,13 +132,13 @@ export default function RegisterPage() {
                                     <input
                                         type="checkbox"
                                         {...register('agreeToTerms')}
-                                        className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded mt-0.5"
+                                        className="h-4 w-4 text-[var(--cps-blue-base)] focus:ring-[var(--cps-blue-base)] border-gray-300 rounded mt-0.5"
                                     />
                                     <span className="text-sm text-gray-600 leading-relaxed">
                                         Eu aceito os{' '}
                                         <Link
                                             href="/termos"
-                                            className="text-[#CB2616] hover:text-red-700 underline"
+                                            className="text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] underline"
                                             target="_blank"
                                         >
                                             termos e condições
@@ -149,7 +146,7 @@ export default function RegisterPage() {
                                         {' '}e a{' '}
                                         <Link
                                             href="/privacidade"
-                                            className="text-[#CB2616] hover:text-red-700 underline"
+                                            className="text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] underline"
                                             target="_blank"
                                         >
                                             política de privacidade
@@ -163,13 +160,17 @@ export default function RegisterPage() {
                                 )}
                             </div>
 
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full bg-[#CB2616] hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#CB2616] focus:ring-offset-2"
-                            >
-                                {isLoading ? 'CRIANDO CONTA...' : 'CRIAR CONTA'}
-                            </button>
+                            <div>
+                                <Button
+                                    label={isLoading ? 'CRIANDO CONTA...' : 'CRIAR CONTA'}
+                                    onClick={() => {}}
+                                    disabled={isLoading}
+                                    variant="primary"
+                                    size="large"
+                                    type="submit"
+                                    className="w-full rounded-md"
+                                />
+                            </div>
                         </Form>
 
                         <footer className="mt-8 pt-6 border-t border-gray-200">

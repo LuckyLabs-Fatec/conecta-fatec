@@ -33,7 +33,7 @@ export const Header = () => {
   }, []);
 
   return (
-    <header className="bg-[#CB2616] text-white p-4 flex items-center justify-between">
+    <header className="bg-[var(--cps-red-base)] text-white p-4 flex items-center justify-between">
       <div className="flex items-center gap-8">
         <Link href="/" className="flex items-center">
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-montserrat), sans-serif', color: '#FCFCFC' }}>Fatec Conecta</h1>

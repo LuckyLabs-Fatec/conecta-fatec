@@ -105,17 +105,17 @@ export default function LandingPage() {
               role="listitem"
               aria-labelledby="ods-16-title"
             >
-              <h3 id="ods-16-title" className="font-bold text-red-600 mb-2">ODS-16</h3>
+              <h3 id="ods-16-title" className="font-bold text-[var(--cps-blue-base)] mb-2">ODS-16</h3>
               <p className="text-sm text-gray-600" aria-describedby="ods-16-title">
                 Paz, Justiça e Instituições Eficazes
               </p>
             </article>
-            <article 
+            <article
               className="bg-white p-4 rounded-lg shadow-md"
               role="listitem"
               aria-labelledby="ods-17-title"
             >
-              <h3 id="ods-17-title" className="font-bold text-red-600 mb-2">ODS-17</h3>
+              <h3 id="ods-17-title" className="font-bold text-[var(--cps-blue-base)] mb-2">ODS-17</h3>
               <p className="text-sm text-gray-600" aria-describedby="ods-17-title">
                 Parcerias e Meios de Implementação
               </p>
@@ -221,7 +221,7 @@ export default function LandingPage() {
       </main>
       
       <footer 
-        className="bg-gray-800 text-white text-center p-4"
+        className="bg-[var(--cps-blue-base)] text-white text-center p-4"
         role="contentinfo"
         aria-label="Informações do rodapé"
       >
