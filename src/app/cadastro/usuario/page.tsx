@@ -187,13 +187,6 @@ export default function RegisterPage() {
                             </div>
                         </footer>
                     </div>
-
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-500">
-                            Uma iniciativa{' '}
-                            <span className="font-medium text-[#CB2616]">Lucky Labs</span>
-                        </p>
-                    </div>
                 </div>
             </section>
         </main>
