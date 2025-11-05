@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { ProblemDetailsStep } from '../components/ProblemDetailsStep';
+import { ProblemDetailsStep } from '../presentation/components/ProblemDetailsStep';
 
 const meta: Meta<typeof ProblemDetailsStep> = {
   title: 'Organisms/Form Steps/ProblemDetailsStep',

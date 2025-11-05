@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormSetValue, FieldErrors, FieldPath, FieldPathValue } from 'react-hook-form';
-import { ImprovementDetailsStep } from '@/components';
+import { ImprovementDetailsStep } from '@/presentation/components';
 import { SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
 
 interface Props {

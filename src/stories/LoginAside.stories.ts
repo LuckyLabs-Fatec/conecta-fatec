@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { LoginAside } from '@/components';
+import { LoginAside } from '@/presentation/components';
 
 const meta = {
     title: 'Organisms/LoginAside',

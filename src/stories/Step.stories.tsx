@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 
-import { Step } from '@/components';
+import { Step } from '@/presentation/components';
 
 import { Lightbulb } from 'lucide-react';
 

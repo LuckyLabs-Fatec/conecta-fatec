@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormSetValue, FieldPath, FieldPathValue, FieldErrors } from 'react-hook-form';
-import { ContactInfoStep } from '@/components';
+import { LocationStep } from '@/presentation/components';
 import { SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   errors: FieldErrors<SuggestionSchema>;
 }
 
-export const ContactInfoStepAdapter = ({ setValue, values, errors }: Props) => {
+export const LocationStepAdapter = ({ setValue, values, errors }: Props) => {
   const onChange = (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (subField) {
@@ -21,26 +21,21 @@ export const ContactInfoStepAdapter = ({ setValue, values, errors }: Props) => {
     }
   };
 
-  const onAllowContactChange = (checked: boolean) => {
-    const path = ('contactInfo.allowContact' as unknown) as FieldPath<SuggestionSchema>;
-    setValue(path, checked as unknown as FieldPathValue<SuggestionSchema, typeof path>, { shouldValidate: true });
-  };
-
   const formData = {
-    contactInfo: {
-      name: values.contactInfo?.name ?? '',
-      email: values.contactInfo?.email ?? '',
-      phone: values.contactInfo?.phone ?? '',
-      allowContact: values.contactInfo?.allowContact ?? true,
+    location: {
+      address: values.location?.address ?? '',
+      neighborhood: values.location?.neighborhood ?? '',
+      city: values.location?.city ?? 'Votorantim'
     }
   };
 
   const flatErrors = {
-    name: (errors.contactInfo?.name?.message as string) || '',
-    email: (errors.contactInfo?.email?.message as string) || ''
+    address: (errors.location?.address?.message as string) || '',
+    neighborhood: (errors.location?.neighborhood?.message as string) || ''
   };
 
-  return <ContactInfoStep formData={formData} errors={flatErrors} onChange={onChange} onAllowContactChange={onAllowContactChange} />;
+  return <LocationStep formData={formData} errors={flatErrors} onChange={onChange} />;
 };
 
-export default ContactInfoStepAdapter;
+export default LocationStepAdapter;
+

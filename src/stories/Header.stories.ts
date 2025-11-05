@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 
 import { fn } from 'storybook/test';
 
-import { Header } from '@/components';
+import { Header } from '@/presentation/components';
 
 const meta = {
   title: 'Organisms/Header',

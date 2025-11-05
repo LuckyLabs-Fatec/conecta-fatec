@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
-import { LoginAside, Input } from "@/components"
+import { LoginAside, Input } from "@/presentation/components"
 import Link from "next/link";
-import { useAuth, UserRole } from "@/hooks/useAuth";
+import { useAuth, UserRole } from "@/presentation/hooks/useAuth";
 import { loginSchema, LoginSchema } from '@/domain/auth/schemas/login.schema';
 import { resolveMockUser } from '@/domain/auth/mockUsers';
 

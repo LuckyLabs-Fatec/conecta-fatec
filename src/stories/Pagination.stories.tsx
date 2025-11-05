@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
-import { Pagination, PaginationProps } from '@/components';
+import { Pagination, PaginationProps } from '@/presentation/components';
 
 const meta = {
   title: 'Molecules/Pagination',

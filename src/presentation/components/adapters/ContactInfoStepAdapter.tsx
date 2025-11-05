@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormSetValue, FieldPath, FieldPathValue, FieldErrors } from 'react-hook-form';
-import { LocationStep } from '@/components';
+import { ContactInfoStep } from '@/presentation/components';
 import { SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   errors: FieldErrors<SuggestionSchema>;
 }
 
-export const LocationStepAdapter = ({ setValue, values, errors }: Props) => {
+export const ContactInfoStepAdapter = ({ setValue, values, errors }: Props) => {
   const onChange = (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (subField) {
@@ -21,21 +21,26 @@ export const LocationStepAdapter = ({ setValue, values, errors }: Props) => {
     }
   };
 
+  const onAllowContactChange = (checked: boolean) => {
+    const path = ('contactInfo.allowContact' as unknown) as FieldPath<SuggestionSchema>;
+    setValue(path, checked as unknown as FieldPathValue<SuggestionSchema, typeof path>, { shouldValidate: true });
+  };
+
   const formData = {
-    location: {
-      address: values.location?.address ?? '',
-      neighborhood: values.location?.neighborhood ?? '',
-      city: values.location?.city ?? 'Votorantim'
+    contactInfo: {
+      name: values.contactInfo?.name ?? '',
+      email: values.contactInfo?.email ?? '',
+      phone: values.contactInfo?.phone ?? '',
+      allowContact: values.contactInfo?.allowContact ?? true,
     }
   };
 
   const flatErrors = {
-    address: (errors.location?.address?.message as string) || '',
-    neighborhood: (errors.location?.neighborhood?.message as string) || ''
+    name: (errors.contactInfo?.name?.message as string) || '',
+    email: (errors.contactInfo?.email?.message as string) || ''
   };
 
-  return <LocationStep formData={formData} errors={flatErrors} onChange={onChange} />;
+  return <ContactInfoStep formData={formData} errors={flatErrors} onChange={onChange} onAllowContactChange={onAllowContactChange} />;
 };
 
-export default LocationStepAdapter;
-
+export default ContactInfoStepAdapter;

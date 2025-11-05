@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Header } from "@/components";
-import { Button } from "@/components";
-import { useAuth } from "@/hooks/useAuth";
+import { Header } from "@/presentation/components";
+import { Button } from "@/presentation/components";
+import { useAuth } from "@/presentation/hooks/useAuth";
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, User, AlertCircle, CheckCircle, XCircle, Eye, Filter, Search, Users, BookOpen } from "lucide-react";
 import Image from "next/image";

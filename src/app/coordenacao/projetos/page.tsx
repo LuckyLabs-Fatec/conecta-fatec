@@ -3,14 +3,14 @@ export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/presentation/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Header } from '@/components';
-import { Button } from '@/components';
+import { Header } from '@/presentation/components';
+import { Button } from '@/presentation/components';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { assignmentSchema, type AssignmentSchema } from '@/domain/projects/schemas/assignment.schema';
-import { useToast } from '@/components';
+import { useToast } from '@/presentation/components';
 
 interface CoordProjeto {
   id: string;

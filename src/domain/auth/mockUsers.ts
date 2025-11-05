@@ -1,4 +1,4 @@
-import { UserRole } from '@/hooks/useAuth';
+import { UserRole } from '@/presentation/hooks/useAuth';
 
 export type MockUser = {
   email: string;

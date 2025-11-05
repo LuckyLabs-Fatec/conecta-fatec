@@ -1,12 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/presentation/hooks/useAuth';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { reviewSchema, type ReviewSchema } from '@/domain/ideas/schemas/review.schema';
-import { Header } from '@/components';
-import { Button } from '@/components';
+import { Header } from '@/presentation/components';
+import { Button } from '@/presentation/components';
 
 interface Idea {
   id: string;

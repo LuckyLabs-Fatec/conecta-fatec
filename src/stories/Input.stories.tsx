@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Input, InputProps } from '@/components';
+import { Input, InputProps } from '@/presentation/components';
 import { useState } from 'react';
 
 const meta = {

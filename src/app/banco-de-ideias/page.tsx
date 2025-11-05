@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { Header, useToast } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
+import { Header, useToast } from '@/presentation/components';
+import { useAuth } from '@/presentation/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { Calendar, MapPin, Search, Users, CheckCircle } from 'lucide-react';
-import { Button } from '@/components';
+import { Button } from '@/presentation/components';
 
 type SimpleIdea = {
   id: string;

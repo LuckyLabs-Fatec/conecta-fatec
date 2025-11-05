@@ -1,6 +1,6 @@
 import { Input } from "../../atoms/Input";
-import { CategorySelectorMobile } from "@/components/molecules/CategorySelectorMobile";
-import { CategorySelectorDesktop } from "@/components/molecules/CategorySelectorDesktop";
+import { CategorySelectorMobile } from "@/presentation/components/molecules/CategorySelectorMobile";
+import { CategorySelectorDesktop } from "@/presentation/components/molecules/CategorySelectorDesktop";
 
 interface ImprovementDetailsStepProps {
     formData: {

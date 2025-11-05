@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { Button } from "../atoms/Button";
 import Link from "next/link";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/presentation/hooks/useAuth";
 import { ChevronDown, User, LogOut, Settings, School } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 

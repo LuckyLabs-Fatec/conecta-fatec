@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header, useToast } from "@/components";
-import { useAuth } from "@/hooks/useAuth";
+import { Header, useToast } from "@/presentation/components";
+import { useAuth } from "@/presentation/hooks/useAuth";
 
 export default function PerfilPage() {
   const router = useRouter();

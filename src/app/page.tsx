@@ -1,9 +1,9 @@
 'use client';
-import { Button } from "@/components";
-import { Header } from "@/components";
+import { Button } from "@/presentation/components";
+import { Header } from "@/presentation/components";
 import { ClipboardList, Library, Hammer } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/presentation/hooks/useAuth";
 
 export default function LandingPage() {
   const { user, canSuggestIdeas, canAccessIdeaValidation } = useAuth();

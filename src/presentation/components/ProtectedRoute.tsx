@@ -1,5 +1,5 @@
 'use client';
-import { useAuth, UserRole } from '@/hooks/useAuth';
+import { useAuth, UserRole } from '@/presentation/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
