@@ -46,8 +46,8 @@ export const Header = () => {
             </Link>
           )}
           {isAuthenticated && user?.role === 'estudante' && (
-            <Link href="/backlog" className="hover:text-red-200 transition-colors">
-              Backlog
+            <Link href="/banco-de-ideias" className="hover:text-red-200 transition-colors">
+              Banco de Ideias
             </Link>
           )}
           {isAuthenticated && (user?.role === 'mediador' || user?.role === 'coordenacao') && (

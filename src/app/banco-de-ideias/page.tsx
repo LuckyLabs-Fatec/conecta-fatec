@@ -17,7 +17,7 @@ type SimpleIdea = {
 
 const STORAGE_KEY = 'fatec-conecta-backlog-interests';
 
-export default function BacklogPage() {
+export default function BancoDeIdeiasPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const { show } = useToast();
@@ -114,7 +114,7 @@ export default function BacklogPage() {
       <main className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Backlog de Ideias</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Banco de Ideias</h1>
             <p className="text-gray-600">Escolha uma ideia aprovada para trabalhar neste semestre.</p>
           </div>
 
