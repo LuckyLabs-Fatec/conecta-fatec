@@ -163,7 +163,6 @@ export default function RegisterPage() {
                             <div>
                                 <Button
                                     label={isLoading ? 'CRIANDO CONTA...' : 'CRIAR CONTA'}
-                                    onClick={() => {}}
                                     disabled={isLoading}
                                     variant="primary"
                                     size="large"

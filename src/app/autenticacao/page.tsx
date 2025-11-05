@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
-import { LoginAside, Input } from "@/presentation/components"
+import { LoginAside, Input, Button } from "@/presentation/components"
 import Link from "next/link";
 import { useAuth, UserRole } from "@/presentation/hooks/useAuth";
 import { loginSchema, LoginSchema } from '@/domain/auth/schemas/login.schema';
@@ -77,7 +77,7 @@ export default function LoginPage () {
                             <h2 className="text-2xl font-bold text-gray-800 mb-2">Login</h2>
                             <p className="text-gray-600 mb-4">
                                 Se você ainda não possui uma conta! Pode{' '}
-                                <Link href="/cadastro/usuario" className="text-[#CB2616] hover:text-red-700 font-medium underline">
+                                <Link href="/cadastro/usuario" className="text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] font-medium underline">
                                     se cadastrar aqui!
                                 </Link>
                             </p>
@@ -118,29 +118,30 @@ export default function LoginPage () {
                                     />
                                     <span className="ml-2 text-sm text-gray-600">Lembre-se de mim</span>
                                 </label>
-                                <a href="/esqueci-senha" className="text-sm text-[#CB2616] hover:text-red-700 underline">
+                                <a href="/esqueci-senha" className="text-sm text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] underline">
                                     Esqueceu a senha?
                                 </a>
                             </div>
 
-                            <button 
-                                type="submit" 
+                            <Button
+                                label={isLoading ? 'Entrando...' : 'ENTRAR'}
                                 disabled={isLoading}
-                                className="w-full bg-[#CB2616] hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#CB2616] focus:ring-offset-2"
-                            >
-                                {isLoading ? 'Entrando...' : 'ENTRAR'}
-                            </button>
+                                variant="primary"
+                                size="large"
+                                type="submit"
+                                className="w-full rounded-md"
+                            />
                         </Form>
 
                         <footer className="mt-8 pt-6 border-t border-gray-200">
                             <div className="text-center">
                                 <p className="text-sm text-gray-600 mb-4">Novo no Fatec Conecta?</p>
-                                <a 
+                                <Link
                                     href="/cadastro/usuario"
-                                    className="inline-block px-6 py-2 border border-[#CB2616] text-[#CB2616] rounded-lg hover:bg-red-50 transition-colors font-medium"
+                                    className='inline-block px-6 py-2 border border-[var(--cps-blue-base)] text-[var(--cps-blue-base)] rounded-lg hover:bg-[var(--cps-blue-text-hover)] transition-colors font-medium'
                                 >
                                     Criar Conta
-                                </a>
+                                </Link>
                             </div>
                         </footer>
                     </div>
