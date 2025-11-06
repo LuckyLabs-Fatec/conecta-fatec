@@ -312,7 +312,7 @@ export default function ProjectsPage() {
                                     type="text"
                                     placeholder="Buscar por projeto, estudante..."
                                     {...form.register('search', { onChange: () => setPage(1) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
                                 />
                                 {form.formState.errors.search && (
                                     <p className="mt-1 text-xs text-red-600">{form.formState.errors.search.message}</p>
@@ -327,7 +327,7 @@ export default function ProjectsPage() {
                                 <select
                                     id="status-select"
                                     {...form.register('status', { onChange: () => setPage(1) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
                                 >
                                     <option value="">Todos os status</option>
                                     {Object.entries(statusConfig).map(([key, config]) => (
@@ -341,7 +341,7 @@ export default function ProjectsPage() {
                                 <select
                                     id="category-select"
                                     {...form.register('category', { onChange: () => setPage(1) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
                                 >
                                     <option value="">Todas as categorias</option>
                                     {Object.entries(categoryConfig).map(([key, label]) => (
@@ -355,7 +355,7 @@ export default function ProjectsPage() {
                                 <select
                                     id="priority-select"
                                     {...form.register('priority', { onChange: () => setPage(1) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
                                 >
                                     <option value="">Todas as prioridades</option>
                                     {Object.entries(priorityConfig).map(([key, config]) => (
