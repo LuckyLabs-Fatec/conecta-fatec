@@ -8,7 +8,7 @@ const meta: Meta<typeof ContactInfoStep> = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Quarto e último passo do formulário de relato de problemas, onde o usuário informa seus dados de contato.',
+        component: 'Segundo e último passo do formulário de sugestão, com emails e telefones de contato.',
       },
     },
   },
@@ -25,10 +25,6 @@ const meta: Meta<typeof ContactInfoStep> = {
       description: 'Função callback chamada quando um campo é alterado',
       action: 'changed',
     },
-    onAllowContactChange: {
-      description: 'Função callback para alteração da permissão de contato',
-      action: 'allow-contact-changed',
-    },
   },
   tags: ['autodocs'],
 };
@@ -39,19 +35,17 @@ type Story = StoryObj<typeof ContactInfoStep>;
 export const Default: Story = {
   args: {
     formData: {
-      contactInfo: {
-        name: '',
-        email: '',
-        phone: '',
-        allowContact: true,
+      contact: {
+        primaryEmail: 'usuario@exemplo.com',
+        secondaryEmail: '',
+        primaryPhone: '',
+        secondaryPhone: '',
+        details: '',
       },
     },
     errors: {},
-    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       console.log(`Field ${field}.${subField} changed to:`, e.target.value);
-    },
-    onAllowContactChange: (checked: boolean) => {
-      console.log('Allow contact changed to:', checked);
     },
   },
 };
@@ -59,19 +53,17 @@ export const Default: Story = {
 export const WithFilledData: Story = {
   args: {
     formData: {
-      contactInfo: {
-        name: 'Maria Silva',
-        email: 'maria.silva@email.com',
-        phone: '(15) 99999-9999',
-        allowContact: true,
+      contact: {
+        primaryEmail: 'maria@exemplo.com',
+        secondaryEmail: 'alternativo@exemplo.com',
+        primaryPhone: '(15) 99999-9999',
+        secondaryPhone: '(11) 98888-7777',
+        details: 'Ligar à tarde',
       },
     },
     errors: {},
-    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       console.log(`Field ${field}.${subField} changed to:`, e.target.value);
-    },
-    onAllowContactChange: (checked: boolean) => {
-      console.log('Allow contact changed to:', checked);
     },
   },
 };
@@ -79,42 +71,21 @@ export const WithFilledData: Story = {
 export const WithErrors: Story = {
   args: {
     formData: {
-      contactInfo: {
-        name: '',
-        email: 'email-invalido',
-        phone: '',
-        allowContact: true,
+      contact: {
+        primaryEmail: 'email-invalido',
+        secondaryEmail: 'invalid',
+        primaryPhone: '',
+        secondaryPhone: '',
+        details: '',
       },
     },
     errors: {
-      name: 'Nome é obrigatório',
-      email: 'Email deve ter um formato válido',
+      primaryEmail: 'Email principal inválido',
+      secondaryEmail: 'Email opcional inválido',
+      primaryPhone: 'Telefone principal é obrigatório',
     },
-    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       console.log(`Field ${field}.${subField} changed to:`, e.target.value);
-    },
-    onAllowContactChange: (checked: boolean) => {
-      console.log('Allow contact changed to:', checked);
-    },
-  },
-};
-
-export const WithoutContactPermission: Story = {
-  args: {
-    formData: {
-      contactInfo: {
-        name: 'João Santos',
-        email: 'joao@email.com',
-        phone: '',
-        allowContact: false,
-      },
-    },
-    errors: {},
-    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      console.log(`Field ${field}.${subField} changed to:`, e.target.value);
-    },
-    onAllowContactChange: (checked: boolean) => {
-      console.log('Allow contact changed to:', checked);
     },
   },
 };
@@ -122,19 +93,17 @@ export const WithoutContactPermission: Story = {
 export const MinimalInfo: Story = {
   args: {
     formData: {
-      contactInfo: {
-        name: 'Ana Costa',
-        email: 'ana@email.com',
-        phone: '',
-        allowContact: true,
+      contact: {
+        primaryEmail: 'ana@exemplo.com',
+        secondaryEmail: '',
+        primaryPhone: '(15) 90000-0000',
+        secondaryPhone: '',
+        details: '',
       },
     },
     errors: {},
-    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       console.log(`Field ${field}.${subField} changed to:`, e.target.value);
-    },
-    onAllowContactChange: (checked: boolean) => {
-      console.log('Allow contact changed to:', checked);
     },
   },
 };

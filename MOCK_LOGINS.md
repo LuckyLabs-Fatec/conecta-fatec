@@ -5,12 +5,12 @@ Use estes logins para acessar o sistema com perfis diferentes. A autenticação 
 - Comunidade
   - Email: comunidade@fatecconecta.com
   - Senha: 123456
-  - Permissões: sugerir ideias
+  - Permissões: sugerir ideias, ver as próprias ideias que foram submetidas
 
 - Estudante
   - Email: estudante@fatecconecta.com
   - Senha: 123456
-  - Permissões: sugerir ideias
+  - Permissões: sugerir ideias, visualizar ideias aguardando desenvolvimento
 
 - Mediador
   - Email: mediador@fatecconecta.com

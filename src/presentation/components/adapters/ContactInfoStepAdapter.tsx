@@ -10,8 +10,8 @@ interface Props {
 }
 
 export const ContactInfoStepAdapter = ({ setValue, values, errors }: Props) => {
-  const onChange = (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const onChange = (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = (e.target as HTMLInputElement).value;
     if (subField) {
       const path = (`${field}.${subField}` as unknown) as FieldPath<SuggestionSchema>;
       setValue(path, value as unknown as FieldPathValue<SuggestionSchema, typeof path>, { shouldValidate: true });
@@ -21,26 +21,30 @@ export const ContactInfoStepAdapter = ({ setValue, values, errors }: Props) => {
     }
   };
 
-  const onAllowContactChange = (checked: boolean) => {
-    const path = ('contactInfo.allowContact' as unknown) as FieldPath<SuggestionSchema>;
+  const onToggle = (subField: string, checked: boolean) => {
+    const path = (`contact.${subField}` as unknown) as FieldPath<SuggestionSchema>;
     setValue(path, checked as unknown as FieldPathValue<SuggestionSchema, typeof path>, { shouldValidate: true });
   };
 
   const formData = {
-    contactInfo: {
-      name: values.contactInfo?.name ?? '',
-      email: values.contactInfo?.email ?? '',
-      phone: values.contactInfo?.phone ?? '',
-      allowContact: values.contactInfo?.allowContact ?? true,
+    contact: {
+      primaryEmail: values.contact?.primaryEmail ?? '',
+      secondaryEmail: values.contact?.secondaryEmail ?? '',
+      primaryPhone: values.contact?.primaryPhone ?? '',
+      secondaryPhone: values.contact?.secondaryPhone ?? '',
+      details: values.contact?.details ?? '',
+      primaryPhoneIsWhatsapp: values.contact?.primaryPhoneIsWhatsapp ?? false,
+      secondaryPhoneIsWhatsapp: values.contact?.secondaryPhoneIsWhatsapp ?? false,
     }
   };
 
   const flatErrors = {
-    name: (errors.contactInfo?.name?.message as string) || '',
-    email: (errors.contactInfo?.email?.message as string) || ''
-  };
+    primaryEmail: (errors.contact?.primaryEmail?.message as string) || '',
+    secondaryEmail: (errors.contact?.secondaryEmail?.message as string) || '',
+    primaryPhone: (errors.contact?.primaryPhone?.message as string) || '',
+  } as { [key: string]: string };
 
-  return <ContactInfoStep formData={formData} errors={flatErrors} onChange={onChange} onAllowContactChange={onAllowContactChange} />;
+  return <ContactInfoStep formData={formData} errors={flatErrors} onChange={onChange} onToggle={onToggle} />;
 };
 
 export default ContactInfoStepAdapter;

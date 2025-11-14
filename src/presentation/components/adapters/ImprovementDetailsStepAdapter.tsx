@@ -13,7 +13,7 @@ export const ImprovementDetailsStepAdapter = ({ setValue, values, errors }: Prop
   const onChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = e.target.value;
     let path: FieldPath<SuggestionSchema> | null = null;
-    if (field === 'category' || field === 'title' || field === 'description') {
+    if (field === 'title' || field === 'description') {
       path = field as FieldPath<SuggestionSchema>;
     }
     if (path) {
@@ -21,19 +21,40 @@ export const ImprovementDetailsStepAdapter = ({ setValue, values, errors }: Prop
     }
   };
 
+  const onAttachmentUpload = (files: FileList | null) => {
+    if (!files) return;
+    const arr: File[] = Array.from(files).slice(0, 5);
+    const path = 'attachments' as FieldPath<SuggestionSchema>;
+    setValue(path, arr as unknown as FieldPathValue<SuggestionSchema, typeof path>, { shouldValidate: true });
+  };
+
+  const onRemoveAttachment = (index: number) => {
+    const current: File[] = (values.attachments as File[]) || [];
+    const next: File[] = current.filter((_, i) => i !== index);
+    const path = 'attachments' as FieldPath<SuggestionSchema>;
+    setValue(path, next as unknown as FieldPathValue<SuggestionSchema, typeof path>, { shouldValidate: true });
+  };
+
   const formData = {
-    category: (values.category as string) ?? '',
     title: (values.title as string) ?? '',
-    description: (values.description as string) ?? ''
+    description: (values.description as string) ?? '',
+    attachments: (values.attachments as File[]) ?? []
   };
 
   const flatErrors = {
-    category: (errors.category?.message as string) || '',
     title: (errors.title?.message as string) || '',
     description: (errors.description?.message as string) || ''
   };
 
-  return <ImprovementDetailsStep formData={formData} errors={flatErrors} onChange={onChange} />;
+  return (
+    <ImprovementDetailsStep
+      formData={formData}
+      errors={flatErrors}
+      onChange={onChange}
+      onAttachmentUpload={onAttachmentUpload}
+      onRemoveAttachment={onRemoveAttachment}
+    />
+  );
 };
 
 export default ImprovementDetailsStepAdapter;

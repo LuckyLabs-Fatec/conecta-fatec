@@ -6,27 +6,31 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
 import { Header } from "@/presentation/components"
 import { ImprovementDetailsStepAdapter } from '@/presentation/components/adapters/ImprovementDetailsStepAdapter'
-import { LocationStepAdapter } from '@/presentation/components/adapters/LocationStepAdapter'
-import { PriorityImpactStepAdapter } from '@/presentation/components/adapters/PriorityImpactStepAdapter'
 import { ContactInfoStepAdapter } from '@/presentation/components/adapters/ContactInfoStepAdapter'
 import { ChevronLeft, ChevronRight, Send } from "lucide-react";
 import { suggestionSchema, SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
+import { useAuth } from "@/presentation/hooks/useAuth";
 
 export default function SuggestImprovementPage() {
     const [currentStep, setCurrentStep] = useState(1);
-    const totalSteps = 4;
+    const totalSteps = 2;
+    const { user } = useAuth();
 
     const { handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<SuggestionSchema>({
         resolver: zodResolver(suggestionSchema) as Resolver<SuggestionSchema>,
         defaultValues: {
-            category: '',
             title: '',
             description: '',
-            location: { address: '', neighborhood: '', city: 'Votorantim' },
-            affectedPeople: '',
-            frequency: 'unica',
-            images: [],
-            contactInfo: { name: '', email: '', phone: '', allowContact: true }
+            attachments: [],
+            contact: {
+                primaryEmail: user?.email || '',
+                secondaryEmail: '',
+                primaryPhone: '',
+                secondaryPhone: '',
+                details: '',
+                primaryPhoneIsWhatsapp: false,
+                secondaryPhoneIsWhatsapp: false,
+            }
         }
     });
 
@@ -35,13 +39,9 @@ export default function SuggestImprovementPage() {
     const validateStep = async (step: number): Promise<boolean> => {
         switch (step) {
             case 1:
-                return await trigger(['category', 'title', 'description']);
+                return await trigger(['title', 'description']);
             case 2:
-                return true; // todos os campos de localização são opcionais
-            case 3:
-                return await trigger(['affectedPeople']);
-            case 4:
-                return await trigger(['contactInfo.name', 'contactInfo.email']);
+                return await trigger(['contact.primaryEmail', 'contact.primaryPhone']);
             default:
                 return true;
         }
@@ -62,18 +62,7 @@ export default function SuggestImprovementPage() {
         console.log('Submitting improvement suggestion:', data);
         // Here you would submit to your backend
     };
-
-    const handleImageUpload = (files: FileList | null) => {
-        if (!files) return;
-        const arr: File[] = Array.from(files).slice(0, 5);
-        setValue('images', arr, { shouldValidate: true });
-    };
-
-    const removeImage = (index: number) => {
-        const current: File[] = (watchAll.images as unknown as File[]) || [];
-        const next: File[] = current.filter((_, i) => i !== index);
-        setValue('images', next, { shouldValidate: true });
-    };
+    // Attachments are handled inside the details adapter
 
     const ProgressBar = () => (
         <div className="mb-8">
@@ -101,111 +90,83 @@ export default function SuggestImprovementPage() {
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                            Sugira uma Ideia de Melhoria
+                            Submeter uma proposta
                         </h1>
                         <p className="text-gray-600">
-                            Compartilhe sua ideia de melhoria para a comunidade. Estudantes da Fatec Votorantim podem transformar sua sugestão em um projeto real!
+                            Cadastre a sua proposta. Estudantes da Fatec Votorantim podem transformar sua sugestão em um projeto real!
                         </p>
                     </div>
 
-                        <ProgressBar />
+                    <ProgressBar />
 
-                        <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                            {/* Step 1: Improvement Details */}
-                            {currentStep === 1 && (
-                                <div className="space-y-6" role="group" aria-labelledby="improvement-details-heading">
-                                    <ImprovementDetailsStepAdapter
-                                        setValue={setValue}
-                                        values={{
-                                            category: watchAll.category,
-                                            title: watchAll.title,
-                                            description: watchAll.description,
-                                        }}
-                                        errors={errors}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Step 2: Location */}
-                            {currentStep === 2 && (
-                                <LocationStepAdapter
+                    <Form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                        {/* Step 1: Improvement Details */}
+                        {currentStep === 1 && (
+                            <div className="space-y-6" role="group" aria-labelledby="improvement-details-heading">
+                                <ImprovementDetailsStepAdapter
                                     setValue={setValue}
-                                    values={{ location: watchAll.location }}
+                                    values={{
+                                        title: watchAll.title,
+                                        description: watchAll.description,
+                                        attachments: watchAll.attachments,
+                                    }}
                                     errors={errors}
+
                                 />
-                            )}
+                            </div>
+                        )}
 
-                            {/* Step 3: Priority and Impact */}
-                            {currentStep === 3 && (
-                                <div className="space-y-6" role="group" aria-labelledby="impact-priority-heading">
-                                    <h2 id="impact-priority-heading" className="text-xl font-semibold text-gray-800 mb-4">
-                                        Impacto e Benefícios
-                                    </h2>
-                                    <PriorityImpactStepAdapter
-                                        setValue={setValue}
-                                        values={{
-                                            affectedPeople: watchAll.affectedPeople,
-                                            frequency: watchAll.frequency,
-                                            images: watchAll.images,
-                                        }}
-                                        errors={errors}
-                                        onImageUpload={handleImageUpload}
-                                        onRemoveImage={removeImage}
-                                    />
-                                </div>
-                            )}
+                        {/* Step 2: Contact Information */}
+                        {currentStep === 2 && (
+                            <ContactInfoStepAdapter
+                                setValue={setValue}
+                                values={{ contact: watchAll.contact }}
+                                errors={errors}
+                            />
+                        )}
 
-                            {/* Step 4: Contact Information */}
-                            {currentStep === 4 && (
-                                <ContactInfoStepAdapter
-                                    setValue={setValue}
-                                    values={{ contactInfo: watchAll.contactInfo }}
-                                    errors={errors}
-                                />
-                            )}
+                        {/* Navigation Buttons */}
+                        <div className="flex justify-between pt-6 border-t border-gray-200">
+                            <button
+                                type="button"
+                                onClick={prevStep}
+                                disabled={currentStep === 1}
+                                className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                            >
+                                <ChevronLeft size={16} />
+                                Anterior
+                            </button>
 
-                            {/* Navigation Buttons */}
-                            <div className="flex justify-between pt-6 border-t border-gray-200">
+                            {currentStep < totalSteps ? (
                                 <button
                                     type="button"
-                                    onClick={prevStep}
-                                    disabled={currentStep === 1}
-                                    className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                                    onClick={nextStep}
+                                    className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors"
                                 >
-                                    <ChevronLeft size={16} />
-                                    Anterior
+                                    Próximo
+                                    <ChevronRight size={16} />
                                 </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors"
+                                >
+                                    <Send size={16} />
+                                    Enviar Sugestão
+                                </button>
+                            )}
+                        </div>
+                    </Form>
+                </div>
 
-                                {currentStep < totalSteps ? (
-                                    <button
-                                        type="button"
-                                        onClick={nextStep}
-                                        className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors"
-                                    >
-                                        Próximo
-                                        <ChevronRight size={16} />
-                                    </button>
-                                ) : (
-                                    <button
-                                        type="submit"
-                                        className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors"
-                                    >
-                                        <Send size={16} />
-                                        Enviar Sugestão
-                                    </button>
-                                )}
-                            </div>
-                        </Form>
-                    </div>
-
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-500">
-                            Dúvidas? Entre em contato:{' '}
-                            <a href="mailto:contato@fatecconecta.com" className="text-[#CB2616] hover:underline">
-                                contato@fatecconecta.com
-                            </a>
-                        </p>
-                    </div>
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-500">
+                        Dúvidas? Entre em contato:{' '}
+                        <a href="mailto:contato@fatecconecta.com" className="text-[#CB2616] hover:underline">
+                            contato@fatecconecta.com
+                        </a>
+                    </p>
+                </div>
             </main>
         </>
     );
