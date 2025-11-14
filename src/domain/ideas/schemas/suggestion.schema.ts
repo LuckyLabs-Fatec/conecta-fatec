@@ -1,25 +1,19 @@
 import { z } from 'zod';
 
+// New two-step schema: details + contact
 export const suggestionSchema = z.object({
-  category: z.string().min(1, 'Selecione uma categoria'),
   title: z.string().min(1, 'Título é obrigatório'),
   description: z.string().min(1, 'Descrição é obrigatória'),
-  location: z.object({
-    address: z.string().optional(),
-    neighborhood: z.string().optional(),
-    city: z.string().optional(),
-    coordinates: z
-      .object({ lat: z.number(), lng: z.number() })
-      .optional(),
-  }),
-  affectedPeople: z.string().min(1, 'Informe quantas pessoas serão beneficiadas'),
-  frequency: z.enum(['unica', 'semanal', 'diaria', 'constante']).default('unica'),
-  images: z.array(z.instanceof(File)).max(5).optional(),
-  contactInfo: z.object({
-    name: z.string().min(1, 'Nome é obrigatório'),
-    email: z.string().email('Email inválido'),
-    phone: z.string().optional(),
-    allowContact: z.boolean().default(true),
+  attachments: z.array(z.instanceof(File)).max(5).optional(),
+  contact: z.object({
+    primaryEmail: z.string().email('Email principal inválido'),
+    // Allow empty string for optional fields coming from inputs
+    secondaryEmail: z.union([z.string().email('Email opcional inválido'), z.literal('')]).optional(),
+    primaryPhone: z.string().min(1, 'Telefone principal é obrigatório'),
+    secondaryPhone: z.union([z.string(), z.literal('')]).optional(),
+    details: z.union([z.string(), z.literal('')]).optional(),
+    primaryPhoneIsWhatsapp: z.boolean().default(false),
+    secondaryPhoneIsWhatsapp: z.boolean().optional().default(false),
   }),
 });
 
