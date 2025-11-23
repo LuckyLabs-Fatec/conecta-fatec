@@ -43,6 +43,3 @@ Projeto desenvolvido durante o PI do curso de Desenvolvimento de Software Multip
 - `src/components`: Contém os componentes reutilizáveis da aplicação.
 - `src/stories`: Contém os arquivos de Storybook para os componentes.
 - `public`: Contém os arquivos estáticos, como imagens e fontes.
-
-## Contribuição
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests.
