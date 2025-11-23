@@ -83,9 +83,9 @@ export const ImprovementDetailsStep = ({ formData, errors, onChange, onAttachmen
                 </div>
 
                 {formData.attachments.length > 0 && (
-                    <ul className="mt-4 space-y-2" role="list">
+                    <ul className="mt-4 space-y-2">
                         {formData.attachments.map((file, idx) => (
-                            <li key={idx} role="listitem" className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md px-3 py-2 text-sm">
+                            <li key={idx} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md px-3 py-2 text-sm">
                                 <span className="truncate mr-3">{file.name}</span>
                                 <button
                                     type="button"
