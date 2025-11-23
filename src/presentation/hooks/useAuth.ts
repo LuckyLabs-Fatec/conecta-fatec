@@ -1,67 +1,98 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/client';
+import { LoginSchema } from '@/domain/auth/schemas/login.schema';
+import { RegisterSchema } from '@/domain/auth/schemas/register.schema';
 
 export type UserRole = 'comunidade' | 'mediador' | 'coordenacao' | 'estudante';
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string;
-    loginTime: string;
+interface AppUser extends User {
     role: UserRole;
-    department?: string; // Para coordenação
-    specialization?: string; // Para mediador
+    department?: string;
+    specialization?: string;
+    user_metadata: {
+        name?: string;
+        avatar?: string;
+        role?: UserRole;
+        phone?: string;
+        phone_is_whats?: boolean;
+    }
 }
 
 export const useAuth = () => {
-    const [user, setUser] = useState<User | null>(null);
+    const supabase = createClient();
+    const [user, setUser] = useState<AppUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Check if user is logged in on component mount
-        const checkAuth = () => {
-            try {
-                const userData = localStorage.getItem('fatec-conecta-user');
-                if (userData) {
-                    const parsedUser = JSON.parse(userData);
-                    setUser(parsedUser);
-                }
-            } catch (error) {
-                console.error('Error parsing user data:', error);
-                localStorage.removeItem('fatec-conecta-user');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        checkAuth();
-    }, []);
-
-    const login = (userData: User) => {
-        localStorage.setItem('fatec-conecta-user', JSON.stringify(userData));
-        setUser(userData);
-    };
-
-    const logout = () => {
-        localStorage.removeItem('fatec-conecta-user');
-        setUser(null);
-    };
-
-    const updateUser = (partial: Partial<User>) => {
-        setUser((prev) => {
-            if (!prev) return prev;
-            const next = { ...prev, ...partial } as User;
-            localStorage.setItem('fatec-conecta-user', JSON.stringify(next));
-            return next;
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            setUser(session?.user as AppUser ?? null);
+            setIsLoading(false);
         });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [supabase.auth]);
+
+    const login = async (credentials: LoginSchema) => {
+        const { error } = await supabase.auth.signInWithPassword(credentials);
+        if (error) {
+            throw new Error(error.message);
+        }
+    };
+
+    const signup = async (credentials: RegisterSchema) => {
+        const { error: signUpError } = await supabase.auth.signUp({
+            email: credentials.email,
+            password: credentials.password,
+            options: {
+                data: {
+                    name: credentials.name,
+                    role: 'comunidade',
+                },
+            },
+        });
+
+        if (signUpError) {
+            throw new Error(signUpError.message);
+        }
+
+        const { name, email, phone } = credentials;
+        const role = 'comunidade';
+
+        try {
+            const response = await fetch('/api/user-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, phone, role }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error creating user profile:', errorData);
+                throw new Error(errorData.error || 'Failed to create user profile');
+            }
+        } catch (profileError: unknown) {
+            const err = profileError as Error;
+            console.error('Network or unexpected error when creating user profile:', err);
+            throw new Error(err.message || 'Failed to create user profile');
+        }
+    };
+
+    const logout = async () => {
+        await supabase.auth.signOut();
+        setUser(null);
     };
 
     const hasPermission = (requiredRole: UserRole | UserRole[]) => {
         if (!user) return false;
-        
+
         const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-        return roles.includes(user.role);
+        const userRole = (user.user_metadata.role as string)?.toLowerCase() as UserRole;
+        const normalizedRoles = roles.map(role => role.toLowerCase() as UserRole);
+        return normalizedRoles.includes(userRole);
     };
 
     const canAccessIdeaValidation = () => {
@@ -80,8 +111,8 @@ export const useAuth = () => {
         user,
         isLoading,
         login,
+        signup,
         logout,
-        updateUser,
         isAuthenticated: !!user,
         hasPermission,
         canAccessIdeaValidation,

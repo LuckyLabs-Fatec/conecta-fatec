@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,10 +7,13 @@ import { useAuth } from "@/presentation/hooks/useAuth";
 
 export default function PerfilPage() {
   const router = useRouter();
-  const { user, isLoading, isAuthenticated, updateUser } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
   const { show } = useToast();
-  const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState("");
+  const [editingName, setEditingName] = useState('');
+  const [editingAvatar, setEditingAvatar] = useState('');
+  const [editingPhone, setEditingPhone] = useState('');
+  const [editingPhoneIsWhatsapp, setEditingPhoneIsWhatsapp] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [largeFont, setLargeFont] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
 
@@ -23,12 +25,10 @@ export default function PerfilPage() {
 
   useEffect(() => {
     if (user) {
-      setName(user.name ?? "");
-      setAvatar(user.avatar ?? "");
-    }
-    if (typeof window !== "undefined") {
-      setLargeFont(document.body.classList.contains("a11y-large-font"));
-      setHighContrast(document.body.classList.contains("a11y-high-contrast"));
+      setEditingName(user.user_metadata.name ?? '');
+      setEditingAvatar(user.user_metadata.avatar ?? '');
+      setEditingPhone(user.user_metadata.phone ?? '');
+      setEditingPhoneIsWhatsapp(user.user_metadata.phone_is_whats ?? false);
     }
   }, [user]);
 
@@ -36,26 +36,11 @@ export default function PerfilPage() {
     return null;
   }
 
-  const roleLabel: Record<string, string> = {
-    comunidade: "Comunidade",
-    mediador: "Mediador",
-    coordenacao: "Coordenação",
-  };
-
-  const formattedLoginTime = (() => {
-    try {
-      return new Date(user.loginTime).toLocaleString();
-    } catch {
-      return user.loginTime;
-    }
-  })();
-
-  const onSave = () => {
-    updateUser({ name, avatar });
-    show({ kind: "success", message: "Perfil atualizado." });
-  };
-
   const onCopyEmail = async () => {
+    if (!user.email) {
+      show({ kind: "error", message: "E-mail não disponível para cópia." });
+      return;
+    }
     try {
       await navigator.clipboard.writeText(user.email);
       show({ kind: "success", message: "E-mail copiado para a área de transferência." });
@@ -87,6 +72,36 @@ export default function PerfilPage() {
     applyA11y("a11y-high-contrast", next);
   };
 
+  const onSave = async () => {
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/user-profile/${user?.id as string}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: editingName,
+          avatar: editingAvatar,
+          phone: editingPhone,
+          phone_is_whats: editingPhoneIsWhatsapp,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update profile');
+      }
+
+      show({ kind: 'success', message: 'Perfil atualizado com sucesso!' });
+    } catch (error: unknown) {
+      const err = error as Error;
+      show({ kind: 'error', message: err.message || 'Erro ao atualizar perfil.' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -97,8 +112,8 @@ export default function PerfilPage() {
           <section className="bg-white border rounded-xl shadow-sm p-6 flex flex-col md:flex-row gap-6">
             <div className="flex-shrink-0">
               <Image
-                src={user.avatar}
-                alt={`Avatar de ${user.name}`}
+                src={user.user_metadata.avatar ?? '/logo.svg'}
+                alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
                 width={96}
                 height={96}
                 className="rounded-full border"
@@ -110,8 +125,8 @@ export default function PerfilPage() {
                 <label htmlFor="name" className="text-xs text-gray-500">Nome</label>
                 <input
                   id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
                   className="mt-1 w-full px-3 py-2 border rounded-lg"
                 />
               </div>
@@ -122,14 +137,33 @@ export default function PerfilPage() {
                   <button onClick={onCopyEmail} className="text-sm text-[#CB2616] hover:underline">Copiar</button>
                 </div>
               </div>
-              <Info label="Perfil" value={roleLabel[user.role] ?? user.role} />
-              <Info label="Login" value={formattedLoginTime} />
+
+              <div className="md:col-span-1">
+                <label htmlFor="phone" className="text-xs text-gray-500">Telefone</label>
+                <input
+                  id="phone"
+                  value={editingPhone}
+                  onChange={(e) => setEditingPhone(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div className="md:col-span-1 flex items-center mt-6">
+                <input
+                  type="checkbox"
+                  id="phoneIsWhatsapp"
+                  checked={editingPhoneIsWhatsapp}
+                  onChange={(e) => setEditingPhoneIsWhatsapp(e.target.checked)}
+                  className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
+                />
+                <label htmlFor="phoneIsWhatsapp" className="ml-2 text-sm text-gray-600">É WhatsApp</label>
+              </div>
+
               <div className="md:col-span-2">
                 <label htmlFor="avatar" className="text-xs text-gray-500">URL do Avatar</label>
                 <input
                   id="avatar"
-                  value={avatar}
-                  onChange={(e) => setAvatar(e.target.value)}
+                  value={editingAvatar}
+                  onChange={(e) => setEditingAvatar(e.target.value)}
                   placeholder="https://..."
                   className="mt-1 w-full px-3 py-2 border rounded-lg"
                 />
@@ -140,8 +174,8 @@ export default function PerfilPage() {
           </section>
 
           <div className="mt-4 flex gap-3">
-            <button onClick={onSave} className="rounded px-4 py-2 bg-[var(--palette-red-600)] text-white hover:bg-[var(--palette-red-700)]">
-              Salvar alterações
+            <button onClick={onSave} disabled={isSaving} className="rounded px-4 py-2 bg-[var(--palette-red-600)] text-white hover:bg-[var(--palette-red-700)] disabled:opacity-50 disabled:cursor-not-allowed">
+              {isSaving ? 'Salvando...' : 'Salvar alterações'}
             </button>
           </div>
 

@@ -40,22 +40,22 @@ export const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          {isAuthenticated && user?.role === 'comunidade' && (
+          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'comunidade' && (
             <Link href="/sugerir-melhoria" className="hover:text-red-200 transition-colors">
               Sugerir Melhoria
             </Link>
           )}
-          {isAuthenticated && user?.role === 'estudante' && (
+          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'estudante' && (
             <Link href="/banco-de-ideias" className="hover:text-red-200 transition-colors">
               Banco de Ideias
             </Link>
           )}
-          {isAuthenticated && (user?.role === 'mediador' || user?.role === 'coordenacao') && (
+          {isAuthenticated && (user?.user_metadata.role?.toLowerCase() === 'mediador' || user?.user_metadata.role?.toLowerCase() === 'coordenacao') && (
             <Link href="/validar-ideias" className="hover:text-red-200 transition-colors">
               Validar Ideias
             </Link>
           )}
-          {isAuthenticated && user?.role === 'coordenacao' && (
+          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'coordenacao' && (
             <Link href="/coordenacao/projetos" className="hover:text-red-200 transition-colors">
               Direcionar para Curso
             </Link>
@@ -75,23 +75,23 @@ export const Header = () => {
             aria-haspopup="true"
           >
             <Image
-              src={user.avatar}
-              alt={`Avatar de ${user.name}`}
+              src={user.user_metadata.avatar ?? '/logo.svg'}
+              alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
               width={32}
               height={32}
               className="rounded-full"
             />
-            <span className="hidden md:block font-medium">{user.name}</span>
+            <span className="hidden md:block font-medium">{user.user_metadata.name}</span>
             <ChevronDown size={16} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg border z-50">
               <div className="px-4 py-3 border-b border-gray-200">
-                <p className="font-medium">{user.name}</p>
+                <p className="font-medium">{user.user_metadata.name}</p>
                 <p className="text-sm text-gray-500">{user.email}</p>
               </div>
-              
+
               <div className="py-1">
                 <Link href="/perfil" onClick={() => setIsDropdownOpen(false)} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
                   <User size={16} />
@@ -101,14 +101,14 @@ export const Header = () => {
                   <Settings size={16} />
                   <span>Configurações</span>
                 </Link>
-                {user.role === 'coordenacao' && (
+                {user.user_metadata.role?.toLowerCase() === 'coordenacao' && (
                   <Link href="/coordenacao/projetos" className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
                     <School size={16} />
                     <span>Direcionar para Curso</span>
                   </Link>
                 )}
                 <hr className="my-1" />
-                <button 
+                <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors"
                 >
@@ -121,7 +121,7 @@ export const Header = () => {
         </div>
       ) : (
         <Link href="/autenticacao">
-          <Button label="Login" onClick={() => {}} variant="secondary" size="medium" />
+          <Button label="Login" onClick={() => { }} variant="secondary" size="medium" />
         </Link>
       )}
     </header>

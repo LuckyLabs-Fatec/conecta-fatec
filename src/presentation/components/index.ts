@@ -2,6 +2,8 @@
 export { Button } from './atoms/Button';
 export { Input } from './atoms/Input';
 export type { InputProps } from './atoms/Input';
+export { MaskedInput } from './atoms/MaskedInput';
+export type { MaskConfig } from './atoms/MaskedInput';
 export { ToastProvider, useToast } from './atoms/Toast';
 export { VLibrasWidget } from './atoms/VLibrasWidget';
 

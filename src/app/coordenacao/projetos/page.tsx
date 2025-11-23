@@ -54,7 +54,7 @@ function CoordenacaoProjetosContent() {
 
   useEffect(() => {
     if (!isLoading) {
-      if (!user || user.role !== 'coordenacao') router.push('/');
+      if (!user || (user.role as string)?.toLowerCase() !== 'coordenacao') router.push('/');
     }
   }, [isLoading, user, router]);
 
@@ -188,7 +188,7 @@ function CoordenacaoProjetosContent() {
                 </div>
                 <div className="flex gap-2 justify-end pt-2">
                   <Button label="Cancelar" onClick={() => setSelected(null)} variant="secondary" size="medium" />
-                  <Button label="Direcionar" onClick={() => {}} variant="primary" size="medium" />
+                  <Button label="Direcionar" onClick={() => { }} variant="primary" size="medium" />
                   <button type="submit" className="hidden" />
                 </div>
               </form>

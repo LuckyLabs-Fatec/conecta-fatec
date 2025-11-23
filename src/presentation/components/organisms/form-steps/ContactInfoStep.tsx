@@ -1,4 +1,11 @@
 import { Input } from "../../atoms/Input";
+import { MaskedInput, type MaskConfig } from "../../atoms/MaskedInput";
+
+const phoneMaskConfig: MaskConfig = {
+    pattern: '(xx) xxxxx-xxxx',
+    charRegex: /^\d{0,11}$/,
+    placeholder: '(11) 99999-9999'
+};
 
 interface ContactInfoStepProps {
     formData: {
@@ -15,9 +22,10 @@ interface ContactInfoStepProps {
     errors: { [key: string]: string };
     onChange: (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onToggle: (subField: string, value: boolean) => void;
+    hasPhone?: boolean;
 }
 
-export const ContactInfoStep = ({ formData, errors, onChange, onToggle }: ContactInfoStepProps) => (
+export const ContactInfoStep = ({ formData, errors, onChange, onToggle, hasPhone = false }: ContactInfoStepProps) => (
     <div className="space-y-6" role="group" aria-labelledby="contact-info-heading">
         <h2 id="contact-info-heading" className="text-xl font-semibold text-gray-800 mb-4">
             Informações de Contato
@@ -52,15 +60,16 @@ export const ContactInfoStep = ({ formData, errors, onChange, onToggle }: Contac
             error={errors.secondaryEmail}
         />
 
-        <Input
+        <MaskedInput
             label="Telefone principal"
             id="primaryPhone"
-            type="tel"
-            placeholder="(11) 99999-9999"
             required={true}
+            disabled={hasPhone}
             value={formData.contact.primaryPhone}
             onChange={onChange('contact', 'primaryPhone')}
+            maskConfig={phoneMaskConfig}
             error={errors.primaryPhone}
+            description={hasPhone ? 'Este telefone está vinculado à sua conta' : undefined}
         />
         <div className="flex items-center gap-2 ml-1">
             <input
@@ -75,13 +84,12 @@ export const ContactInfoStep = ({ formData, errors, onChange, onToggle }: Contac
             </label>
         </div>
 
-        <Input
+        <MaskedInput
             label="Segundo telefone (opcional)"
             id="secondaryPhone"
-            type="tel"
-            placeholder="Opcional"
             value={formData.contact.secondaryPhone || ''}
             onChange={onChange('contact', 'secondaryPhone')}
+            maskConfig={phoneMaskConfig}
         />
         <div className="flex items-center gap-2 ml-1">
             <input
