@@ -6,9 +6,10 @@ import { cookies } from 'next/headers';
 
 const userProfileSchema = z.object({
   name: z.string().min(1),
-  email: z.string().min(1).email(),
+  email: z.email().min(1),
   phone: z.string().optional(),
-  role: z.enum(['Comunidade', 'Mediador', 'Coordenacao', 'Estudante', 'comunidade', 'mediador', 'coordenacao', 'estudante']),
+  role: z.enum(['comunidade', 'mediador', 'coordenacao', 'estudante']),
+  uid: z.uuid(),
 });
 
 const updatePhoneSchema = z.object({
@@ -24,21 +25,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(validation.error.issues, { status: 400 });
   }
 
-  const { name, email, phone, role } = validation.data;
+  const { name, email, phone, role, uid } = validation.data;
 
-  const capitalizeRole = (role: string): string => {
-    const roleMap: Record<string, string> = {
-      'comunidade': 'Comunidade',
-      'mediador': 'Mediador',
-      'coordenacao': 'Coordenacao',
-      'estudante': 'Estudante',
-      'Comunidade': 'Comunidade',
-      'Mediador': 'Mediador',
-      'Coordenacao': 'Coordenacao',
-      'Estudante': 'Estudante',
-    };
-    return roleMap[role] || role;
-  };
+
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -67,7 +56,8 @@ export async function POST(req: NextRequest) {
         telefone: phone || '',
         telefone_is_whats: false,
         ativo: true,
-        perfil: capitalizeRole(role),
+        perfil: role,
+        uid: uid,
       },
     ]);
 

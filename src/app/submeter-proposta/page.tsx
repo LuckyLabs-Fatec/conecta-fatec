@@ -257,6 +257,7 @@ export default function SuggestImprovementPage() {
 
                             {currentStep < totalSteps ? (
                                 <button
+                                    key="next-btn"
                                     type="button"
                                     onClick={nextStep}
                                     className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -266,6 +267,7 @@ export default function SuggestImprovementPage() {
                                 </button>
                             ) : (
                                 <button
+                                    key="submit-btn"
                                     type="submit"
                                     disabled={isSubmitting}
                                     className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "../atoms/Button";
 import Link from "next/link";
 import { useAuth } from "@/presentation/hooks/useAuth";
-import { ChevronDown, User, LogOut, Settings, School } from "lucide-react";
+import { ChevronDown, User, LogOut, Settings } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export const Header = () => {
@@ -11,10 +11,9 @@ export const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setIsDropdownOpen(false);
-    // Redirect to home page
     window.location.href = '/';
   };
 
@@ -41,28 +40,21 @@ export const Header = () => {
 
         <nav className="hidden md:flex items-center gap-6">
           {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'comunidade' && (
-            <Link href="/sugerir-melhoria" className="hover:text-red-200 transition-colors">
-              Sugerir Melhoria
+            <Link href="/submeter-proposta" className="hover:text-red-200 transition-colors">
+              Submeter Proposta
             </Link>
           )}
-          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'estudante' && (
-            <Link href="/banco-de-ideias" className="hover:text-red-200 transition-colors">
-              Banco de Ideias
+          {/* Unified Dashboard Link */}
+          {isAuthenticated && ['coordenador', 'mediador'].includes(user?.user_metadata.role?.toLowerCase() ?? '') && (
+            <Link href="/acompanhar-projetos" className="hover:text-red-200 transition-colors">
+              Acompanhar Projetos
             </Link>
           )}
-          {isAuthenticated && (user?.user_metadata.role?.toLowerCase() === 'mediador' || user?.user_metadata.role?.toLowerCase() === 'coordenacao') && (
-            <Link href="/validar-ideias" className="hover:text-red-200 transition-colors">
-              Validar Ideias
+          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'admin' && (
+            <Link href="/admin/usuarios" className="hover:text-red-200 transition-colors">
+              Administração
             </Link>
           )}
-          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'coordenacao' && (
-            <Link href="/coordenacao/projetos" className="hover:text-red-200 transition-colors">
-              Direcionar para Curso
-            </Link>
-          )}
-          <Link href="/acompanhar-projetos" className="hover:text-red-200 transition-colors">
-            Acompanhar Projetos
-          </Link>
         </nav>
       </div>
 
@@ -101,12 +93,6 @@ export const Header = () => {
                   <Settings size={16} />
                   <span>Configurações</span>
                 </Link>
-                {user.user_metadata.role?.toLowerCase() === 'coordenacao' && (
-                  <Link href="/coordenacao/projetos" className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition-colors">
-                    <School size={16} />
-                    <span>Direcionar para Curso</span>
-                  </Link>
-                )}
                 <hr className="my-1" />
                 <button
                   onClick={handleLogout}

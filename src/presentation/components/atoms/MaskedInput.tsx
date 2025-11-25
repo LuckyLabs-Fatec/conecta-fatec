@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 export interface MaskConfig {
-  pattern: string;
+  pattern: string | ((value: string) => string);
   charRegex: RegExp;
   placeholder?: string;
 }
@@ -36,20 +36,26 @@ export const MaskedInput: React.FC<MaskedInputProps> = ({
 
   const applyMask = useCallback((rawValue: string): string => {
     const cleanValue = rawValue.replace(/\D/g, '');
+
+    // Get the pattern - it can be a string or a function
+    const pattern = typeof maskConfig.pattern === 'function'
+      ? maskConfig.pattern(cleanValue)
+      : maskConfig.pattern;
+
     let masked = '';
     let valueIndex = 0;
 
-    for (let i = 0; i < maskConfig.pattern.length && valueIndex < cleanValue.length; i++) {
-      if (maskConfig.pattern[i] === 'x') {
+    for (let i = 0; i < pattern.length && valueIndex < cleanValue.length; i++) {
+      if (pattern[i] === 'x') {
         masked += cleanValue[valueIndex];
         valueIndex++;
       } else {
-        masked += maskConfig.pattern[i];
+        masked += pattern[i];
       }
     }
 
     return masked;
-  }, [maskConfig.pattern]);
+  }, [maskConfig]);
 
   const removeMask = (maskedValue: string): string => {
     return maskedValue.replace(/\D/g, '');

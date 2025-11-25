@@ -4,11 +4,21 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
-import { LoginAside, Input, Button } from "@/presentation/components"
+import { LoginAside, Input, Button, MaskedInput, type MaskConfig } from "@/presentation/components"
 import { useAuth } from "@/presentation/hooks/useAuth"
 import Link from "next/link";
 import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';
 import { useToast } from "@/presentation/components";
+
+const phoneMaskConfig: MaskConfig = {
+    pattern: (value: string) => {
+        // 10 digits: (xx) xxxx-xxxx (landline)
+        // 11 digits: (xx) xxxxx-xxxx (mobile)
+        return value.length <= 10 ? '(xx) xxxx-xxxx' : '(xx) xxxxx-xxxx';
+    },
+    charRegex: /^\d{0,11}$/,
+    placeholder: '(11) 99999-9999'
+};
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -97,13 +107,12 @@ export default function RegisterPage() {
                                 error={errors.email?.message}
                             />
 
-                            <Input
+                            <MaskedInput
                                 label="Telefone"
                                 id="phone"
-                                type="tel"
-                                placeholder="(11) 99999-9999"
                                 {...register('phone')}
                                 error={errors.phone?.message}
+                                maskConfig={phoneMaskConfig}
                             />
 
 

@@ -8,11 +8,12 @@ const userProfileUpdateSchema = z.object({
   avatar: z.string().url().optional(),
   phone: z.string().optional(),
   phone_is_whats: z.boolean().optional(),
+  role: z.enum(['comunidade', 'mediador', 'coordenacao', 'estudante', 'admin']).optional(),
 });
 
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> } 
+  context: { params: Promise<{ id: string }> }
 ) {
   const params = await context.params;
   const id = params.id as string;
@@ -23,7 +24,7 @@ export async function PUT(
     return NextResponse.json(validation.error.issues, { status: 400 });
   }
 
-  const { name, avatar, phone, phone_is_whats } = validation.data;
+  const { name, avatar, phone, phone_is_whats, role } = validation.data;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -43,10 +44,11 @@ export async function PUT(
     }
   );
 
-  const updates: { nome?: string; telefone?: string; telefone_is_whats?: boolean } = {};
+  const updates: { nome?: string; telefone?: string; telefone_is_whats?: boolean; perfil?: string } = {};
   if (name !== undefined) updates.nome = name;
   if (phone !== undefined) updates.telefone = phone;
   if (phone_is_whats !== undefined) updates.telefone_is_whats = phone_is_whats;
+  if (role !== undefined) updates.perfil = role;
 
   const { error: dbError } = await supabase
     .from('usuario')
@@ -60,23 +62,24 @@ export async function PUT(
 
   const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
 
-  if (authError || !authUser || authUser.id !== id) {
+  if (authError || !authUser) {
     return NextResponse.json({ error: 'Unauthorized or user not found' }, { status: 401 });
   }
 
-  const userMetadataUpdates: { name?: string; avatar?: string } = {};
+  const userMetadataUpdates: { name?: string; avatar?: string; role?: string } = {};
   if (name !== undefined) userMetadataUpdates.name = name;
   if (avatar !== undefined) userMetadataUpdates.avatar = avatar;
+  if (role !== undefined) userMetadataUpdates.role = role;
 
   if (Object.keys(userMetadataUpdates).length > 0) {
     const { error: metadataError } = await supabase.auth.updateUser({
-        data: userMetadataUpdates
+      data: userMetadataUpdates
     });
 
     if (metadataError) {
-        console.error('Error updating user metadata:', metadataError);
-        // TODO: Melhorar error handling
-        return NextResponse.json({ error: metadataError.message }, { status: 500 });
+      console.error('Error updating user metadata:', metadataError);
+      // TODO: Melhorar error handling
+      return NextResponse.json({ error: metadataError.message }, { status: 500 });
     }
   }
 

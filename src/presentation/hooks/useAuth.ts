@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { LoginSchema } from '@/domain/auth/schemas/login.schema';
 import { RegisterSchema } from '@/domain/auth/schemas/register.schema';
 
-export type UserRole = 'comunidade' | 'mediador' | 'coordenacao' | 'estudante';
+export type UserRole = 'comunidade' | 'mediador' | 'coordenacao' | 'estudante' | 'admin';
 
 interface AppUser extends User {
     role: UserRole;
@@ -44,7 +44,7 @@ export const useAuth = () => {
     };
 
     const signup = async (credentials: RegisterSchema) => {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
             email: credentials.email,
             password: credentials.password,
             options: {
@@ -59,14 +59,19 @@ export const useAuth = () => {
             throw new Error(signUpError.message);
         }
 
+        if (!data.user?.id) {
+            throw new Error('Failed to retrieve user ID after signup');
+        }
+
         const { name, email, phone } = credentials;
         const role = 'comunidade';
+        const uid = data.user.id;
 
         try {
             const response = await fetch('/api/user-profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, phone, role }),
+                body: JSON.stringify({ name, email, phone, role, uid }),
             });
 
             if (!response.ok) {
@@ -82,8 +87,21 @@ export const useAuth = () => {
     };
 
     const logout = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
+        try {
+            await supabase.auth.signOut({ scope: 'global' });
+        } catch (error) {
+            console.error('Error during logout:', error);
+        } finally {
+            setUser(null);
+
+            if (typeof window !== 'undefined') {
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('sb-')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+        }
     };
 
     const hasPermission = (requiredRole: UserRole | UserRole[]) => {

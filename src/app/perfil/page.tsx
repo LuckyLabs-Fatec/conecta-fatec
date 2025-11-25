@@ -2,8 +2,18 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header, useToast } from "@/presentation/components";
+import { Header, useToast, MaskedInput, type MaskConfig } from "@/presentation/components";
 import { useAuth } from "@/presentation/hooks/useAuth";
+
+const phoneMaskConfig: MaskConfig = {
+  pattern: (value: string) => {
+    // 10 digits: (xx) xxxx-xxxx (landline)
+    // 11 digits: (xx) xxxxx-xxxx (mobile)
+    return value.length <= 10 ? '(xx) xxxx-xxxx' : '(xx) xxxxx-xxxx';
+  },
+  charRegex: /^\d{0,11}$/,
+  placeholder: '(11) 99999-9999'
+};
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -13,6 +23,7 @@ export default function PerfilPage() {
   const [editingAvatar, setEditingAvatar] = useState('');
   const [editingPhone, setEditingPhone] = useState('');
   const [editingPhoneIsWhatsapp, setEditingPhoneIsWhatsapp] = useState(false);
+  const [editingRole, setEditingRole] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [largeFont, setLargeFont] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
@@ -29,6 +40,7 @@ export default function PerfilPage() {
       setEditingAvatar(user.user_metadata.avatar ?? '');
       setEditingPhone(user.user_metadata.phone ?? '');
       setEditingPhoneIsWhatsapp(user.user_metadata.phone_is_whats ?? false);
+      setEditingRole(user.user_metadata.role ?? '');
     }
   }, [user]);
 
@@ -85,6 +97,7 @@ export default function PerfilPage() {
           avatar: editingAvatar,
           phone: editingPhone,
           phone_is_whats: editingPhoneIsWhatsapp,
+          role: editingRole,
         }),
       });
 
@@ -139,12 +152,12 @@ export default function PerfilPage() {
               </div>
 
               <div className="md:col-span-1">
-                <label htmlFor="phone" className="text-xs text-gray-500">Telefone</label>
-                <input
+                <MaskedInput
+                  label="Telefone"
                   id="phone"
                   value={editingPhone}
                   onChange={(e) => setEditingPhone(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded-lg"
+                  maskConfig={phoneMaskConfig}
                 />
               </div>
               <div className="md:col-span-1 flex items-center mt-6">
@@ -156,6 +169,22 @@ export default function PerfilPage() {
                   className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
                 />
                 <label htmlFor="phoneIsWhatsapp" className="ml-2 text-sm text-gray-600">É WhatsApp</label>
+              </div>
+
+              <div className="md:col-span-2">
+                <label htmlFor="role" className="text-xs text-gray-500">Perfil(PROVISÓRIO)</label>
+                <select
+                  id="role"
+                  value={editingRole}
+                  onChange={(e) => setEditingRole(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 border rounded-lg bg-white"
+                >
+                  <option value="comunidade">Comunidade</option>
+                  <option value="estudante">Estudante</option>
+                  <option value="mediador">Mediador</option>
+                  <option value="coordenacao">Coordenação</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
 
               <div className="md:col-span-2">
