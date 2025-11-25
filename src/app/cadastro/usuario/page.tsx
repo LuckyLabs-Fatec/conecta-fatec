@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
 import { LoginAside, Input, Button, MaskedInput, type MaskConfig } from "@/presentation/components"
@@ -27,7 +27,7 @@ export default function RegisterPage() {
     const [authError, setAuthError] = useState<string | null>(null);
     const { show } = useToast();
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, control, formState: { errors } } = useForm({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             name: '',
@@ -107,12 +107,19 @@ export default function RegisterPage() {
                                 error={errors.email?.message}
                             />
 
-                            <MaskedInput
-                                label="Telefone"
-                                id="phone"
-                                {...register('phone')}
-                                error={errors.phone?.message}
-                                maskConfig={phoneMaskConfig}
+                            <Controller
+                                name="phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <MaskedInput
+                                        label="Telefone"
+                                        id="phone"
+                                        value={field.value || ''}
+                                        onChange={field.onChange}
+                                        error={errors.phone?.message}
+                                        maskConfig={phoneMaskConfig}
+                                    />
+                                )}
                             />
 
 

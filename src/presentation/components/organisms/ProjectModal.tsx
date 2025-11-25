@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Project, ProjectStatus } from "@/domain/projects/types";
-import { useAuth, UserRole } from "@/presentation/hooks/useAuth";
+import { useAuth } from "@/presentation/hooks/useAuth";
 import Image from "next/image";
 import { Button } from "@/presentation/components";
 
@@ -24,18 +24,15 @@ const statusConfig: Record<ProjectStatus, { label: string; color: string }> = {
 };
 
 export const ProjectModal = ({ project, onClose, onUpdateStatus, onAddUpdate }: ProjectModalProps) => {
-  const { user, hasPermission } = useAuth();
+  const { hasPermission } = useAuth();
   const [newUpdate, setNewUpdate] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<ProjectStatus>(project.status);
   const [activeTab, setActiveTab] = useState<'details' | 'assignment'>('details');
 
   const isCoordinator = hasPermission('coordenacao');
   const isMediator = hasPermission('mediador');
-  const isStudent = hasPermission('estudante');
   const isCommunity = hasPermission('comunidade');
 
-  // Hierarchy check: Admin > Coordinator > Mediator > Community/Student
-  // Actually useAuth handles roles, but we need to know specific capabilities
   const canEditStatus = isCoordinator || isMediator;
   const canAddUpdate = isCoordinator || isMediator || isCommunity;
   const canAssign = isCoordinator && project.status === 'aprovado';
@@ -59,18 +56,30 @@ export const ProjectModal = ({ project, onClose, onUpdateStatus, onAddUpdate }: 
     }
   };
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
   return (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity"
-      onClick={onClose}
+      onClick={handleBackdropClick}
+      onKeyDown={handleKeyDown}
       role="dialog"
       aria-modal="true"
-      onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
       tabIndex={-1}
     >
       <div
         className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl"
-        onClick={(e) => e.stopPropagation()}
         role="document"
       >
         <div className="p-6">
@@ -79,6 +88,7 @@ export const ProjectModal = ({ project, onClose, onUpdateStatus, onAddUpdate }: 
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+              aria-label="Fechar modal"
             >
               ×
             </button>

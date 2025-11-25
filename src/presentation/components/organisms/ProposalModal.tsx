@@ -33,7 +33,7 @@ const reviewSchema = z.object({
 type ReviewSchema = z.infer<typeof reviewSchema>;
 
 export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: ProposalModalProps) => {
-    const { user, hasPermission } = useAuth();
+    const { hasPermission } = useAuth();
     const [action, setAction] = useState<'approve' | 'reject' | 'assign' | 'request_info' | null>(null);
 
     const reviewForm = useForm<ReviewSchema>({

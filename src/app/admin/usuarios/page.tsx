@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header, Button, useToast } from '@/presentation/components';
+import { Header, useToast } from '@/presentation/components';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { Trash2, Search } from 'lucide-react';
 
