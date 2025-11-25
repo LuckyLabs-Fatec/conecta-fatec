@@ -71,7 +71,7 @@ const Toast: React.FC<{ toast: ToastItem; onRemove: (id: string) => void }> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={[
-        'min-w-[260px] max-w-sm rounded-lg shadow-lg border px-4 py-3 text-sm flex items-start gap-3 cursor-pointer transition-transform hover:scale-105',
+        'w-[350px] h-[100px] rounded-lg shadow-lg border px-4 py-1 text-lg flex items-center gap-3 cursor-pointer transition-transform hover:scale-105',
         toast.kind === 'success' && 'bg-green-50 border-green-200 text-green-800',
         toast.kind === 'error' && 'bg-red-50 border-red-200 text-red-800',
         toast.kind === 'warning' && 'bg-yellow-50 border-yellow-200 text-yellow-800',
@@ -90,7 +90,7 @@ const Toast: React.FC<{ toast: ToastItem; onRemove: (id: string) => void }> = ({
       <button
         onClick={() => onRemove(toast.id)}
         aria-label="Fechar"
-        className="text-current/70 hover:text-current"
+        className="text-current/70 hover:text-current self-start mt-2"
       >
         ×
       </button>
@@ -124,7 +124,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
         {toasts.map((t) => (
           <Toast key={t.id} toast={t} onRemove={remove} />
         ))}

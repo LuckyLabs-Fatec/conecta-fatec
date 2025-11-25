@@ -7,17 +7,17 @@ import { useAuth } from "@/presentation/hooks/useAuth";
 
 export default function LandingPage() {
   const { user, canSuggestIdeas } = useAuth();
-  
+
   return (
     <>
       <Header />
       <main>
-        <section 
+        <section
           className="relative flex flex-col items-center justify-center text-center p-8 gap-6 min-h-[500px] bg-black"
           aria-labelledby="hero-title"
           role="banner"
         >
-          <div 
+          <div
             className="absolute inset-0 bg-cover bg-center opacity-50"
             style={{
               backgroundImage: "url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')"
@@ -30,17 +30,17 @@ export default function LandingPage() {
           <div className="relative z-10 flex flex-col items-center gap-6 max-w-4xl mx-auto">
             <h1 id="hero-title" className="text-white text-4xl font-bold">Fatec Conecta</h1>
             <p className="text-white text-xl">
-              Transforme os desafios da sua comunidade em projetos estudantis inovadores. 
+              Transforme os desafios da sua comunidade em projetos estudantis inovadores.
               Conectamos problemas reais com soluções acadêmicas desenvolvidas pelos alunos da Fatec Votorantim.
             </p>
             <nav className="flex gap-4 flex-wrap justify-center" aria-label="Ações principais">
               {canSuggestIdeas() && (
                 <>
-                  <Link href="/sugerir-melhoria">
-                    <Button 
-                      label="Sugira uma ideia de melhoria" 
-                      onClick={() => {}} 
-                      variant="primary" 
+                  <Link href="/submeter-proposta">
+                    <Button
+                      label="Sugira uma ideia de melhoria"
+                      onClick={() => { }}
+                      variant="primary"
                       size="large"
                       aria-describedby="sugira-ideia-desc"
                     />
@@ -52,11 +52,11 @@ export default function LandingPage() {
               )}
               {!user && (
                 <>
-                  <Link href="/sugerir-melhoria">
-                    <Button 
-                      label="Sugira uma ideia de melhoria" 
-                      onClick={() => {}} 
-                      variant="primary" 
+                  <Link href="/submeter-proposta">
+                    <Button
+                      label="Sugira uma ideia de melhoria"
+                      onClick={() => { }}
+                      variant="primary"
                       size="large"
                       aria-describedby="sugira-ideia-desc-guest"
                     />
@@ -66,12 +66,12 @@ export default function LandingPage() {
                   </span>
                 </>
               )}
-              
+
             </nav>
           </div>
         </section>
-        
-        <section 
+
+        <section
           className="flex flex-col items-center bg-gray-100 text-center p-8 gap-6"
           aria-labelledby="mission-title"
         >
@@ -79,12 +79,12 @@ export default function LandingPage() {
           <p className="text-gray-500 text-xl max-w-4xl">
             O Fatec Conecta cria um espaço colaborativo onde a comunidade pode expor desafios cotidianos, e estudantes da Fatec Votorantim desenvolvem soluções inovadoras. Contribuímos para os Objetivos de Desenvolvimento Sustentável da ONU: ODS-16 (Paz, Justiça e Instituições Eficazes) e ODS-17 (Parcerias e Meios de Implementação).
           </p>
-          <div 
+          <div
             className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"
             role="list"
             aria-label="Objetivos de Desenvolvimento Sustentável da ONU"
           >
-            <article 
+            <article
               className="bg-white p-4 rounded-lg shadow-md"
               role="listitem"
               aria-labelledby="ods-16-title"
@@ -105,11 +105,11 @@ export default function LandingPage() {
               </p>
             </article>
           </div>
-          <Link href="/sugerir-melhoria">
-            <Button 
-              label="Sugira uma ideia de melhoria" 
-              onClick={() => {}} 
-              variant="primary" 
+          <Link href="/submeter-proposta">
+            <Button
+              label="Sugira uma ideia de melhoria"
+              onClick={() => { }}
+              variant="primary"
               size="large"
               aria-describedby="mission-cta-desc"
             />
@@ -119,12 +119,12 @@ export default function LandingPage() {
           </span>
         </section>
 
-        <section 
+        <section
           className="flex flex-col items-center bg-neutral-900 text-center p-10 gap-8"
           aria-labelledby="how-it-works-title"
         >
           <h2 id="how-it-works-title" className="text-neutral-50 text-2xl font-bold">Como Funciona</h2>
-          <ol 
+          <ol
             className="relative w-full max-w-4xl text-left border-l border-neutral-700 pl-6 md:pl-10 space-y-10 md:space-y-12"
             aria-label="Linha do tempo do processo Fatec Conecta"
           >
@@ -167,9 +167,9 @@ export default function LandingPage() {
               Acompanhe o progresso dos projetos em desenvolvimento e veja como suas ideias se transformam em soluções reais.
             </p>
             <Link href="/acompanhar-projetos">
-              <Button 
-                label="Acompanhar Projetos" 
-                onClick={() => {}} 
+              <Button
+                label="Acompanhar Projetos"
+                onClick={() => { }}
                 variant="secondary"
                 size="large"
                 aria-describedby="track-projects-desc"
@@ -181,7 +181,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section 
+        <section
           className="flex flex-col items-center bg-gray-100 text-center p-8 gap-6"
           aria-labelledby="cta-title"
         >
@@ -189,11 +189,11 @@ export default function LandingPage() {
           <p className="text-gray-500 text-xl max-w-3xl">
             Sua voz importa! Compartilhe suas ideias de melhoria para a comunidade e ajude os estudantes da Fatec a criar soluções que fazem a diferença. Juntos, construímos uma sociedade mais justa e eficaz.
           </p>
-          <Link href="/sugerir-melhoria">
-            <Button 
-              label="Sugira uma Ideia de Melhoria" 
-              onClick={() => {}} 
-              variant="primary" 
+          <Link href="/submeter-proposta">
+            <Button
+              label="Sugira uma Ideia de Melhoria"
+              onClick={() => { }}
+              variant="primary"
               size="large"
               aria-describedby="final-cta-desc"
             />
@@ -203,8 +203,8 @@ export default function LandingPage() {
           </span>
         </section>
       </main>
-      
-      <footer 
+
+      <footer
         className="bg-[var(--cps-blue-base)] text-white text-center p-4"
         role="contentinfo"
         aria-label="Informações do rodapé"
