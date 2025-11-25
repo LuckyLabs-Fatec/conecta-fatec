@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-// Import types from domain to ensure consistency
 import { Project, ProjectStatus } from '@/domain/projects/types';
 
 export async function GET(request: Request) {
@@ -32,19 +31,15 @@ export async function GET(request: Request) {
     }
   );
 
-  // Build the query
   let query = supabase
     .from('proposta')
     .select('*, usuario(nome, perfil)', { count: 'exact' });
 
-  // Filter for project statuses only
-  // Projects are those that are NOT in initial proposal stages
   const projectStatuses = ['em_desenvolvimento', 'testando', 'concluido', 'suspenso', 'atribuida'];
 
   if (status) {
     query = query.eq('status', status);
   } else {
-    // If no specific status requested, filter to show only project statuses
     query = query.in('status', projectStatuses);
   }
 
@@ -52,7 +47,6 @@ export async function GET(request: Request) {
     query = query.or(`titulo.ilike.%${search}%,descricao.ilike.%${search}%`);
   }
 
-  // Pagination
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
   query = query.range(from, to);
@@ -64,9 +58,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Map to Project interface
   const projects: Project[] = data.map((item: any) => {
-    // Parse attachments if any
     const images = item.anexos
       ? (Array.isArray(item.anexos) ? item.anexos.map((a: any) => a.url) : [])
       : [];
@@ -77,15 +69,15 @@ export async function GET(request: Request) {
       description: item.descricao,
       status: (item.status as ProjectStatus) || 'em_analise',
       student: item.usuario ? {
-        name: item.usuario.nome, // Using author as student/responsible for now
+        name: item.usuario.nome, 
         course: 'Não informado',
         semester: 'Não informado'
       } : undefined,
-      startDate: item.created_at, // Using creation date
+      startDate: item.created_at, 
       expectedEndDate: undefined,
-      progress: 0, // Placeholder
+      progress: 0, 
       images: images,
-      updates: [] // Placeholder
+      updates: [] 
     };
   });
 
@@ -122,7 +114,6 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { id, status, updateMessage } = body;
 
-    // Log unused variable for now
     console.log('Update message:', updateMessage);
 
     if (!id) {
@@ -131,9 +122,6 @@ export async function PUT(request: Request) {
 
     const updateData: any = {};
     if (status) updateData.status = status;
-
-    // If there's an update message, we might want to store it.
-    // For now, just updating status.
 
     const { data, error } = await supabase
       .from('proposta')

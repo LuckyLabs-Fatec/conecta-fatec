@@ -16,7 +16,6 @@ import { ProposalModal } from "@/presentation/components/organisms/ProposalModal
 import { DashboardTabs } from "@/presentation/components/organisms/DashboardTabs";
 import { useAuth } from "@/presentation/hooks/useAuth";
 
-// Base da API mockada
 const API_PROJECTS = '/api/projetos';
 const API_PROPOSALS = '/api/ideias-simples';
 
@@ -37,11 +36,9 @@ export default function ProjectsPage() {
     const { show } = useToast();
     const [activeTab, setActiveTab] = useState<'proposals' | 'projects'>('projects');
 
-    // Projects State
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-    // Proposals State
     const [proposals, setProposals] = useState<Proposal[]>([]);
     const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
 
@@ -64,7 +61,6 @@ export default function ProjectsPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch Data
     useEffect(() => {
         const controller = new AbortController();
         const fetchData = async () => {
@@ -90,7 +86,6 @@ export default function ProjectsPage() {
                     if (!res.ok) throw new Error('Falha ao carregar propostas');
                     const data = await res.json();
 
-                    // Map SimpleIdea to Proposal
                     const mappedProposals: Proposal[] = data.map((item: any) => ({
                         id: item.id,
                         title: item.titulo,
@@ -102,11 +97,10 @@ export default function ProjectsPage() {
                         },
                         submittedAt: item.created_at || new Date().toISOString(),
                         images: item.anexos ? (Array.isArray(item.anexos) ? item.anexos.map((a: any) => a.url) : []) : [],
-                        mediatorNotes: '', // Assuming not returned yet
+                        mediatorNotes: '',
                         coordinatorNotes: '',
                     }));
 
-                    // Client-side filtering for now
                     let filtered = mappedProposals;
                     if (filters.search) {
                         const q = filters.search.toLowerCase();
@@ -159,12 +153,6 @@ export default function ProjectsPage() {
 
     const handleAddUpdate = async (message: string) => {
         if (selectedProject) {
-            // Since API doesn't support adding updates to a list yet (DB limitation assumed),
-            // we will just simulate it locally or log it.
-            // But let's try to send it to the API if we implemented it.
-            // We implemented PUT with updateMessage but didn't really store it in a list.
-            // So for now, we'll just show a success message but warn it might not persist as expected without DB schema changes.
-
             const newUpdate = {
                 id: Date.now().toString(),
                 date: new Date().toISOString(),
@@ -190,7 +178,7 @@ export default function ProjectsPage() {
                     body: JSON.stringify({
                         id: selectedProposal.id,
                         status,
-                        mediatorNotes: message // Sending message as mediator notes for now
+                        mediatorNotes: message
                     }),
                 });
 

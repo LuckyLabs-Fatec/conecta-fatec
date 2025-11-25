@@ -3,8 +3,6 @@ import { MaskedInput, type MaskConfig } from "../../atoms/MaskedInput";
 
 const phoneMaskConfig: MaskConfig = {
     pattern: (value: string) => {
-        // 10 digits: (xx) xxxx-xxxx (landline)
-        // 11 digits: (xx) xxxxx-xxxx (mobile)
         return value.length <= 10 ? '(xx) xxxx-xxxx' : '(xx) xxxxx-xxxx';
     },
     charRegex: /^\d{0,11}$/,

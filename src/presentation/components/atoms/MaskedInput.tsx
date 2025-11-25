@@ -37,7 +37,6 @@ export const MaskedInput: React.FC<MaskedInputProps> = ({
   const applyMask = useCallback((rawValue: string): string => {
     const cleanValue = rawValue.replace(/\D/g, '');
 
-    // Get the pattern - it can be a string or a function
     const pattern = typeof maskConfig.pattern === 'function'
       ? maskConfig.pattern(cleanValue)
       : maskConfig.pattern;

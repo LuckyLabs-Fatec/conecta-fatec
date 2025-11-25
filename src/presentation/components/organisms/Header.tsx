@@ -7,7 +7,7 @@ import { ChevronDown, User, LogOut, Settings } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export const Header = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, hasPermission } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -17,7 +17,6 @@ export const Header = () => {
     window.location.href = '/';
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -39,18 +38,18 @@ export const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'comunidade' && (
+          {isAuthenticated && hasPermission('comunidade') && (
             <Link href="/submeter-proposta" className="hover:text-red-200 transition-colors">
               Submeter Proposta
             </Link>
           )}
           {/* Unified Dashboard Link */}
-          {isAuthenticated && ['coordenador', 'mediador'].includes(user?.user_metadata.role?.toLowerCase() ?? '') && (
+          {isAuthenticated && hasPermission('mediador') && (
             <Link href="/acompanhar-projetos" className="hover:text-red-200 transition-colors">
               Acompanhar Projetos
             </Link>
           )}
-          {isAuthenticated && user?.user_metadata.role?.toLowerCase() === 'admin' && (
+          {isAuthenticated && hasPermission('admin') && (
             <Link href="/admin/usuarios" className="hover:text-red-200 transition-colors">
               Administração
             </Link>

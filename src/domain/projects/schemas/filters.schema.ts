@@ -9,7 +9,6 @@ export const statusEnum = [
   'pendente',
 ] as const;
 
-// Accept empty string as "no filter" for selects
 const SelectWithEmpty = <T extends readonly [string, ...string[]]>(values: T) =>
   z.union([z.literal(''), z.enum(values)]);
 

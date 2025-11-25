@@ -174,7 +174,6 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { id, status, mediatorNotes, coordinatorNotes, assignedTo } = body;
 
-    // Log unused variables for now to avoid lint errors
     console.log('Update details:', { mediatorNotes, coordinatorNotes, assignedTo });
 
     if (!id) {
@@ -183,23 +182,6 @@ export async function PUT(request: Request) {
 
     const updateData: any = {};
     if (status) updateData.status = status;
-    // Assuming we store notes in a JSONB column or similar, or just appending to description for now if columns don't exist
-    // But ideally we should have columns. Let's assume we can update 'observacoes' or similar if it exists.
-    // For now, let's try to update specific columns if they exist, or fallback to a generic metadata column.
-    // Since I don't know the schema for sure, I'll assume 'observacoes' exists or I'll just update status for now.
-    // Wait, the previous code didn't show 'observacoes'.
-    // Let's check the GET response structure in previous turns.
-    // It showed: id, titulo, descricao, status, anexos, created_at, usuario...
-
-    // If I can't store notes, I'll just update status.
-    // But the requirements say "No modal de informações deve conter um campo de texto para submeter novas informações".
-    // I'll assume there is a 'historico' or 'observacoes' column. If not, I'll create a migration later? No, I can't.
-    // I'll try to use 'descricao' to append notes if no other place, or just log it.
-    // Actually, let's just update status for now and assume we can add columns later if needed.
-    // BUT, for assignment, we need to store assignment data.
-    // Maybe 'atribuicao' JSONB column?
-
-    // Let's try to update 'status' and see if it works.
 
     const { data, error } = await supabase
       .from('proposta')

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import { LoginSchema } from '@/domain/auth/schemas/login.schema';
@@ -19,6 +19,14 @@ interface AppUser extends User {
         phone_is_whats?: boolean;
     }
 }
+
+const ROLE_LEVELS: Record<UserRole, number> = {
+    'admin': 4,
+    'coordenacao': 3,
+    'mediador': 2,
+    'estudante': 1,
+    'comunidade': 0
+};
 
 export const useAuth = () => {
     const supabase = createClient();
@@ -104,17 +112,23 @@ export const useAuth = () => {
         }
     };
 
-    const hasPermission = (requiredRole: UserRole | UserRole[]) => {
+
+
+    const hasPermission = useCallback((requiredRole: UserRole) => {
         if (!user) return false;
 
-        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
         const userRole = (user.user_metadata.role as string)?.toLowerCase() as UserRole;
-        const normalizedRoles = roles.map(role => role.toLowerCase() as UserRole);
-        return normalizedRoles.includes(userRole);
-    };
+
+        if (!userRole || !ROLE_LEVELS.hasOwnProperty(userRole)) return false;
+
+        const userLevel = ROLE_LEVELS[userRole];
+        const requiredLevel = ROLE_LEVELS[requiredRole];
+
+        return userLevel >= requiredLevel;
+    }, [user]);
 
     const canAccessIdeaValidation = () => {
-        return hasPermission(['mediador', 'coordenacao']);
+        return hasPermission('mediador');
     };
 
     const canAssignToClasses = () => {
@@ -122,7 +136,7 @@ export const useAuth = () => {
     };
 
     const canSuggestIdeas = () => {
-        return hasPermission(['comunidade', 'estudante']);
+        return hasPermission('comunidade');
     };
 
     return {

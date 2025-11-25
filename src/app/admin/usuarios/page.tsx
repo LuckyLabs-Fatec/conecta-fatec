@@ -13,7 +13,7 @@ interface User {
   perfil: 'comunidade' | 'estudante' | 'mediador' | 'coordenador' | 'admin';
 }
 
-// Mock data for demonstration
+// Dados mockados
 const mockUsers: User[] = [
   { id: '1', nome: 'João Silva', email: 'joao.silva@fatec.sp.gov.br', telefone: '11987654321', perfil: 'estudante' },
   { id: '2', nome: 'Maria Santos', email: 'maria.santos@fatec.sp.gov.br', telefone: '11976543210', perfil: 'mediador' },
@@ -39,7 +39,7 @@ const roleLabels: Record<string, string> = {
 
 export default function AdminUsersPage() {
   const router = useRouter();
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, hasPermission } = useAuth();
   const { show } = useToast();
 
   const [users, setUsers] = useState<User[]>(mockUsers);
@@ -49,16 +49,16 @@ export default function AdminUsersPage() {
   const usersPerPage = 10;
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user?.user_metadata.role?.toLowerCase() !== 'admin') {
+    if (!isLoading && isAuthenticated && !hasPermission('admin')) {
       show({
         kind: 'error',
         message: 'Acesso negado. Apenas administradores podem acessar esta página.',
       });
       router.push('/');
     }
-  }, [isLoading, isAuthenticated, user, router, show]);
+  }, [isLoading, isAuthenticated, user, router, show, hasPermission]);
 
-  if (isLoading || !isAuthenticated || user?.user_metadata.role?.toLowerCase() !== 'admin') {
+  if (isLoading || !isAuthenticated || !hasPermission('admin')) {
     return null;
   }
 
@@ -101,14 +101,12 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Filter users based on search
   const filteredUsers = users.filter(user => {
     if (!searchQuery) return true;
     const value = user[searchField].toLowerCase();
     return value.includes(searchQuery.toLowerCase());
   });
 
-  // Pagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);

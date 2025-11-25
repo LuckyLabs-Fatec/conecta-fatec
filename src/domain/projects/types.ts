@@ -18,7 +18,7 @@ export interface Project {
   title: string;
   description: string;
   status: ProjectStatus;
-  student?: ProjectStudent; // Optional because a proposal might not have a student yet
+  student?: ProjectStudent;
   startDate?: string;
   expectedEndDate?: string;
   progress: number;

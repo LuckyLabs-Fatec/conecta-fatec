@@ -26,7 +26,6 @@ export function usePagination({
   const setTotals = useCallback((newTotal: number, newTotalPages: number) => {
     setTotal(newTotal);
     setTotalPages(Math.max(1, newTotalPages));
-    // clamp current page if needed
     setPage(p => Math.min(Math.max(1, newTotalPages), p));
   }, []);
 

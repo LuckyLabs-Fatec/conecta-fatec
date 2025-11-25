@@ -25,7 +25,6 @@ const statusConfig: Record<ProposalStatus, { label: string; color: string }> = {
     atribuida: { label: 'Atribuída', color: 'bg-purple-100 text-purple-800' },
 };
 
-// Schema for review actions
 const reviewSchema = z.object({
     message: z.string().min(1, "Mensagem é obrigatória"),
 });
@@ -52,7 +51,6 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
     const isCoordinator = hasPermission('coordenacao');
     const isMediator = hasPermission('mediador');
 
-    // Hierarchy check
     const canReview = isCoordinator || isMediator;
     const canAssign = isCoordinator && proposal.status === 'aprovada';
 
@@ -60,7 +58,6 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
         return new Date(dateString).toLocaleDateString('pt-BR');
     };
 
-    // Reset form when action changes
     useEffect(() => {
         if (action === 'approve' || action === 'reject' || action === 'request_info') {
             reviewForm.reset({ message: '' });

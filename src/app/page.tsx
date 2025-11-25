@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/presentation/hooks/useAuth";
 
 export default function LandingPage() {
-  const { user, canSuggestIdeas, canAccessIdeaValidation } = useAuth();
+  const { user, canSuggestIdeas } = useAuth();
   
   return (
     <>
@@ -47,22 +47,6 @@ export default function LandingPage() {
                   </Link>
                   <span id="sugira-ideia-desc" className="sr-only">
                     Acesse o formulário para sugerir melhorias para sua comunidade
-                  </span>
-                </>
-              )}
-              {canAccessIdeaValidation() && (
-                <>
-                  <Link href="/validar-ideias">
-                    <Button 
-                      label="Validar Ideias" 
-                      onClick={() => {}} 
-                      variant="primary" 
-                      size="large"
-                      aria-describedby="validar-ideias-desc"
-                    />
-                  </Link>
-                  <span id="validar-ideias-desc" className="sr-only">
-                    Acesse o painel para analisar e aprovar ideias da comunidade
                   </span>
                 </>
               )}
