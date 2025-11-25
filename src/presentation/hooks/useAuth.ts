@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { LoginSchema } from '@/domain/auth/schemas/login.schema';
 import { RegisterSchema } from '@/domain/auth/schemas/register.schema';
 
-export type UserRole = 'comunidade' | 'mediador' | 'coordenacao' | 'estudante' | 'admin';
+export type UserRole = 'comunidade' | 'mediador' | 'coordenador' | 'estudante' | 'admin';
 
 interface AppUser extends User {
     role: UserRole;
@@ -22,7 +22,7 @@ interface AppUser extends User {
 
 const ROLE_LEVELS: Record<UserRole, number> = {
     'admin': 4,
-    'coordenacao': 3,
+    'coordenador': 3,
     'mediador': 2,
     'estudante': 1,
     'comunidade': 0
@@ -132,7 +132,7 @@ export const useAuth = () => {
     };
 
     const canAssignToClasses = () => {
-        return hasPermission('coordenacao');
+        return hasPermission('coordenador');
     };
 
     const canSuggestIdeas = () => {

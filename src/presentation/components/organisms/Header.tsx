@@ -11,6 +11,8 @@ export const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const mockAvatar = 'https://doodleipsum.com/700/avatar-2'
+
   const handleLogout = async () => {
     await logout();
     setIsDropdownOpen(false);
@@ -66,11 +68,11 @@ export const Header = () => {
             aria-haspopup="true"
           >
             <Image
-              src={user.user_metadata.avatar ?? '/logo.svg'}
+              src={user.user_metadata.avatar ? user.user_metadata.avatar : mockAvatar}
               alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
               width={32}
               height={32}
-              className="rounded-full"
+              className="rounded-full border border-gray-200"
             />
             <span className="hidden md:block font-medium">{user.user_metadata.name}</span>
             <ChevronDown size={16} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -79,8 +81,8 @@ export const Header = () => {
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg border z-50">
               <div className="px-4 py-3 border-b border-gray-200">
-                <p className="font-medium">{user.user_metadata.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="font-medium break-normal">{user.user_metadata.name}</p>
+                <p className="text-sm text-gray-500 break-all">{user.email}</p>
               </div>
 
               <div className="py-1">

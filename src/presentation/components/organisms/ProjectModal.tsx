@@ -29,7 +29,7 @@ export const ProjectModal = ({ project, onClose, onUpdateStatus, onAddUpdate }: 
   const [selectedStatus, setSelectedStatus] = useState<ProjectStatus>(project.status);
   const [activeTab, setActiveTab] = useState<'details' | 'assignment'>('details');
 
-  const isCoordinator = hasPermission('coordenacao');
+  const isCoordinator = hasPermission('coordenador');
   const isMediator = hasPermission('mediador');
   const isCommunity = hasPermission('comunidade');
 

@@ -8,7 +8,7 @@ const userProfileSchema = z.object({
   name: z.string().min(1),
   email: z.email().min(1),
   phone: z.string().optional(),
-  role: z.enum(['comunidade', 'mediador', 'coordenacao', 'estudante']),
+  role: z.enum(['comunidade', 'mediador', 'coordenador', 'estudante']),
   uid: z.uuid(),
 });
 

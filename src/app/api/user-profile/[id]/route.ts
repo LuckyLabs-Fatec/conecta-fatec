@@ -5,10 +5,10 @@ import { z } from 'zod';
 
 const userProfileUpdateSchema = z.object({
   name: z.string().min(1).optional(),
-  avatar: z.string().url().optional(),
+  avatar: z.union([z.string().url(), z.literal('')]).optional(),
   phone: z.string().optional(),
   phone_is_whats: z.boolean().optional(),
-  role: z.enum(['comunidade', 'mediador', 'coordenacao', 'estudante', 'admin']).optional(),
+  role: z.enum(['comunidade', 'mediador', 'coordenador', 'estudante', 'admin']).optional(),
 });
 
 export async function PUT(
@@ -53,7 +53,7 @@ export async function PUT(
   const { error: dbError } = await supabase
     .from('usuario')
     .update(updates)
-    .eq('id_usuario', id);
+    .eq('uid', id);
 
   if (dbError) {
     console.error('Error updating user profile in public.usuario:', dbError);

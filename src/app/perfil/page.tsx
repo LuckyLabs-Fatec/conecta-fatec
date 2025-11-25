@@ -26,6 +26,8 @@ export default function PerfilPage() {
   const [largeFont, setLargeFont] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
 
+  const mockAvatar = 'https://doodleipsum.com/700/avatar-2'
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace("/autenticacao");
@@ -123,7 +125,7 @@ export default function PerfilPage() {
           <section className="bg-white border rounded-xl shadow-sm p-6 flex flex-col md:flex-row gap-6">
             <div className="flex-shrink-0">
               <Image
-                src={user.user_metadata.avatar ?? '/logo.svg'}
+                src={user.user_metadata.avatar ? user.user_metadata.avatar : mockAvatar}
                 alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
                 width={96}
                 height={96}
@@ -166,7 +168,7 @@ export default function PerfilPage() {
                   onChange={(e) => setEditingPhoneIsWhatsapp(e.target.checked)}
                   className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
                 />
-                <label htmlFor="phoneIsWhatsapp" className="ml-2 text-sm text-gray-600">É WhatsApp</label>
+                <label htmlFor="phoneIsWhatsapp" className="ml-2 text-sm text-gray-600">WhatsApp</label>
               </div>
 
               <div className="md:col-span-2">
@@ -180,7 +182,7 @@ export default function PerfilPage() {
                   <option value="comunidade">Comunidade</option>
                   <option value="estudante">Estudante</option>
                   <option value="mediador">Mediador</option>
-                  <option value="coordenacao">Coordenação</option>
+                  <option value="coordenador">Coordenação</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>

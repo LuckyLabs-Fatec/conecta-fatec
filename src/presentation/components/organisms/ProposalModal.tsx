@@ -48,7 +48,7 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
         professor: ''
     });
 
-    const isCoordinator = hasPermission('coordenacao');
+    const isCoordinator = hasPermission('coordenador');
     const isMediator = hasPermission('mediador');
 
     const canReview = isCoordinator || isMediator;
