@@ -6,9 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
 import { LoginAside, Input, Button } from "@/presentation/components"
 import Link from "next/link";
-import { useAuth, UserRole } from "@/presentation/hooks/useAuth";
+import { useAuth } from "@/presentation/hooks/useAuth";
 import { loginSchema, LoginSchema } from '@/domain/auth/schemas/login.schema';
-import { resolveMockUser } from '@/domain/auth/mockUsers';
 
 export default function LoginPage () {
     const router = useRouter();
@@ -26,42 +25,15 @@ export default function LoginPage () {
 
     const onSubmit = async (data: LoginSchema) => {
         setIsLoading(true);
+        setAuthError(null);
         try {
-            // Simulate API delay
-            setAuthError(null);
-            await new Promise(resolve => setTimeout(resolve, 800));
-
-            const mock = resolveMockUser(data.email, data.password);
-            if (!mock) {
-                setAuthError('Email ou senha inválidos. Consulte as credenciais em MOCK_LOGINS.md.');
-                setError('email', { type: 'manual', message: ' ' });
-                setError('password', { type: 'manual', message: 'Email ou senha inválidos' });
-                return;
-            }
-
-            const role: UserRole = mock.role;
-            const name = mock.name;
-
-            const userData = {
-                id: '1',
-                name,
-                email: data.email,
-                avatar: `https://doodleipsum.com/700/avatar?i=fd7c77f6b306c724bb34cc62124ff04e`,
-                loginTime: new Date().toISOString(),
-                role,
-                ...(mock.department && { department: mock.department }),
-                ...(mock.specialization && { specialization: mock.specialization })
-            };
-
-            login(userData);
-
-            const redirectPath = role === 'mediador' || role === 'coordenacao' 
-                ? '/validar-ideias' 
-                : '/';
-            router.push(redirectPath);
-        } catch (err) {
-            // Could map to toast or form error
-            console.error(err);
+            await login(data);
+            router.push('/');
+        } catch (err: unknown) {
+            const error = err as Error;
+            setAuthError(error.message);
+            setError('email', { type: 'manual', message: ' ' });
+            setError('password', { type: 'manual', message: 'Email ou senha inválidos' });
         } finally {
             setIsLoading(false);
         }

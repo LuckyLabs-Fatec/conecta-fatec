@@ -2,17 +2,17 @@
 import { useAuth, UserRole } from '@/presentation/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-
+// TODO: Remover arquivo??
 interface ProtectedRouteProps {
     children: React.ReactNode;
     allowedRoles: UserRole[];
     redirectTo?: string;
 }
 
-export const ProtectedRoute = ({ 
-    children, 
-    allowedRoles, 
-    redirectTo = '/' 
+export const ProtectedRoute = ({
+    children,
+    allowedRoles,
+    redirectTo = '/'
 }: ProtectedRouteProps) => {
     const { user, isLoading } = useAuth();
     const router = useRouter();
@@ -24,7 +24,10 @@ export const ProtectedRoute = ({
                 return;
             }
 
-            if (!allowedRoles.includes(user.role)) {
+            const userRole = (user.role as string)?.toLowerCase();
+            const normalizedAllowedRoles = allowedRoles.map(role => role.toLowerCase());
+
+            if (!normalizedAllowedRoles.includes(userRole)) {
                 router.push(redirectTo);
                 return;
             }
@@ -42,7 +45,10 @@ export const ProtectedRoute = ({
         );
     }
 
-    if (!user || !allowedRoles.includes(user.role)) {
+    const userRole = (user?.role as string)?.toLowerCase();
+    const normalizedAllowedRoles = allowedRoles.map(role => role.toLowerCase());
+
+    if (!user || !normalizedAllowedRoles.includes(userRole)) {
         return null;
     }
 
@@ -50,4 +56,4 @@ export const ProtectedRoute = ({
 };
 
 // Deprecated: ProtectedRoute has been removed as it's unused in the app.
-export {};
+export { };

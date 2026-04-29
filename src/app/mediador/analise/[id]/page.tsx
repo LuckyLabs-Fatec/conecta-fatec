@@ -34,16 +34,14 @@ export default function MediatorReviewPage() {
     mode: 'onChange',
   });
 
-  // Guard: somente mediador
   useEffect(() => {
     if (!isLoading) {
-      if (!user || user.role !== 'mediador') {
+      if (!user || (user.role as string)?.toLowerCase() !== 'mediador') {
         router.push('/');
       }
     }
   }, [isLoading, user, router]);
 
-  // Carrega ideia simples
   useEffect(() => {
     const controller = new AbortController();
     const load = async () => {
@@ -139,7 +137,7 @@ export default function MediatorReviewPage() {
                 )}
               </div>
               <div className="flex gap-2">
-                <Button label="Enviar" onClick={() => {}} variant="primary" size="medium" />
+                <Button label="Enviar" onClick={() => { }} variant="primary" size="medium" />
                 <button type="submit" className="hidden" />
                 <Button label="Voltar" onClick={() => router.push('/validar-ideias')} variant="secondary" size="medium" />
               </div>

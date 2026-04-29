@@ -7,9 +7,10 @@ interface Props {
   setValue: UseFormSetValue<SuggestionSchema>;
   values: Partial<SuggestionSchema>;
   errors: FieldErrors<SuggestionSchema>;
+  hasPhone?: boolean;
 }
 
-export const ContactInfoStepAdapter = ({ setValue, values, errors }: Props) => {
+export const ContactInfoStepAdapter = ({ setValue, values, errors, hasPhone = false }: Props) => {
   const onChange = (field: string, subField?: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = (e.target as HTMLInputElement).value;
     if (subField) {
@@ -44,7 +45,7 @@ export const ContactInfoStepAdapter = ({ setValue, values, errors }: Props) => {
     primaryPhone: (errors.contact?.primaryPhone?.message as string) || '',
   } as { [key: string]: string };
 
-  return <ContactInfoStep formData={formData} errors={flatErrors} onChange={onChange} onToggle={onToggle} />;
+  return <ContactInfoStep formData={formData} errors={flatErrors} onChange={onChange} onToggle={onToggle} hasPhone={hasPhone} />;
 };
 
 export default ContactInfoStepAdapter;

@@ -1,20 +1,31 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
-import { LoginAside, Input, Button } from "@/presentation/components"
+import { LoginAside, Input, Button, MaskedInput, type MaskConfig } from "@/presentation/components"
 import { useAuth } from "@/presentation/hooks/useAuth"
 import Link from "next/link";
 import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';
+import { useToast } from "@/presentation/components";
+
+const phoneMaskConfig: MaskConfig = {
+    pattern: (value: string) => {
+        return value.length <= 10 ? '(xx) xxxx-xxxx' : '(xx) xxxxx-xxxx';
+    },
+    charRegex: /^\d{0,11}$/,
+    placeholder: '(11) 99999-9999'
+};
 
 export default function RegisterPage() {
     const router = useRouter();
-    const { login } = useAuth();
+    const { signup } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+    const [authError, setAuthError] = useState<string | null>(null);
+    const { show } = useToast();
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, control, formState: { errors } } = useForm({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             name: '',
@@ -28,25 +39,18 @@ export default function RegisterPage() {
 
     const onSubmit = async (data: RegisterSchema) => {
         setIsLoading(true);
+        setAuthError(null);
         try {
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1200));
-
-            const userData = {
-                id: Date.now().toString(),
-                name: data.name,
-                email: data.email,
-                avatar: `https://doodleipsum.com/700/avatar?i=${Math.random()}`,
-                loginTime: new Date().toISOString(),
-                role: 'comunidade' as const
-            };
-
-            login(userData);
-
-            const redirectPath = '/';
-            router.push(redirectPath);
-        } catch (error) {
-            console.error('Erro ao criar conta:', error);
+            await signup(data);
+            show({
+                kind: 'success',
+                message: 'Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.',
+            });
+            router.push('/autenticacao');
+        } catch (error: unknown) {
+            const err = error as Error;
+            setAuthError(err.message);
+            console.error('Erro ao criar conta:', err);
         } finally {
             setIsLoading(false);
         }
@@ -76,6 +80,11 @@ export default function RegisterPage() {
                         </header>
 
                         <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+                            {authError && (
+                                <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3">
+                                    {authError}
+                                </div>
+                            )}
                             <Input
                                 label="Nome completo"
                                 id="name"
@@ -96,13 +105,19 @@ export default function RegisterPage() {
                                 error={errors.email?.message}
                             />
 
-                            <Input
-                                label="Telefone"
-                                id="phone"
-                                type="tel"
-                                placeholder="(11) 99999-9999"
-                                {...register('phone')}
-                                error={errors.phone?.message}
+                            <Controller
+                                name="phone"
+                                control={control}
+                                render={({ field }) => (
+                                    <MaskedInput
+                                        label="Telefone"
+                                        id="phone"
+                                        value={field.value || ''}
+                                        onChange={field.onChange}
+                                        error={errors.phone?.message}
+                                        maskConfig={phoneMaskConfig}
+                                    />
+                                )}
                             />
 
 
