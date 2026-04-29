@@ -1,42 +1,20 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { suggestionSchemaServer } from '@/domain/ideas/schemas/suggestion.schema';
+import {
+  createProposal,
+  findProposal,
+  findUserByEmail,
+  listProposals,
+  updateProposal,
+} from '@/lib/mock/db';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options });
-        },
-      },
-    }
-  );
-
   if (id) {
-    const { data, error } = await supabase
-      .from('proposta')
-      .select('*, usuario(nome, email)')
-      .eq('id', id)
-      .single();
+    const data = findProposal(id);
 
-    if (error) {
-      console.error('Error fetching idea by ID:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
     if (!data) {
       return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
     }
@@ -46,16 +24,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const { data, error } = await supabase
-    .from('proposta')
-    .select('*, usuario(nome, email)');
-
-  if (error) {
-    console.error('Error fetching ideas:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  const mappedData = data.map((item: any) => ({
+  const mappedData = listProposals().map((item) => ({
     ...item,
     autor: item.usuario?.nome || 'Anônimo'
   }));
@@ -64,45 +33,14 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options });
-        },
-      },
-    }
-  );
-
   try {
     const body = await request.json();
     const validatedData = suggestionSchemaServer.parse(body);
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { title, description, contact } = validatedData;
+    const userData = findUserByEmail(contact.primaryEmail);
 
-    const { data: userData, error: userError } = await supabase
-      .from('usuario')
-      .select('id_usuario')
-      .eq('email', user.email)
-      .single();
-
-    if (userError || !userData) {
-      console.error('Error fetching user:', userError);
+    if (!userData) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -128,16 +66,7 @@ export async function POST(request: Request) {
       insertData.telefone_contato_opcional_is_whats = contact.secondaryPhoneIsWhatsapp || false;
     }
 
-    const { data: newIdea, error } = await supabase
-      .from('proposta')
-      .insert(insertData)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error inserting new idea:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    const newIdea = createProposal(insertData);
 
     return NextResponse.json(newIdea, { status: 201 });
   } catch (error) {
@@ -151,25 +80,6 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options });
-        },
-      },
-    }
-  );
-
   try {
     const body = await request.json();
     const { id, status, mediatorNotes, coordinatorNotes, assignedTo } = body;
@@ -180,19 +90,10 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
-    const updateData: any = {};
-    if (status) updateData.status = status;
+    const data = updateProposal(id, status ? { status } : {});
 
-    const { data, error } = await supabase
-      .from('proposta')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating idea:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!data) {
+      return NextResponse.json({ error: 'Idea not found' }, { status: 404 });
     }
 
     return NextResponse.json(data);

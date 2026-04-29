@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { User } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/client';
 import { LoginSchema } from '@/domain/auth/schemas/login.schema';
 import { RegisterSchema } from '@/domain/auth/schemas/register.schema';
 
 export type UserRole = 'comunidade' | 'mediador' | 'coordenador' | 'estudante' | 'admin';
 
-interface AppUser extends User {
+interface AppUser {
+    id: string;
+    email?: string;
     role: UserRole;
     department?: string;
     specialization?: string;
@@ -20,6 +20,71 @@ interface AppUser extends User {
     }
 }
 
+const AUTH_STORAGE_KEY = 'conecta-fatec-mock-user';
+
+const createMockUser = (email: string, role: UserRole = 'comunidade', name?: string, phone?: string): AppUser => ({
+    id: crypto.randomUUID(),
+    email,
+    role,
+    user_metadata: {
+        name: name || email.split('@')[0],
+        role,
+        phone,
+        phone_is_whats: false,
+    },
+});
+
+const getRoleFromEmail = (email: string): UserRole => {
+    const normalizedEmail = email.toLowerCase();
+
+    if (normalizedEmail.includes('admin')) return 'admin';
+    if (normalizedEmail.includes('coordenador')) return 'coordenador';
+    if (normalizedEmail.includes('mediador')) return 'mediador';
+    if (normalizedEmail.includes('estudante')) return 'estudante';
+
+    return 'comunidade';
+};
+
+const saveMockUser = (mockUser: AppUser) => {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(mockUser));
+    return mockUser;
+};
+
+const syncMockProfile = async (mockUser: AppUser, phone?: string) => {
+    const response = await fetch('/api/user-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            name: mockUser.user_metadata.name || mockUser.email,
+            email: mockUser.email,
+            phone,
+            role: mockUser.user_metadata.role || 'comunidade',
+            uid: mockUser.id,
+        }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error creating user profile:', errorData);
+        throw new Error(errorData.error || 'Failed to create user profile');
+    }
+
+    const { data } = await response.json();
+
+    return {
+        ...mockUser,
+        id: data.uid,
+        role: data.perfil,
+        user_metadata: {
+            ...mockUser.user_metadata,
+            name: data.nome,
+            role: data.perfil,
+            phone: data.telefone,
+            phone_is_whats: data.telefone_is_whats,
+        },
+    } as AppUser;
+};
+
 const ROLE_LEVELS: Record<UserRole, number> = {
     'admin': 4,
     'coordenador': 3,
@@ -29,64 +94,37 @@ const ROLE_LEVELS: Record<UserRole, number> = {
 };
 
 export const useAuth = () => {
-    const supabase = createClient();
     const [user, setUser] = useState<AppUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            setUser(session?.user as AppUser ?? null);
-            setIsLoading(false);
-        });
+        const storedUser = localStorage.getItem(AUTH_STORAGE_KEY);
 
-        return () => {
-            subscription.unsubscribe();
-        };
-    }, [supabase.auth]);
+        if (storedUser) {
+            setUser(JSON.parse(storedUser) as AppUser);
+        }
+
+        setIsLoading(false);
+    }, []);
 
     const login = async (credentials: LoginSchema) => {
-        const { error } = await supabase.auth.signInWithPassword(credentials);
-        if (error) {
-            throw new Error(error.message);
-        }
+        const syncedUser = await syncMockProfile(createMockUser(
+            credentials.email,
+            getRoleFromEmail(credentials.email),
+        ));
+
+        setUser(saveMockUser(syncedUser));
     };
 
     const signup = async (credentials: RegisterSchema) => {
-        const { data, error: signUpError } = await supabase.auth.signUp({
-            email: credentials.email,
-            password: credentials.password,
-            options: {
-                data: {
-                    name: credentials.name,
-                    role: 'comunidade',
-                },
-            },
-        });
-
-        if (signUpError) {
-            throw new Error(signUpError.message);
-        }
-
-        if (!data.user?.id) {
-            throw new Error('Failed to retrieve user ID after signup');
-        }
-
         const { name, email, phone } = credentials;
         const role = 'comunidade';
-        const uid = data.user.id;
+        const mockUser = createMockUser(email, role, name, phone);
+        const uid = mockUser.id;
 
         try {
-            const response = await fetch('/api/user-profile', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, phone, role, uid }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Error creating user profile:', errorData);
-                throw new Error(errorData.error || 'Failed to create user profile');
-            }
+            const syncedUser = await syncMockProfile({ ...mockUser, id: uid }, phone);
+            setUser(saveMockUser(syncedUser));
         } catch (profileError: unknown) {
             const err = profileError as Error;
             console.error('Network or unexpected error when creating user profile:', err);
@@ -96,19 +134,11 @@ export const useAuth = () => {
 
     const logout = async () => {
         try {
-            await supabase.auth.signOut({ scope: 'global' });
+            localStorage.removeItem(AUTH_STORAGE_KEY);
         } catch (error) {
             console.error('Error during logout:', error);
         } finally {
             setUser(null);
-
-            if (typeof window !== 'undefined') {
-                Object.keys(localStorage).forEach(key => {
-                    if (key.startsWith('sb-')) {
-                        localStorage.removeItem(key);
-                    }
-                });
-            }
         }
     };
 

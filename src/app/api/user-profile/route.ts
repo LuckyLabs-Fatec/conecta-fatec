@@ -1,14 +1,12 @@
-
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { cookies } from 'next/headers';
+import { createUser, findUserByEmail, updateUser } from '@/lib/mock/db';
 
 const userProfileSchema = z.object({
   name: z.string().min(1),
   email: z.email().min(1),
   phone: z.string().optional(),
-  role: z.enum(['comunidade', 'mediador', 'coordenador', 'estudante']),
+  role: z.enum(['comunidade', 'mediador', 'coordenador', 'estudante', 'admin']),
   uid: z.uuid(),
 });
 
@@ -27,44 +25,7 @@ export async function POST(req: NextRequest) {
 
   const { name, email, phone, role, uid } = validation.data;
 
-
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return req.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          req.cookies.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          req.cookies.set({ name, value: '', ...options })
-        },
-      },
-    }
-  );
-
-  const { data, error } = await supabase
-    .from('usuario')
-    .insert([
-      {
-        nome: name,
-        email: email,
-        telefone: phone || '',
-        telefone_is_whats: false,
-        ativo: true,
-        perfil: role,
-        uid: uid,
-      },
-    ]);
-
-  if (error) {
-    console.error('Error inserting user profile:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const data = createUser({ name, email, phone, role, uid });
 
   return NextResponse.json({ message: 'User profile created successfully', data }, { status: 201 });
 }
@@ -78,57 +39,16 @@ export async function PATCH(req: NextRequest) {
   }
 
   const { phone, phone_is_whats } = validation.data;
+  const email = req.headers.get('x-mock-user-email') || req.nextUrl.searchParams.get('email');
+  const user = findUserByEmail(email);
 
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options });
-        },
-      },
-    }
-  );
-
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const updateData: { telefone: string; telefone_is_whats?: boolean } = {
+  const data = updateUser(user.uid, {
     telefone: phone,
-  };
-
-  if (phone_is_whats !== undefined) {
-    updateData.telefone_is_whats = phone_is_whats;
-  }
-
-  const { data, error } = await supabase
-    .from('usuario')
-    .update(updateData)
-    .eq('email', user.email)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating user profile:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  await supabase.auth.updateUser({
-    data: {
-      phone: phone,
-      phone_is_whats: phone_is_whats ?? false,
-    }
+    telefone_is_whats: phone_is_whats ?? false,
   });
 
   return NextResponse.json({ message: 'User profile updated successfully', data }, { status: 200 });

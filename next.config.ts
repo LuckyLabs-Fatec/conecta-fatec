@@ -15,12 +15,6 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'crlqlpslzugeloxiwiaj.supabase.co',
-        port: '',
-        pathname: '/**',
-      },
     ]
   }
 };

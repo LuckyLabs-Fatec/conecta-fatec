@@ -8,7 +8,6 @@ Projeto desenvolvido durante o PI do curso de Desenvolvimento de Software Multip
 - Tailwind CSS
 - Storybook
 - Base UI
-- Supabase
 
 ## Como Rodar o Projeto
 1. Clone o repositório:
