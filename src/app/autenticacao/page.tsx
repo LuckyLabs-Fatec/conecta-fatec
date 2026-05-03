@@ -8,11 +8,11 @@ import { LoginAside, Input, Button } from "@/presentation/components"
 import Link from "next/link";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { loginSchema, LoginSchema } from '@/domain/auth/schemas/login.schema';
+import { useMutation } from '@tanstack/react-query';
 
 export default function LoginPage () {
     const router = useRouter();
     const { login } = useAuth();
-    const [isLoading, setIsLoading] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
 
     const { register, handleSubmit, setError, formState: { errors } } = useForm({
@@ -23,20 +23,23 @@ export default function LoginPage () {
         }
     });
 
-    const onSubmit = async (data: LoginSchema) => {
-        setIsLoading(true);
-        setAuthError(null);
-        try {
-            await login(data);
+    const loginMutation = useMutation({
+        mutationFn: login,
+        onMutate: () => {
+            setAuthError(null);
+        },
+        onSuccess: () => {
             router.push('/');
-        } catch (err: unknown) {
-            const error = err as Error;
-            setAuthError(error.message);
+        },
+        onError: (err: Error) => {
+            setAuthError(err.message);
             setError('email', { type: 'manual', message: ' ' });
             setError('password', { type: 'manual', message: 'Email ou senha inválidos' });
-        } finally {
-            setIsLoading(false);
-        }
+        },
+    });
+
+    const onSubmit = async (data: LoginSchema) => {
+        loginMutation.mutate(data);
     };
 
     return (
@@ -96,8 +99,8 @@ export default function LoginPage () {
                             </div>
 
                             <Button
-                                label={isLoading ? 'Entrando...' : 'ENTRAR'}
-                                disabled={isLoading}
+                                label={loginMutation.isPending ? 'Entrando...' : 'ENTRAR'}
+                                disabled={loginMutation.isPending}
                                 variant="primary"
                                 size="large"
                                 type="submit"

@@ -2,25 +2,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { LoginSchema } from '@/domain/auth/schemas/login.schema';
 import { RegisterSchema } from '@/domain/auth/schemas/register.schema';
+import {
+    clearAuthCookie,
+    readAuthCookie,
+    writeAuthCookie,
+    type AuthSessionUser,
+    type UserRole,
+} from '@/presentation/lib/auth-session';
 
-export type UserRole = 'comunidade' | 'mediador' | 'coordenador' | 'estudante' | 'admin';
+export type { UserRole } from '@/presentation/lib/auth-session';
 
-interface AppUser {
-    id: string;
-    email?: string;
-    role: UserRole;
-    department?: string;
-    specialization?: string;
-    user_metadata: {
-        name?: string;
-        avatar?: string;
-        role?: UserRole;
-        phone?: string;
-        phone_is_whats?: boolean;
-    }
-}
-
-const AUTH_STORAGE_KEY = 'conecta-fatec-mock-user';
+type AppUser = AuthSessionUser;
 
 const createMockUser = (email: string, role: UserRole = 'comunidade', name?: string, phone?: string): AppUser => ({
     id: crypto.randomUUID(),
@@ -45,9 +37,9 @@ const getRoleFromEmail = (email: string): UserRole => {
     return 'comunidade';
 };
 
-const saveMockUser = (mockUser: AppUser) => {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(mockUser));
-    return mockUser;
+const saveAuthSession = (accessToken: string, user: AppUser) => {
+    writeAuthCookie({ accessToken, user });
+    return user;
 };
 
 const syncMockProfile = async (mockUser: AppUser, phone?: string) => {
@@ -86,11 +78,11 @@ const syncMockProfile = async (mockUser: AppUser, phone?: string) => {
 };
 
 const ROLE_LEVELS: Record<UserRole, number> = {
-    'admin': 4,
-    'coordenador': 3,
-    'mediador': 2,
-    'estudante': 1,
-    'comunidade': 0
+    admin: 4,
+    coordenador: 3,
+    mediador: 2,
+    estudante: 1,
+    comunidade: 0,
 };
 
 export const useAuth = () => {
@@ -98,22 +90,51 @@ export const useAuth = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem(AUTH_STORAGE_KEY);
+        try {
+            const session = readAuthCookie();
 
-        if (storedUser) {
-            setUser(JSON.parse(storedUser) as AppUser);
+            if (session?.user) {
+                setUser(session.user);
+            }
+        } catch (error) {
+            console.error('Error reading auth cookie:', error);
+            clearAuthCookie();
         }
 
         setIsLoading(false);
     }, []);
 
     const login = async (credentials: LoginSchema) => {
-        const syncedUser = await syncMockProfile(createMockUser(
-            credentials.email,
-            getRoleFromEmail(credentials.email),
-        ));
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(credentials),
+        });
 
-        setUser(saveMockUser(syncedUser));
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Email ou senha inválidos');
+        }
+
+        const data = await response.json() as {
+            accessToken: string;
+            role: UserRole;
+            user: AppUser;
+        };
+
+        const sessionUser = {
+            ...data.user,
+            email: data.user.email || credentials.email,
+            role: data.user.role || getRoleFromEmail(credentials.email),
+            user_metadata: {
+                ...data.user.user_metadata,
+                name: data.user.user_metadata.name || credentials.email.split('@')[0],
+                role: data.user.user_metadata.role || data.role,
+            },
+        } as AppUser;
+
+        setUser(saveAuthSession(data.accessToken, sessionUser));
+        return sessionUser;
     };
 
     const signup = async (credentials: RegisterSchema) => {
@@ -124,7 +145,7 @@ export const useAuth = () => {
 
         try {
             const syncedUser = await syncMockProfile({ ...mockUser, id: uid }, phone);
-            setUser(saveMockUser(syncedUser));
+            setUser(saveAuthSession(crypto.randomUUID(), syncedUser));
         } catch (profileError: unknown) {
             const err = profileError as Error;
             console.error('Network or unexpected error when creating user profile:', err);
@@ -134,7 +155,7 @@ export const useAuth = () => {
 
     const logout = async () => {
         try {
-            localStorage.removeItem(AUTH_STORAGE_KEY);
+            clearAuthCookie();
         } catch (error) {
             console.error('Error during logout:', error);
         } finally {
@@ -142,14 +163,12 @@ export const useAuth = () => {
         }
     };
 
-
-
     const hasPermission = useCallback((requiredRole: UserRole) => {
         if (!user) return false;
 
         const userRole = (user.user_metadata.role as string)?.toLowerCase() as UserRole;
 
-        if (!userRole || !ROLE_LEVELS.hasOwnProperty(userRole)) return false;
+        if (!userRole || !Object.prototype.hasOwnProperty.call(ROLE_LEVELS, userRole)) return false;
 
         const userLevel = ROLE_LEVELS[userRole];
         const requiredLevel = ROLE_LEVELS[requiredRole];
@@ -179,6 +198,6 @@ export const useAuth = () => {
         hasPermission,
         canAccessIdeaValidation,
         canAssignToClasses,
-        canSuggestIdeas
+        canSuggestIdeas,
     };
 };
