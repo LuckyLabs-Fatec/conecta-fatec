@@ -28,10 +28,30 @@ export async function POST(req: NextRequest) {
         );
     }
 
+    const mapAppRoleToApiRole = (appRole: string) => {
+        const map: Record<string, string> = {
+            'comunidade': 'SOCIETY',
+            'mediador': 'MEDIATOR',
+            'coordenador': 'COORDINATOR',
+            'estudante': 'STUDENT',
+            'admin': 'ADMIN',
+        };
+
+        return map[appRole] ?? 'SOCIETY';
+    };
+
     return NextResponse.json(
         {
             accessToken: crypto.randomUUID(),
-            role: user.perfil,
+            user: {
+                id: user.uid,
+                email: user.email,
+                name: user.nome,
+                avatar: user.user_metadata?.avatar ?? null,
+                phone: user.telefone ?? '',
+                phoneIsWhats: user.telefone_is_whats ?? false,
+                role: mapAppRoleToApiRole(user.perfil),
+            },
         },
         { status: 200 }
     );

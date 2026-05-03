@@ -92,19 +92,31 @@ export const useAuth = () => {
         const res = await http.post('/auth/login', credentials);
         const data = res.data as {
             accessToken: string;
-            role: string;
+            user?: {
+                id?: string;
+                email?: string;
+                name?: string;
+                avatar?: string | null;
+                phone?: string;
+                phoneIsWhats?: boolean;
+                role?: string;
+            };
         };
 
+        const apiUser = data.user;
         const fallbackName = credentials.email.split('@')[0];
-        const mappedRole = mapApiRoleToAppRole(data.role);
+        const mappedRole = mapApiRoleToAppRole(apiUser?.role ?? 'SOCIETY');
 
         const sessionUser: AppUser = {
-            id: crypto.randomUUID(),
-            email: credentials.email,
+            id: apiUser?.id || crypto.randomUUID(),
+            email: apiUser?.email || credentials.email,
             role: mappedRole,
             user_metadata: {
-                name: fallbackName,
+                name: apiUser?.name || fallbackName,
+                avatar: apiUser?.avatar ?? undefined,
                 role: mappedRole,
+                phone: apiUser?.phone ?? '',
+                phone_is_whats: apiUser?.phoneIsWhats ?? false,
             },
         };
 
