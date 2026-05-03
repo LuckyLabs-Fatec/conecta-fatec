@@ -44,7 +44,7 @@ const saveAuthSession = (accessToken: string, user: AppUser) => {
 };
 
 const syncMockProfile = async (mockUser: AppUser, phone?: string) => {
-    const res = await http.post('/api/user-profile', {
+    const res = await http.post('/user-profile', {
         name: mockUser.user_metadata.name || mockUser.email,
         email: mockUser.email,
         phone,
@@ -96,7 +96,7 @@ export const useAuth = () => {
     }, []);
 
     const login = async (credentials: LoginSchema) => {
-        const res = await http.post('/api/auth/login', credentials);
+        const res = await http.post('/auth/login', credentials);
         const data = res.data as {
             accessToken: string;
             role: UserRole;
