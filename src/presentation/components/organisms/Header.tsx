@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { ChevronDown, User, LogOut, Settings } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useState as useStateReact } from 'react';
 
 export const Header = () => {
   const { user, logout, isAuthenticated, hasPermission } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [avatarError, setAvatarError] = useStateReact(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const mockAvatar = 'https://doodleipsum.com/700/avatar-2'
@@ -67,13 +69,20 @@ export const Header = () => {
             aria-expanded={isDropdownOpen}
             aria-haspopup="true"
           >
-            <Image
-              src={user.user_metadata.avatar ? user.user_metadata.avatar : mockAvatar}
-              alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
-              width={32}
-              height={32}
-              className="rounded-full border border-gray-200"
-            />
+            {user.user_metadata.avatar && !avatarError ? (
+              <Image
+                src={user.user_metadata.avatar}
+                alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
+                width={32}
+                height={32}
+                className="rounded-full border border-gray-200"
+                onError={() => setAvatarError(true)}
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-gray-200">
+                <User size={16} className="text-white" />
+              </div>
+            )}
             <span className="hidden md:block font-medium">{user.user_metadata.name}</span>
             <ChevronDown size={16} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
           </button>

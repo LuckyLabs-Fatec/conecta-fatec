@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { User } from 'lucide-react';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header, useToast, MaskedInput, type MaskConfig } from "@/presentation/components";
@@ -18,6 +19,7 @@ export default function PerfilPage() {
   const router = useRouter();
   const { user, isLoading, isAuthenticated } = useAuth();
   const { show } = useToast();
+  const [avatarError, setAvatarError] = useState(false);
   const [editingName, setEditingName] = useState('');
   const [editingAvatar, setEditingAvatar] = useState('');
   const [editingPhone, setEditingPhone] = useState('');
@@ -42,6 +44,7 @@ export default function PerfilPage() {
       setEditingPhone(user.user_metadata.phone ?? '');
       setEditingPhoneIsWhatsapp(user.user_metadata.phone_is_whats ?? false);
       setEditingRole(user.user_metadata.role ?? '');
+      setAvatarError(false);
     }
   }, [user]);
 
@@ -114,13 +117,20 @@ export default function PerfilPage() {
 
           <section className="bg-white border rounded-xl shadow-sm p-6 flex flex-col md:flex-row gap-6">
             <div className="flex-shrink-0">
-              <Image
-                src={user.user_metadata.avatar ? user.user_metadata.avatar : mockAvatar}
-                alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
-                width={96}
-                height={96}
-                className="rounded-full border"
-              />
+              {user.user_metadata.avatar && !avatarError ? (
+                <Image
+                  src={user.user_metadata.avatar}
+                  alt={`Avatar de ${user.user_metadata.name ?? 'Usuário'}`}
+                  width={96}
+                  height={96}
+                  className="rounded-full border"
+                  onError={() => setAvatarError(true)}
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border">
+                  <User size={40} className="text-gray-500" />
+                </div>
+              )}
             </div>
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
