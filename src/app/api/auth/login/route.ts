@@ -32,14 +32,6 @@ export async function POST(req: NextRequest) {
         {
             accessToken: crypto.randomUUID(),
             role: user.perfil,
-            user: {
-                id: user.uid,
-                email: user.email,
-                role: user.perfil,
-                department: undefined,
-                specialization: undefined,
-                user_metadata: user.user_metadata,
-            },
         },
         { status: 200 }
     );

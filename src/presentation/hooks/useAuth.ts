@@ -49,6 +49,24 @@ const ROLE_LEVELS: Record<UserRole, number> = {
     comunidade: 0,
 };
 
+// Mapear roles da API (em maiúsculas) para roles da aplicação (em minúsculas)
+const mapApiRoleToAppRole = (apiRole: string): UserRole => {
+    const roleMap: Record<string, UserRole> = {
+        'ADMIN': 'admin',
+        'COORDINATOR': 'coordenador',
+        'COORDENADOR': 'coordenador',
+        'MEDIATOR': 'mediador',
+        'MEDIADOR': 'mediador',
+        'STUDENT': 'estudante',
+        'ESTUDANTE': 'estudante',
+        'SOCIETY': 'comunidade',
+        'COMUNIDADE': 'comunidade',
+        'COMMUNITY': 'comunidade',
+    };
+    
+    return roleMap[apiRole.toUpperCase()] || 'comunidade';
+};
+
 export const useAuth = () => {
     const [user, setUser] = useState<AppUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -74,22 +92,21 @@ export const useAuth = () => {
         const res = await http.post('/auth/login', credentials);
         const data = res.data as {
             accessToken: string;
-            role: UserRole;
-            user?: Partial<AppUser>;
+            role: string;
         };
 
         const fallbackName = credentials.email.split('@')[0];
+        const mappedRole = mapApiRoleToAppRole(data.role);
 
-        const sessionUser = {
-            id: data.user?.id || crypto.randomUUID(),
-            email: data.user?.email || credentials.email,
-            role: data.user?.role || data.role || 'comunidade',
+        const sessionUser: AppUser = {
+            id: crypto.randomUUID(),
+            email: credentials.email,
+            role: mappedRole,
             user_metadata: {
-                ...data.user?.user_metadata,
-                name: data.user?.user_metadata?.name || fallbackName,
-                role: data.user?.user_metadata?.role || data.role,
+                name: fallbackName,
+                role: mappedRole,
             },
-        } as AppUser;
+        };
 
         setUser(saveAuthSession(data.accessToken, sessionUser));
         return sessionUser;
