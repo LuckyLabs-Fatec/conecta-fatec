@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Header, useToast, MaskedInput, type MaskConfig } from "@/presentation/components";
+import http from '@/presentation/lib/http';
 import { useAuth } from "@/presentation/hooks/useAuth";
 
 const phoneMaskConfig: MaskConfig = {
@@ -87,24 +88,13 @@ export default function PerfilPage() {
   const onSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/user-profile/${user?.id as string}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: editingName,
-          avatar: editingAvatar,
-          phone: editingPhone,
-          phone_is_whats: editingPhoneIsWhatsapp,
-          role: editingRole,
-        }),
+      await http.put(`/api/user-profile/${user?.id as string}`, {
+        name: editingName,
+        avatar: editingAvatar,
+        phone: editingPhone,
+        phone_is_whats: editingPhoneIsWhatsapp,
+        role: editingRole,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update profile');
-      }
 
       show({ kind: 'success', message: 'Perfil atualizado com sucesso!' });
     } catch (error: unknown) {

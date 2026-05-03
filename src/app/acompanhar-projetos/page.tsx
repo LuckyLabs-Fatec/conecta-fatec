@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { projectsFiltersSchema, type ProjectsFiltersFormValues } from "@/domain/projects/schemas/filters.schema";
 import { usePagination } from "@/presentation/hooks/usePagination";
+import http from '@/presentation/lib/http';
 import { Pagination } from "@/presentation/components";
 import { Project, ProjectStatus } from "@/domain/projects/types";
 import { ProjectCard } from "@/presentation/components/molecules/ProjectCard";
@@ -62,7 +63,6 @@ export default function ProjectsPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const controller = new AbortController();
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -76,15 +76,13 @@ export default function ProjectsPage() {
                     if (filters.status) params.set('status', filters.status);
                     if (filters.search) params.set('search', filters.search);
 
-                    const res = await fetch(`${API_PROJECTS}?${params.toString()}`, { signal: controller.signal });
-                    if (!res.ok) throw new Error('Falha ao carregar projetos');
-                    const data = await res.json();
+                    const res = await http.get(`${API_PROJECTS}?${params.toString()}`);
+                    const data = res.data;
                     setProjects(data.data as Project[]);
                     setTotals(Number(data.total), Number(data.totalPages));
                 } else {
-                    const res = await fetch(API_PROPOSALS, { signal: controller.signal });
-                    if (!res.ok) throw new Error('Falha ao carregar propostas');
-                    const data = await res.json();
+                    const res = await http.get(API_PROPOSALS);
+                    const data = res.data;
 
                     const mappedProposals: Proposal[] = data.map((item: any) => ({
                         id: item.id,
@@ -126,19 +124,12 @@ export default function ProjectsPage() {
             }
         };
         fetchData();
-        return () => controller.abort();
     }, [page, pageSize, filters.status, filters.search, setTotals, activeTab]);
 
     const handleUpdateStatus = async (newStatus: ProjectStatus) => {
         if (selectedProject) {
             try {
-                const res = await fetch(API_PROJECTS, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: selectedProject.id, status: newStatus }),
-                });
-
-                if (!res.ok) throw new Error('Falha ao atualizar status');
+                await http.put(API_PROJECTS, { id: selectedProject.id, status: newStatus });
 
                 const updatedProject = { ...selectedProject, status: newStatus };
                 setSelectedProject(updatedProject);
@@ -172,17 +163,11 @@ export default function ProjectsPage() {
     const handleProposalStatusUpdate = async (status: ProposalStatus, message?: string) => {
         if (selectedProposal) {
             try {
-                const res = await fetch(API_PROPOSALS, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: selectedProposal.id,
-                        status,
-                        mediatorNotes: message
-                    }),
+                await http.put(API_PROPOSALS, {
+                    id: selectedProposal.id,
+                    status,
+                    mediatorNotes: message,
                 });
-
-                if (!res.ok) throw new Error('Falha ao atualizar proposta');
 
                 const updated = { ...selectedProposal, status, mediatorNotes: message };
                 setSelectedProposal(updated);
@@ -198,17 +183,11 @@ export default function ProjectsPage() {
     const handleAssign = async (assignmentData: any) => {
         if (selectedProposal) {
             try {
-                const res = await fetch(API_PROPOSALS, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: selectedProposal.id,
-                        status: 'atribuida',
-                        assignedTo: assignmentData
-                    }),
+                await http.put(API_PROPOSALS, {
+                    id: selectedProposal.id,
+                    status: 'atribuida',
+                    assignedTo: assignmentData,
                 });
-
-                if (!res.ok) throw new Error('Falha ao atribuir proposta');
 
                 const updated = { ...selectedProposal, status: 'atribuida' as ProposalStatus, assignedTo: assignmentData };
                 setSelectedProposal(updated);

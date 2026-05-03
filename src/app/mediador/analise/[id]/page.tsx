@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import http from '@/presentation/lib/http';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useForm } from 'react-hook-form';
@@ -43,12 +44,10 @@ export default function MediatorReviewPage() {
   }, [isLoading, user, router]);
 
   useEffect(() => {
-    const controller = new AbortController();
     const load = async () => {
       try {
-        const res = await fetch('/api/ideias-simples', { signal: controller.signal, cache: 'no-store' });
-        if (!res.ok) throw new Error('Falha ao carregar ideia');
-        const list: Idea[] = await res.json();
+        const res = await http.get('/api/ideias-simples');
+        const list: Idea[] = res.data;
         const found = list.find((i) => i.id === ideaId) || null;
         if (!found) throw new Error('Ideia não encontrada');
         setIdea(found);
@@ -60,19 +59,13 @@ export default function MediatorReviewPage() {
       }
     };
     if (ideaId) load();
-    return () => controller.abort();
   }, [ideaId]);
 
-  const onSubmit = form.handleSubmit(async (values) => {
+    const onSubmit = form.handleSubmit(async (values) => {
     setResult(null);
     try {
-      const res = await fetch(`/api/ideias-simples/${ideaId}/review`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-      if (!res.ok) throw new Error('Falha ao enviar revisão');
-      const json: { id: string; status: Idea['status']; message: string | null } = await res.json();
+      const res = await http.post(`/api/ideias-simples/${ideaId}/review`, values);
+      const json: { id: string; status: Idea['status']; message: string | null } = res.data;
       setResult(`Status atualizado para: ${json.status}${json.message ? ' | Feedback: ' + json.message : ''}`);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Erro ao enviar';

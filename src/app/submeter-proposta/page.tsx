@@ -11,6 +11,7 @@ import { ContactInfoStepAdapter } from '@/presentation/components/adapters/Conta
 import { ChevronLeft, ChevronRight, Send, Loader2 } from "lucide-react";
 import { suggestionSchema, SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
 import { useAuth } from "@/presentation/hooks/useAuth";
+import http from '@/presentation/lib/http';
 
 export default function SuggestImprovementPage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -77,49 +78,26 @@ export default function SuggestImprovementPage() {
             const userHadPhone = user?.user_metadata?.phone;
             let attachmentRefs = [];
 
-            if (data.attachments && data.attachments.length > 0) {
+                if (data.attachments && data.attachments.length > 0) {
                 const formData = new FormData();
                 data.attachments.forEach(file => formData.append('files', file));
-
-                const uploadResponse = await fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!uploadResponse.ok) {
-                    const errorData = await uploadResponse.json();
-                    throw new Error(errorData.error || 'Falha ao fazer upload dos anexos');
-                }
-
-                const uploadData = await uploadResponse.json();
-                attachmentRefs = uploadData.files;
+                    const uploadRes = await http.post('/api/upload', formData);
+                    attachmentRefs = uploadRes.data.files;
             }
 
-            const response = await fetch('/api/ideias-simples', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    title: data.title,
-                    description: data.description,
-                    contact: data.contact,
-                    attachments: attachmentRefs,
-                }),
+            const res = await http.post('/api/ideias-simples', {
+                title: data.title,
+                description: data.description,
+                contact: data.contact,
+                attachments: attachmentRefs,
             });
 
-            if (response.ok) {
+            if (res) {
                 if (!userHadPhone && data.contact.primaryPhone) {
                     try {
-                        await fetch('/api/user-profile', {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                phone: data.contact.primaryPhone,
-                                phone_is_whats: data.contact.primaryPhoneIsWhatsapp,
-                            }),
+                        await http.patch('/api/user-profile', {
+                            phone: data.contact.primaryPhone,
+                            phone_is_whats: data.contact.primaryPhoneIsWhatsapp,
                         });
                     } catch (profileError) {
                         console.error('Error updating user profile:', profileError);
@@ -132,8 +110,7 @@ export default function SuggestImprovementPage() {
                 });
                 router.push('/');
             } else {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Erro desconhecido');
+                throw new Error('Erro desconhecido');
             }
         } catch (error) {
             show({

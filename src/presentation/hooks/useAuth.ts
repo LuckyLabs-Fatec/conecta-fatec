@@ -9,6 +9,7 @@ import {
     type AuthSessionUser,
     type UserRole,
 } from '@/presentation/lib/auth-session';
+import http from '@/presentation/lib/http';
 
 export type { UserRole } from '@/presentation/lib/auth-session';
 
@@ -43,25 +44,15 @@ const saveAuthSession = (accessToken: string, user: AppUser) => {
 };
 
 const syncMockProfile = async (mockUser: AppUser, phone?: string) => {
-    const response = await fetch('/api/user-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            name: mockUser.user_metadata.name || mockUser.email,
-            email: mockUser.email,
-            phone,
-            role: mockUser.user_metadata.role || 'comunidade',
-            uid: mockUser.id,
-        }),
+    const res = await http.post('/api/user-profile', {
+        name: mockUser.user_metadata.name || mockUser.email,
+        email: mockUser.email,
+        phone,
+        role: mockUser.user_metadata.role || 'comunidade',
+        uid: mockUser.id,
     });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error creating user profile:', errorData);
-        throw new Error(errorData.error || 'Failed to create user profile');
-    }
-
-    const { data } = await response.json();
+    const { data } = res.data;
 
     return {
         ...mockUser,
@@ -105,18 +96,8 @@ export const useAuth = () => {
     }, []);
 
     const login = async (credentials: LoginSchema) => {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(credentials),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Email ou senha inválidos');
-        }
-
-        const data = await response.json() as {
+        const res = await http.post('/api/auth/login', credentials);
+        const data = res.data as {
             accessToken: string;
             role: UserRole;
             user: AppUser;
