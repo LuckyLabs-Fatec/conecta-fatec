@@ -78,6 +78,7 @@ const mapProposal = (item: ProposalApiItem): Proposal => ({
 
 interface UseMyProposalsOptions {
   enabled?: boolean;
+  authorEmail?: string;
 }
 
 interface UseMyProposalsResult {
@@ -87,9 +88,9 @@ interface UseMyProposalsResult {
   refetch: () => void;
 }
 
-export const useMyProposals = ({ enabled = true }: UseMyProposalsOptions = {}): UseMyProposalsResult => {
+export const useMyProposals = ({ enabled = true, authorEmail }: UseMyProposalsOptions = {}): UseMyProposalsResult => {
   const query = useQuery({
-    queryKey: ['my-proposals'],
+    queryKey: ['my-proposals', authorEmail],
     enabled,
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos
@@ -100,6 +101,7 @@ export const useMyProposals = ({ enabled = true }: UseMyProposalsOptions = {}): 
         params: {
           page: 1,
           limit: 100,
+          email: authorEmail,
         },
       });
 

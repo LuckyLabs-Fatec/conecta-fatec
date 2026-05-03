@@ -20,6 +20,7 @@ export default function MinhasPropostasPage() {
 
   const { proposals, loading, error, refetch } = useMyProposals({
     enabled: isAuthenticated && isCommunityUser,
+    authorEmail: user?.email,
   });
 
   useEffect(() => {

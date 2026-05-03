@@ -11,7 +11,7 @@ import { ContactInfoStepAdapter } from '@/presentation/components/adapters/Conta
 import { ChevronLeft, ChevronRight, Send, Loader2 } from "lucide-react";
 import { suggestionSchema, SuggestionSchema } from '@/domain/ideas/schemas/suggestion.schema';
 import { useAuth } from "@/presentation/hooks/useAuth";
-import http from '@/presentation/lib/http';
+import { useCreateProposal } from '@/presentation/hooks/useCreateProposal';
 
 export default function SuggestImprovementPage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -19,6 +19,7 @@ export default function SuggestImprovementPage() {
     const totalSteps = 2;
     const { user } = useAuth();
     const { show } = useToast();
+    const createProposal = useCreateProposal();
 
     const { handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<SuggestionSchema>({
         resolver: zodResolver(suggestionSchema) as Resolver<SuggestionSchema>,
@@ -73,51 +74,49 @@ export default function SuggestImprovementPage() {
 
     const router = useRouter();
     const onSubmit = async (data: SuggestionSchema) => {
-        setIsSubmitting(true);
         try {
-            const userHadPhone = user?.user_metadata?.phone;
-            let attachmentRefs = [];
+            setIsSubmitting(true);
 
-                if (data.attachments && data.attachments.length > 0) {
-                const formData = new FormData();
-                data.attachments.forEach(file => formData.append('files', file));
-                    const uploadRes = await http.post('/api/upload', formData);
-                    attachmentRefs = uploadRes.data.files;
+            if (!user?.email) {
+                throw new Error('Usuário não autenticado');
             }
 
-            const res = await http.post('/api/ideias-simples', {
-                title: data.title,
-                description: data.description,
-                contact: data.contact,
-                attachments: attachmentRefs,
+            const userHadPhone = user?.user_metadata?.phone;
+
+            await createProposal.mutateAsync({
+                data,
+                authorEmail: user.email,
             });
 
-            if (res) {
-                if (!userHadPhone && data.contact.primaryPhone) {
-                    try {
-                        await http.patch('/api/user-profile', {
+            if (!userHadPhone && data.contact.primaryPhone) {
+                try {
+                    await fetch('/api/user-profile', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
                             phone: data.contact.primaryPhone,
                             phone_is_whats: data.contact.primaryPhoneIsWhatsapp,
-                        });
-                    } catch (profileError) {
-                        console.error('Error updating user profile:', profileError);
-                    }
+                        }),
+                    });
+                } catch (profileError) {
+                    console.error('Error updating user profile:', profileError);
                 }
-
-                show({
-                    message: 'Sua proposta foi enviada com sucesso! Agora ela está aguardando revisão. Quando tivermos uma novidade você será notificado pelo seu email',
-                    kind: 'success'
-                });
-                router.push('/');
-            } else {
-                throw new Error('Erro desconhecido');
             }
+
+            show({
+                message: 'Sua proposta foi enviada com sucesso! Agora ela está aguardando revisão. Quando tivermos uma novidade você será notificado pelo seu email',
+                kind: 'success'
+            });
+            router.push('/minhas-propostas');
         } catch (error) {
             show({
                 message: 'Erro ao enviar proposta',
                 kind: 'error',
                 error: error as Error
             });
+        } finally {
             setIsSubmitting(false);
         }
     };

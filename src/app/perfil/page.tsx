@@ -29,8 +29,6 @@ export default function PerfilPage() {
   const [largeFont, setLargeFont] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
 
-  const mockAvatar = 'https://doodleipsum.com/700/avatar-2'
-
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace("/autenticacao");
