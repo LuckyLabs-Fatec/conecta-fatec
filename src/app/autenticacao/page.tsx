@@ -117,6 +117,14 @@ export default function LoginPage () {
                                 >
                                     Criar Conta
                                 </Link>
+                                <div className="mt-4">
+                                    <Link
+                                        href="/"
+                                        className="inline-block px-6 py-2 text-sm font-medium text-gray-600 hover:text-[var(--cps-blue-base)] underline"
+                                    >
+                                        Voltar para a página inicial
+                                    </Link>
+                                </div>
                             </div>
                         </footer>
                     </div>
