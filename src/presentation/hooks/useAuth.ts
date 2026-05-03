@@ -59,6 +59,8 @@ export const useAuth = () => {
 
             if (session?.user) {
                 setUser(session.user);
+            } else if (session) {
+                clearAuthCookie();
             }
         } catch (error) {
             console.error('Error reading auth cookie:', error);
@@ -73,17 +75,19 @@ export const useAuth = () => {
         const data = res.data as {
             accessToken: string;
             role: UserRole;
-            user: AppUser;
+            user?: Partial<AppUser>;
         };
 
+        const fallbackName = credentials.email.split('@')[0];
+
         const sessionUser = {
-            ...data.user,
-            email: data.user.email || credentials.email,
-            role: data.user.role || 'comunidade',
+            id: data.user?.id || crypto.randomUUID(),
+            email: data.user?.email || credentials.email,
+            role: data.user?.role || data.role || 'comunidade',
             user_metadata: {
-                ...data.user.user_metadata,
-                name: data.user.user_metadata.name || credentials.email.split('@')[0],
-                role: data.user.user_metadata.role || data.role,
+                ...data.user?.user_metadata,
+                name: data.user?.user_metadata?.name || fallbackName,
+                role: data.user?.user_metadata?.role || data.role,
             },
         } as AppUser;
 
