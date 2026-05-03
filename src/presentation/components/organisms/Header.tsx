@@ -13,7 +13,7 @@ export const Header = () => {
   const [avatarError, setAvatarError] = useStateReact(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const mockAvatar = 'https://doodleipsum.com/700/avatar-2'
+  const isCommunityUser = (user?.user_metadata?.role ?? user?.role ?? '').toLowerCase() === 'comunidade';
 
   const handleLogout = async () => {
     await logout();
@@ -42,9 +42,14 @@ export const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          {isAuthenticated && hasPermission('comunidade') && (
+          {isAuthenticated && isCommunityUser && (
             <Link href="/submeter-proposta" className="hover:text-red-200 transition-colors">
               Submeter Proposta
+            </Link>
+          )}
+          {isAuthenticated && isCommunityUser && (
+            <Link href="/minhas-propostas" className="hover:text-red-200 transition-colors">
+              Minhas Propostas
             </Link>
           )}
           {/* Unified Dashboard Link */}
