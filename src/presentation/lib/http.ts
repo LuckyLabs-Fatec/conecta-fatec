@@ -3,8 +3,12 @@
 import axios from 'axios';
 import { readAuthCookie } from './auth-session';
 
+const baseURL = (typeof window !== 'undefined')
+  ? (process.env.NEXT_PUBLIC_CONECTA_FATEC_URL ?? '')
+  : (process.env.CONECTA_FATEC_URL ?? '');
+
 const client = axios.create({
-  baseURL: '',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
