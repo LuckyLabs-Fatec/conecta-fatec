@@ -21,6 +21,9 @@ importers:
       '@moreiraste/react-vlibras':
         specifier: 2.4.5
         version: 2.4.5
+      '@tanstack/react-query':
+        specifier: ^5.100.8
+        version: 5.100.8(react@19.1.0)
       lucide-react:
         specifier: 0.544.0
         version: 0.544.0(react@19.1.0)
@@ -1344,6 +1347,14 @@ packages:
 
   '@tailwindcss/postcss@4.1.13':
     resolution: {integrity: sha512-HLgx6YSFKJT7rJqh9oJs/TkBFhxuMOfUKSBEPYwV+t78POOBsdQ7crhZLzwcH3T0UyUuOzU/GK5pk5eKr3wCiQ==}
+
+  '@tanstack/query-core@5.100.8':
+    resolution: {integrity: sha512-ceYwSFOqjPwET5TA6IOYxzxlGc0ekyH/gfOtWkP0PX43rzX9bxW48Iuw8KAduKCToi4rJAQ6nRy2kAe8gszdmg==}
+
+  '@tanstack/react-query@5.100.8':
+    resolution: {integrity: sha512-iNNEekixXU5vtAGKKZX2lx3jTooG5yNY+kv0wSgEdEYG0Mj0JM5bcuQtC35ZAP3nDopT6jciUK3xeX65U7AnfA==}
+    peerDependencies:
+      react: ^18 || ^19
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -5464,6 +5475,13 @@ snapshots:
       '@tailwindcss/oxide': 4.1.13
       postcss: 8.5.6
       tailwindcss: 4.1.13
+
+  '@tanstack/query-core@5.100.8': {}
+
+  '@tanstack/react-query@5.100.8(react@19.1.0)':
+    dependencies:
+      '@tanstack/query-core': 5.100.8
+      react: 19.1.0
 
   '@testing-library/dom@10.4.1':
     dependencies:
