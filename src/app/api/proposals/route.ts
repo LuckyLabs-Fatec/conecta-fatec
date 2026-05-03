@@ -37,7 +37,8 @@ const normalizeStatus = (status?: string) => {
       return 'aguardando_info';
     case 'ASSIGNED':
     case 'ATRIBUIDA':
-      return 'atribuida';
+      // map assigned/atribuida to an existing ProjectStatus
+      return 'em_desenvolvimento';
     default:
       return 'pendente';
   }
