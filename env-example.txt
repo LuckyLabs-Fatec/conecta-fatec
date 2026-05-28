@@ -1,0 +1,1 @@
+NEXT_PUBLIC_CONECTA_FATEC_URL=http://localhost:8080
