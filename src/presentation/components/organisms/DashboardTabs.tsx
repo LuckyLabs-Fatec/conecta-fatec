@@ -3,9 +3,10 @@ import React from 'react';
 interface DashboardTabsProps {
     activeTab: 'proposals' | 'projects';
     onTabChange: (tab: 'proposals' | 'projects') => void;
+    projectsDisabled?: boolean;
 }
 
-export const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) => {
+export const DashboardTabs = ({ activeTab, onTabChange, projectsDisabled = false }: DashboardTabsProps) => {
     return (
         <div className="flex border-b border-gray-200 mb-6">
             <button
@@ -23,9 +24,14 @@ export const DashboardTabs = ({ activeTab, onTabChange }: DashboardTabsProps) =>
             <button
                 className={`px-6 py-3 font-medium text-sm transition-colors relative ${activeTab === 'projects'
                         ? 'text-[var(--cps-blue-base)]'
-                        : 'text-gray-500 hover:text-gray-700'
+                        : projectsDisabled
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'text-gray-500 hover:text-gray-700'
                     }`}
-                onClick={() => onTabChange('projects')}
+                onClick={() => {
+                    if (!projectsDisabled) onTabChange('projects');
+                }}
+                disabled={projectsDisabled}
             >
                 Projetos
                 {activeTab === 'projects' && (

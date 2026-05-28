@@ -17,8 +17,38 @@ import { ProposalModal } from "@/presentation/components/organisms/ProposalModal
 import { DashboardTabs } from "@/presentation/components/organisms/DashboardTabs";
 import { useAuth } from "@/presentation/hooks/useAuth";
 
-const API_PROJECTS = '/api/projetos';
-const API_PROPOSALS = '/api/ideias-simples';
+const API_PROJECTS = '/projects';
+const API_PROPOSALS = '/proposals';
+const API_MY_PROPOSALS = '/proposals/mine';
+
+type ApiListResponse<T> = {
+    items: T[];
+    page: number;
+    limit: number;
+    totalItems: number;
+    totalPages: number;
+};
+
+type ApiProject = {
+    id: string;
+    title: string;
+    description: string;
+    deadline?: string | null;
+    status: string;
+};
+
+type ApiProposal = {
+    id: string;
+    title: string;
+    description: string;
+    submissionDate: string;
+    status: string;
+    attachments?: string | null;
+    user?: {
+        email?: string | null;
+        name?: string | null;
+    };
+};
 
 const statusConfig: Record<ProjectStatus, { label: string }> = {
     em_analise: { label: 'Em Análise' },
@@ -32,10 +62,102 @@ const statusConfig: Record<ProjectStatus, { label: string }> = {
     pendente: { label: 'Pendente' },
 };
 
+const normalizeProjectStatus = (status: string): ProjectStatus => {
+    const normalized = status.trim().toLowerCase();
+
+    switch (normalized) {
+        case 'active':
+        case 'em_desenvolvimento':
+            return 'em_desenvolvimento';
+        case 'completed':
+        case 'concluido':
+            return 'concluido';
+        case 'suspended':
+        case 'suspenso':
+            return 'suspenso';
+        case 'approved':
+        case 'aprovado':
+            return 'aprovado';
+        case 'rejected':
+        case 'rejeitado':
+            return 'rejeitado';
+        case 'under_review':
+        case 'em_analise':
+            return 'em_analise';
+        case 'testing':
+        case 'testando':
+            return 'testando';
+        case 'awaiting_review':
+        case 'aguardando_revisao':
+            return 'aguardando_revisao';
+        default:
+            return 'pendente';
+    }
+};
+
+const normalizeProposalStatus = (status: string): ProposalStatus => {
+    const normalized = status.trim().toLowerCase();
+
+    switch (normalized) {
+        case 'submitted':
+        case 'pendente':
+            return 'pendente';
+        case 'analysis':
+        case 'under_review':
+        case 'em_analise':
+            return 'em_analise';
+        case 'approved':
+        case 'aprovada':
+            return 'aprovada';
+        case 'rejected':
+        case 'rejeitada':
+            return 'rejeitada';
+        case 'awaiting_info':
+        case 'aguardando_info':
+            return 'aguardando_info';
+        case 'assigned':
+        case 'atribuida':
+            return 'atribuida';
+        default:
+            return 'pendente';
+    }
+};
+
+const mapProject = (item: ApiProject): Project => ({
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    status: normalizeProjectStatus(item.status),
+    startDate: undefined,
+    expectedEndDate: item.deadline ?? undefined,
+    progress: normalizeProjectStatus(item.status) === 'concluido' ? 100 : 0,
+    images: [],
+    updates: [],
+});
+
+const mapProposal = (item: ApiProposal): Proposal => ({
+    id: item.id,
+    title: item.title,
+    description: item.description,
+    status: normalizeProposalStatus(item.status),
+    submittedBy: {
+        name: item.user?.name ?? item.user?.email ?? 'Anônimo',
+        email: item.user?.email ?? 'N/A',
+    },
+    submittedAt: item.submissionDate,
+    images: [],
+    mediatorNotes: '',
+    coordinatorNotes: '',
+});
+
 export default function ProjectsPage() {
-    const { user } = useAuth();
+    const { user, isLoading: isAuthLoading, hasPermission } = useAuth();
     const { show } = useToast();
-    const [activeTab, setActiveTab] = useState<'proposals' | 'projects'>('projects');
+    const canListProjects = hasPermission('estudante');
+    const canListAllProposals = hasPermission('estudante');
+    const [activeTab, setActiveTab] = useState<'proposals' | 'projects'>(() =>
+        canListProjects ? 'projects' : 'proposals',
+    );
 
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -63,56 +185,68 @@ export default function ProjectsPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (!isAuthLoading && !canListProjects && activeTab === 'projects') {
+            setActiveTab('proposals');
+            setPage(1);
+        }
+    }, [activeTab, canListProjects, isAuthLoading, setPage]);
+
+    useEffect(() => {
         const fetchData = async () => {
+            if (isAuthLoading) return;
+
+            if (!user) {
+                setProjects([]);
+                setProposals([]);
+                setTotals(0, 1);
+                setError('Faça login para visualizar os dados.');
+                return;
+            }
+
             try {
                 setLoading(true);
                 setError(null);
 
                 if (activeTab === 'projects') {
+                    if (!canListProjects) {
+                        setProjects([]);
+                        setTotals(0, 1);
+                        setError('Seu perfil não tem permissão para listar projetos.');
+                        return;
+                    }
+
                     const params = new URLSearchParams({
                         page: String(page),
-                        pageSize: String(pageSize),
+                        limit: String(pageSize),
                     });
                     if (filters.status) params.set('status', filters.status);
                     if (filters.search) params.set('search', filters.search);
 
                     const res = await http.get(`${API_PROJECTS}?${params.toString()}`);
-                    const data = res.data;
-                    setProjects(data.data as Project[]);
-                    setTotals(Number(data.total), Number(data.totalPages));
+                    const data = res.data as ApiListResponse<ApiProject>;
+                    setProjects(data.items.map(mapProject));
+                    setTotals(Number(data.totalItems), Number(data.totalPages));
                 } else {
-                    const res = await http.get(API_PROPOSALS);
-                    const data = res.data;
+                    const params = new URLSearchParams({
+                        page: String(page),
+                        limit: String(pageSize),
+                    });
 
-                    const mappedProposals: Proposal[] = data.map((item: any) => ({
-                        id: item.id,
-                        title: item.titulo,
-                        description: item.descricao,
-                        status: item.status,
-                        submittedBy: {
-                            name: item.autor || 'Anônimo',
-                            email: 'N/A',
-                        },
-                        submittedAt: item.created_at || new Date().toISOString(),
-                        images: item.anexos ? (Array.isArray(item.anexos) ? item.anexos.map((a: any) => a.url) : []) : [],
-                        mediatorNotes: '',
-                        coordinatorNotes: '',
-                    }));
+                    const endpoint = canListAllProposals ? API_PROPOSALS : API_MY_PROPOSALS;
+                    const res = await http.get(`${endpoint}?${params.toString()}`);
+                    const data = res.data as ApiListResponse<ApiProposal>;
+                    const mappedProposals = data.items.map(mapProposal);
 
-                    let filtered = mappedProposals;
-                    if (filters.search) {
-                        const q = filters.search.toLowerCase();
-                        filtered = filtered.filter(p =>
-                            p.title.toLowerCase().includes(q) ||
-                            p.description.toLowerCase().includes(q)
-                        );
-                    }
-                    if (filters.status) {
-                        filtered = filtered.filter(p => p.status === filters.status);
-                    }
+                    const filtered = mappedProposals.filter((proposal) => {
+                        const matchesSearch = !filters.search ||
+                            proposal.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+                            proposal.description.toLowerCase().includes(filters.search.toLowerCase());
+                        const matchesStatus = !filters.status || proposal.status === filters.status;
+                        return matchesSearch && matchesStatus;
+                    });
 
                     setProposals(filtered);
-                    setTotals(filtered.length, Math.ceil(filtered.length / pageSize));
+                    setTotals(Number(data.totalItems), Number(data.totalPages));
                 }
 
             } catch (e: unknown) {
@@ -124,12 +258,23 @@ export default function ProjectsPage() {
             }
         };
         fetchData();
-    }, [page, pageSize, filters.status, filters.search, setTotals, activeTab]);
+    }, [
+        activeTab,
+        canListAllProposals,
+        canListProjects,
+        filters.search,
+        filters.status,
+        isAuthLoading,
+        page,
+        pageSize,
+        setTotals,
+        user,
+    ]);
 
     const handleUpdateStatus = async (newStatus: ProjectStatus) => {
         if (selectedProject) {
             try {
-                await http.put(API_PROJECTS, { id: selectedProject.id, status: newStatus });
+                await http.put(`${API_PROJECTS}/${selectedProject.id}`, { status: newStatus });
 
                 const updatedProject = { ...selectedProject, status: newStatus };
                 setSelectedProject(updatedProject);
@@ -163,8 +308,7 @@ export default function ProjectsPage() {
     const handleProposalStatusUpdate = async (status: ProposalStatus, message?: string) => {
         if (selectedProposal) {
             try {
-                await http.put(API_PROPOSALS, {
-                    id: selectedProposal.id,
+                await http.put(`${API_PROPOSALS}/${selectedProposal.id}`, {
                     status,
                     mediatorNotes: message,
                 });
@@ -183,8 +327,7 @@ export default function ProjectsPage() {
     const handleAssign = async (assignmentData: any) => {
         if (selectedProposal) {
             try {
-                await http.put(API_PROPOSALS, {
-                    id: selectedProposal.id,
+                await http.put(`${API_PROPOSALS}/${selectedProposal.id}`, {
                     status: 'atribuida',
                     assignedTo: assignmentData,
                 });
@@ -217,6 +360,7 @@ export default function ProjectsPage() {
                     <DashboardTabs
                         activeTab={activeTab}
                         onTabChange={(tab) => { setActiveTab(tab); setPage(1); form.reset(); }}
+                        projectsDisabled={!canListProjects}
                     />
 
                     {/* Filters */}
