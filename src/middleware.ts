@@ -1,5 +1,5 @@
-import { type NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
 const AUTH_COOKIE_KEY = 'conecta-fatec-auth';
 const PROTECTED_PATHS = [
@@ -11,7 +11,7 @@ const PROTECTED_PATHS = [
   '/submeter-proposta',
 ];
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const needsAuth = PROTECTED_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -24,11 +24,11 @@ export async function proxy(request: NextRequest) {
     request: {
       headers: request.headers,
     },
-  });
+  })
 }
 
 export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
-};
+}
