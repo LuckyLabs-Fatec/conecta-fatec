@@ -1,9 +1,10 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Users } from 'lucide-react';
+import Link from 'next/link';
+import { BookOpen, LucideIcon, Users } from 'lucide-react';
 
-type AdminSection = 'users';
+type AdminSection = 'users' | 'courses';
 
 interface AdminShellProps {
   activeSection: AdminSection;
@@ -14,11 +15,22 @@ const adminSections: Array<{
   id: AdminSection;
   label: string;
   description: string;
+  href: string;
+  icon: LucideIcon;
 }> = [
   {
     id: 'users',
     label: 'Usuários',
     description: 'Perfis e permissões',
+    href: '/admin/usuarios',
+    icon: Users,
+  },
+  {
+    id: 'courses',
+    label: 'Cursos',
+    description: 'Cursos cadastrados',
+    href: '/admin/cursos',
+    icon: BookOpen,
   },
 ];
 
@@ -40,11 +52,12 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
             <nav className="p-3" aria-label="Menu administrativo">
               {adminSections.map((section) => {
                 const isActive = section.id === activeSection;
+                const Icon = section.icon;
 
                 return (
-                  <button
+                  <Link
                     key={section.id}
-                    type="button"
+                    href={section.href}
                     className={`flex w-full items-center gap-3 px-3 py-3 text-left transition-colors ${
                       isActive
                         ? 'bg-red-50 text-[#CB2616]'
@@ -52,7 +65,7 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
                     }`}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    <Users size={20} aria-hidden="true" />
+                    <Icon size={20} aria-hidden="true" />
                     <span>
                       <span className="block text-sm font-semibold">
                         {section.label}
@@ -61,7 +74,7 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
                         {section.description}
                       </span>
                     </span>
-                  </button>
+                  </Link>
                 );
               })}
             </nav>
