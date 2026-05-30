@@ -4,6 +4,7 @@ import { LoginSchema } from '@/domain/auth/schemas/login.schema';
 import { RegisterSchema } from '@/domain/auth/schemas/register.schema';
 import {
     clearAuthCookie,
+    AUTH_SESSION_EXPIRED_EVENT,
     readAuthCookie,
     writeAuthCookie,
     type AuthSessionUser,
@@ -65,6 +66,18 @@ export const useAuth = () => {
         }
 
         setIsLoading(false);
+    }, []);
+
+    useEffect(() => {
+        const handleAuthSessionExpired = () => {
+            setUser(null);
+        };
+
+        window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, handleAuthSessionExpired);
+
+        return () => {
+            window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handleAuthSessionExpired);
+        };
     }, []);
 
     const login = async (credentials: LoginSchema) => {

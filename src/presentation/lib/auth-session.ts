@@ -24,6 +24,8 @@ export const AUTH_COOKIE_KEY = 'conecta-fatec-auth';
 
 export const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
+export const AUTH_SESSION_EXPIRED_EVENT = 'conecta-fatec-auth-session-expired';
+
 export const readAuthCookie = (): AuthSession | null => {
     if (typeof document === 'undefined') {
         return null;
@@ -60,4 +62,18 @@ export const clearAuthCookie = () => {
     }
 
     document.cookie = `${AUTH_COOKIE_KEY}=; path=/; max-age=0; samesite=lax`;
+};
+
+export const expireAuthSession = (redirectTo = '/') => {
+    clearAuthCookie();
+
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    window.dispatchEvent(new Event(AUTH_SESSION_EXPIRED_EVENT));
+
+    if (window.location.pathname !== redirectTo) {
+        window.location.assign(redirectTo);
+    }
 };

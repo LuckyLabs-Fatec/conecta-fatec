@@ -1,7 +1,7 @@
 'use client';
 
 import axios from 'axios';
-import { readAuthCookie } from './auth-session';
+import { expireAuthSession, readAuthCookie } from './auth-session';
 
 const baseURL = (typeof window !== 'undefined')
   ? (process.env.NEXT_PUBLIC_CONECTA_FATEC_URL ?? '')
@@ -38,6 +38,15 @@ client.interceptors.response.use(
     if (error.response && error.response.data) {
       const payload = error.response.data;
       const message = (payload && (payload.error || payload.message)) || error.message;
+
+      if (
+        error.response.status === 401
+        && typeof message === 'string'
+        && message.toLowerCase() === 'invalid or expired token'
+      ) {
+        expireAuthSession('/');
+      }
+
       return Promise.reject(new Error(message));
     }
 
