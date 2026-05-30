@@ -20,27 +20,6 @@ const saveAuthSession = (accessToken: string, user: AppUser) => {
     return user;
 };
 
-const buildUserFromProfile = (profile: {
-    uid: string;
-    email: string;
-    nome: string;
-    telefone?: string;
-    telefone_is_whats?: boolean;
-    perfil: UserRole;
-    avatar?: string;
-}): AppUser => ({
-    id: profile.uid,
-    email: profile.email,
-    role: profile.perfil,
-    user_metadata: {
-        name: profile.nome,
-        avatar: profile.avatar,
-        role: profile.perfil,
-        phone: profile.telefone,
-        phone_is_whats: profile.telefone_is_whats,
-    },
-});
-
 const ROLE_LEVELS: Record<UserRole, number> = {
     admin: 4,
     coordenador: 3,
@@ -125,30 +104,38 @@ export const useAuth = () => {
     };
 
     const signup = async (credentials: RegisterSchema) => {
-        const { name, email, phone } = credentials;
-        const uid = crypto.randomUUID();
+        const { name, email, phone, password } = credentials;
 
-        const res = await http.post('/user-profile', {
+        const res = await http.post('/auth/register', {
             name,
             email,
-            phone,
-            role: 'comunidade',
-            uid,
+            password,
+            phone: phone ?? '',
+            phoneIsWhats: false,
         });
 
-        const profile = (res.data?.data ?? res.data) as {
-            uid: string;
+        const apiUser = res.data as {
+            id: string;
             email: string;
-            nome: string;
-            telefone?: string;
-            telefone_is_whats?: boolean;
-            perfil: UserRole;
-            avatar?: string;
+            name?: string;
+            avatar?: string | null;
+            phone?: string;
+            phoneIsWhats?: boolean;
+            role?: string;
         };
 
-        const user = buildUserFromProfile(profile);
-        setUser(saveAuthSession(crypto.randomUUID(), user));
-        return user;
+        return {
+            id: apiUser.id,
+            email: apiUser.email,
+            role: mapApiRoleToAppRole(apiUser.role ?? 'SOCIETY'),
+            user_metadata: {
+                name: apiUser.name ?? name,
+                avatar: apiUser.avatar ?? undefined,
+                role: mapApiRoleToAppRole(apiUser.role ?? 'SOCIETY'),
+                phone: apiUser.phone ?? phone,
+                phone_is_whats: apiUser.phoneIsWhats ?? false,
+            },
+        } satisfies AppUser;
     };
 
     const logout = async () => {

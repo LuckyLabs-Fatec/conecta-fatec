@@ -13,6 +13,11 @@ export default function AdminCoursesPage() {
   const { show } = useToast();
 
   useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/autenticacao');
+      return;
+    }
+
     if (!isLoading && isAuthenticated && !hasPermission('admin')) {
       show({
         kind: 'error',

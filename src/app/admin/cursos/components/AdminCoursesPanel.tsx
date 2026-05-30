@@ -3,22 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Pencil, Save, Search, Trash2, X } from 'lucide-react';
 import { useToast } from '@/presentation/components';
-import http from '@/presentation/lib/http';
-
-interface Course {
-  id: string;
-  name: string;
-  description?: string;
-  active: boolean;
-}
-
-interface CoursesResponse {
-  items: Course[];
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-}
+import { AdminCourse, useAdminCourses } from '@/presentation/hooks/useAdminCourses';
 
 type SearchField = 'name' | 'description' | 'status';
 
@@ -31,52 +16,20 @@ const statusLabels: Record<string, string> = {
 
 export function AdminCoursesPanel() {
   const { show } = useToast();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    courses,
+    isLoading,
+    error,
+    updateCourse,
+    updatingCourseId,
+    deleteCourse,
+    deletingCourseId,
+  } = useAdminCourses();
   const [searchField, setSearchField] = useState<SearchField>('name');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: '', description: '' });
-  const [savingCourseId, setSavingCourseId] = useState<string | null>(null);
-  const [deletingCourseId, setDeletingCourseId] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadCourses() {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const response = await http.get<CoursesResponse>('/courses', {
-          params: { page: 1, limit: 100 },
-        });
-
-        if (!isMounted) return;
-
-        setCourses(response.data.items);
-      } catch (loadError) {
-        if (!isMounted) return;
-
-        const message = loadError instanceof Error
-          ? loadError.message
-          : 'Não foi possível carregar os cursos.';
-        setError(message);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadCourses();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const filteredCourses = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -101,7 +54,15 @@ export function AdminCoursesPanel() {
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
 
-  const startEditing = (course: Course) => {
+  useEffect(() => {
+    const lastPage = Math.max(1, totalPages);
+
+    if (currentPage > lastPage) {
+      setCurrentPage(lastPage);
+    }
+  }, [currentPage, totalPages]);
+
+  const startEditing = (course: AdminCourse) => {
     setEditingCourseId(course.id);
     setEditForm({
       name: course.name,
@@ -127,15 +88,11 @@ export function AdminCoursesPanel() {
     }
 
     try {
-      setSavingCourseId(courseId);
-      const response = await http.put<Course>(`/courses/${courseId}`, {
+      await updateCourse({
+        id: courseId,
         name,
         description: description || undefined,
       });
-
-      setCourses((previousCourses) => previousCourses.map((course) => (
-        course.id === courseId ? response.data : course
-      )));
       cancelEditing();
 
       show({
@@ -149,22 +106,16 @@ export function AdminCoursesPanel() {
           ? saveError.message
           : 'Não foi possível atualizar o curso.',
       });
-    } finally {
-      setSavingCourseId(null);
     }
   };
 
-  const handleDeleteCourse = async (course: Course) => {
+  const handleDeleteCourse = async (course: AdminCourse) => {
     if (!window.confirm(`Tem certeza que deseja excluir o curso ${course.name}?`)) {
       return;
     }
 
     try {
-      setDeletingCourseId(course.id);
-      await http.delete(`/courses/${course.id}`);
-      setCourses((previousCourses) => (
-        previousCourses.filter((currentCourse) => currentCourse.id !== course.id)
-      ));
+      await deleteCourse(course.id);
 
       show({
         kind: 'success',
@@ -177,8 +128,6 @@ export function AdminCoursesPanel() {
           ? deleteError.message
           : 'Não foi possível excluir o curso.',
       });
-    } finally {
-      setDeletingCourseId(null);
     }
   };
 
@@ -276,7 +225,7 @@ export function AdminCoursesPanel() {
               ) : (
                 currentCourses.map((course) => {
                   const isEditing = editingCourseId === course.id;
-                  const isSaving = savingCourseId === course.id;
+                  const isSaving = updatingCourseId === course.id;
                   const isDeleting = deletingCourseId === course.id;
 
                   return (

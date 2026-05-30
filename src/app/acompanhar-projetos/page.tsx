@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { projectsFiltersSchema, type ProjectsFiltersFormValues } from "@/domain/projects/schemas/filters.schema";
 import { usePagination } from "@/presentation/hooks/usePagination";
-import http from '@/presentation/lib/http';
 import { Pagination } from "@/presentation/components";
 import { Project, ProjectStatus } from "@/domain/projects/types";
 import { ProjectCard } from "@/presentation/components/molecules/ProjectCard";
@@ -16,39 +15,7 @@ import { ProposalList } from "@/presentation/components/organisms/ProposalList";
 import { ProposalModal } from "@/presentation/components/organisms/ProposalModal";
 import { DashboardTabs } from "@/presentation/components/organisms/DashboardTabs";
 import { useAuth } from "@/presentation/hooks/useAuth";
-
-const API_PROJECTS = '/projects';
-const API_PROPOSALS = '/proposals';
-const API_MY_PROPOSALS = '/proposals/mine';
-
-type ApiListResponse<T> = {
-    items: T[];
-    page: number;
-    limit: number;
-    totalItems: number;
-    totalPages: number;
-};
-
-type ApiProject = {
-    id: string;
-    title: string;
-    description: string;
-    deadline?: string | null;
-    status: string;
-};
-
-type ApiProposal = {
-    id: string;
-    title: string;
-    description: string;
-    submissionDate: string;
-    status: string;
-    attachments?: string | null;
-    user?: {
-        email?: string | null;
-        name?: string | null;
-    };
-};
+import { useProjectsDashboard } from "@/presentation/hooks/useProjectsDashboard";
 
 const statusConfig: Record<ProjectStatus, { label: string }> = {
     em_analise: { label: 'Em Análise' },
@@ -62,94 +29,6 @@ const statusConfig: Record<ProjectStatus, { label: string }> = {
     pendente: { label: 'Pendente' },
 };
 
-const normalizeProjectStatus = (status: string): ProjectStatus => {
-    const normalized = status.trim().toLowerCase();
-
-    switch (normalized) {
-        case 'active':
-        case 'em_desenvolvimento':
-            return 'em_desenvolvimento';
-        case 'completed':
-        case 'concluido':
-            return 'concluido';
-        case 'suspended':
-        case 'suspenso':
-            return 'suspenso';
-        case 'approved':
-        case 'aprovado':
-            return 'aprovado';
-        case 'rejected':
-        case 'rejeitado':
-            return 'rejeitado';
-        case 'under_review':
-        case 'em_analise':
-            return 'em_analise';
-        case 'testing':
-        case 'testando':
-            return 'testando';
-        case 'awaiting_review':
-        case 'aguardando_revisao':
-            return 'aguardando_revisao';
-        default:
-            return 'pendente';
-    }
-};
-
-const normalizeProposalStatus = (status: string): ProposalStatus => {
-    const normalized = status.trim().toLowerCase();
-
-    switch (normalized) {
-        case 'submitted':
-        case 'pendente':
-            return 'pendente';
-        case 'analysis':
-        case 'under_review':
-        case 'em_analise':
-            return 'em_analise';
-        case 'approved':
-        case 'aprovada':
-            return 'aprovada';
-        case 'rejected':
-        case 'rejeitada':
-            return 'rejeitada';
-        case 'awaiting_info':
-        case 'aguardando_info':
-            return 'aguardando_info';
-        case 'assigned':
-        case 'atribuida':
-            return 'atribuida';
-        default:
-            return 'pendente';
-    }
-};
-
-const mapProject = (item: ApiProject): Project => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    status: normalizeProjectStatus(item.status),
-    startDate: undefined,
-    expectedEndDate: item.deadline ?? undefined,
-    progress: normalizeProjectStatus(item.status) === 'concluido' ? 100 : 0,
-    images: [],
-    updates: [],
-});
-
-const mapProposal = (item: ApiProposal): Proposal => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    status: normalizeProposalStatus(item.status),
-    submittedBy: {
-        name: item.user?.name ?? item.user?.email ?? 'Anônimo',
-        email: item.user?.email ?? 'N/A',
-    },
-    submittedAt: item.submissionDate,
-    images: [],
-    mediatorNotes: '',
-    coordinatorNotes: '',
-});
-
 export default function ProjectsPage() {
     const { user, isLoading: isAuthLoading, hasPermission } = useAuth();
     const { show } = useToast();
@@ -159,10 +38,8 @@ export default function ProjectsPage() {
         canListProjects ? 'projects' : 'proposals',
     );
 
-    const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-    const [proposals, setProposals] = useState<Proposal[]>([]);
     const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
 
     const form = useForm<ProjectsFiltersFormValues>({
@@ -176,13 +53,33 @@ export default function ProjectsPage() {
         setPage,
         pageSize,
         setPageSize,
-        total,
-        totalPages,
         setTotals,
     } = usePagination({ initialPage: 1, initialPageSize: 6, pageSizeOptions: [6, 9, 12, 24] });
+    const {
+        projects,
+        proposals,
+        total,
+        totalPages,
+        loading,
+        error,
+        updateProjectStatus,
+        updateProposalStatus,
+        assignProposal,
+    } = useProjectsDashboard({
+        activeTab,
+        canListProjects,
+        canListAllProposals,
+        enabled: !isAuthLoading,
+        hasUser: Boolean(user),
+        page,
+        pageSize,
+        search: filters.search,
+        status: filters.status,
+    });
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    useEffect(() => {
+        setTotals(total, totalPages);
+    }, [setTotals, total, totalPages]);
 
     useEffect(() => {
         if (!isAuthLoading && !canListProjects && activeTab === 'projects') {
@@ -191,94 +88,13 @@ export default function ProjectsPage() {
         }
     }, [activeTab, canListProjects, isAuthLoading, setPage]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (isAuthLoading) return;
-
-            if (!user) {
-                setProjects([]);
-                setProposals([]);
-                setTotals(0, 1);
-                setError('Faça login para visualizar os dados.');
-                return;
-            }
-
-            try {
-                setLoading(true);
-                setError(null);
-
-                if (activeTab === 'projects') {
-                    if (!canListProjects) {
-                        setProjects([]);
-                        setTotals(0, 1);
-                        setError('Seu perfil não tem permissão para listar projetos.');
-                        return;
-                    }
-
-                    const params = new URLSearchParams({
-                        page: String(page),
-                        limit: String(pageSize),
-                    });
-                    if (filters.status) params.set('status', filters.status);
-                    if (filters.search) params.set('search', filters.search);
-
-                    const res = await http.get(`${API_PROJECTS}?${params.toString()}`);
-                    const data = res.data as ApiListResponse<ApiProject>;
-                    setProjects(data.items.map(mapProject));
-                    setTotals(Number(data.totalItems), Number(data.totalPages));
-                } else {
-                    const params = new URLSearchParams({
-                        page: String(page),
-                        limit: String(pageSize),
-                    });
-
-                    const endpoint = canListAllProposals ? API_PROPOSALS : API_MY_PROPOSALS;
-                    const res = await http.get(`${endpoint}?${params.toString()}`);
-                    const data = res.data as ApiListResponse<ApiProposal>;
-                    const mappedProposals = data.items.map(mapProposal);
-
-                    const filtered = mappedProposals.filter((proposal) => {
-                        const matchesSearch = !filters.search ||
-                            proposal.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                            proposal.description.toLowerCase().includes(filters.search.toLowerCase());
-                        const matchesStatus = !filters.status || proposal.status === filters.status;
-                        return matchesSearch && matchesStatus;
-                    });
-
-                    setProposals(filtered);
-                    setTotals(Number(data.totalItems), Number(data.totalPages));
-                }
-
-            } catch (e: unknown) {
-                if (e instanceof DOMException && e.name === 'AbortError') return;
-                const message = e instanceof Error ? e.message : 'Erro ao buscar dados';
-                setError(message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [
-        activeTab,
-        canListAllProposals,
-        canListProjects,
-        filters.search,
-        filters.status,
-        isAuthLoading,
-        page,
-        pageSize,
-        setTotals,
-        user,
-    ]);
-
     const handleUpdateStatus = async (newStatus: ProjectStatus) => {
         if (selectedProject) {
             try {
-                await http.put(`${API_PROJECTS}/${selectedProject.id}`, { status: newStatus });
+                await updateProjectStatus({ projectId: selectedProject.id, status: newStatus });
 
                 const updatedProject = { ...selectedProject, status: newStatus };
                 setSelectedProject(updatedProject);
-                setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
                 show({ message: 'Status atualizado com sucesso!', kind: 'success' });
             } catch (error) {
                 console.error(error);
@@ -300,7 +116,6 @@ export default function ProjectsPage() {
                 updates: [newUpdate, ...selectedProject.updates]
             };
             setSelectedProject(updatedProject);
-            setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
             show({ message: 'Atualização adicionada (localmente)', kind: 'success' });
         }
     };
@@ -308,14 +123,10 @@ export default function ProjectsPage() {
     const handleProposalStatusUpdate = async (status: ProposalStatus, message?: string) => {
         if (selectedProposal) {
             try {
-                await http.put(`${API_PROPOSALS}/${selectedProposal.id}`, {
-                    status,
-                    mediatorNotes: message,
-                });
+                await updateProposalStatus({ proposalId: selectedProposal.id, status, message });
 
                 const updated = { ...selectedProposal, status, mediatorNotes: message };
                 setSelectedProposal(updated);
-                setProposals(proposals.map(p => p.id === updated.id ? updated : p));
                 show({ message: 'Proposta atualizada com sucesso!', kind: 'success' });
             } catch (error) {
                 console.error(error);
@@ -327,14 +138,10 @@ export default function ProjectsPage() {
     const handleAssign = async (assignmentData: any) => {
         if (selectedProposal) {
             try {
-                await http.put(`${API_PROPOSALS}/${selectedProposal.id}`, {
-                    status: 'atribuida',
-                    assignedTo: assignmentData,
-                });
+                await assignProposal({ proposalId: selectedProposal.id, assignmentData });
 
                 const updated = { ...selectedProposal, status: 'atribuida' as ProposalStatus, assignedTo: assignmentData };
                 setSelectedProposal(updated);
-                setProposals(proposals.map(p => p.id === updated.id ? updated : p));
                 show({ message: 'Proposta atribuída com sucesso!', kind: 'success' });
             } catch (error) {
                 console.error(error);
@@ -400,7 +207,7 @@ export default function ProjectsPage() {
 
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">
-                                {activeTab === 'projects' ? total : proposals.length} item(s) encontrado(s)
+                                {total} item(s) encontrado(s)
                             </span>
                             <button
                                 onClick={() => { setPage(1); form.reset(); }}

@@ -1,61 +1,41 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2 } from 'lucide-react';
+import { Pencil, Save, Search, Trash2, X } from 'lucide-react';
 import { useToast } from '@/presentation/components';
-import http from '@/presentation/lib/http';
+import {
+  AdminUser,
+  AdminUserRole,
+  useAdminUsers,
+} from '@/presentation/hooks/useAdminUsers';
 
-type ApiRole = 'SOCIETY' | 'STUDENT' | 'MEDIATOR' | 'ADMIN';
-type UserRole = 'comunidade' | 'estudante' | 'mediador' | 'admin';
 type SearchField = 'name' | 'email' | 'phone' | 'role';
 
-interface ApiUser {
-  id: string;
-  email: string;
-  name?: string;
-  avatar?: string;
-  phone: string;
-  phoneIsWhats: boolean;
-  role: ApiRole;
-}
-
-interface UsersResponse {
-  items: ApiUser[];
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-}
-
-interface User {
-  id: string;
+type UserEditForm = {
   name: string;
   email: string;
+  avatar: string;
   phone: string;
-  role: UserRole;
-}
+  phoneIsWhats: boolean;
+  role: AdminUserRole;
+};
 
 const usersPerPage = 10;
 
-const roleLabels: Record<UserRole, string> = {
+const emptyEditForm: UserEditForm = {
+  name: '',
+  email: '',
+  avatar: '',
+  phone: '',
+  phoneIsWhats: false,
+  role: 'comunidade',
+};
+
+const roleLabels: Record<AdminUserRole, string> = {
   comunidade: 'Comunidade',
   estudante: 'Estudante',
   mediador: 'Mediador',
   admin: 'Admin',
-};
-
-const apiRoleByUserRole: Record<UserRole, ApiRole> = {
-  comunidade: 'SOCIETY',
-  estudante: 'STUDENT',
-  mediador: 'MEDIATOR',
-  admin: 'ADMIN',
-};
-
-const userRoleByApiRole: Record<ApiRole, UserRole> = {
-  SOCIETY: 'comunidade',
-  STUDENT: 'estudante',
-  MEDIATOR: 'mediador',
-  ADMIN: 'admin',
 };
 
 const searchFieldLabels: Record<SearchField, string> = {
@@ -65,114 +45,89 @@ const searchFieldLabels: Record<SearchField, string> = {
   role: 'perfil',
 };
 
-const mapApiUser = (user: ApiUser): User => ({
-  id: user.id,
-  name: user.name || 'Sem nome',
-  email: user.email,
-  phone: user.phone,
-  role: userRoleByApiRole[user.role] ?? 'comunidade',
-});
-
 export function AdminUsersPanel() {
   const { show } = useToast();
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    users,
+    isLoading,
+    error,
+    updateUser,
+    updatingUserId,
+    deleteUser,
+    deletingUserId,
+  } = useAdminUsers();
   const [searchField, setSearchField] = useState<SearchField>('name');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
-  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<UserEditForm>(emptyEditForm);
 
-  useEffect(() => {
-    let isMounted = true;
+  const editingUser = users.find((user) => user.id === editingUserId) ?? null;
 
-    async function loadUsers() {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const response = await http.get<UsersResponse>('/auth/register', {
-          params: { page: 1, limit: 100 },
-        });
-
-        if (!isMounted) return;
-
-        setUsers(response.data.items.map(mapApiUser));
-      } catch (loadError) {
-        if (!isMounted) return;
-
-        setError(loadError instanceof Error
-          ? loadError.message
-          : 'Não foi possível carregar os usuários.');
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadUsers();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const isFatecEmail = (email: string): boolean => {
-    return email.endsWith('@fatec.sp.gov.br');
+  const startEditing = (user: AdminUser) => {
+    setEditingUserId(user.id);
+    setEditForm({
+      name: user.name === 'Sem nome' ? '' : user.name,
+      email: user.email,
+      avatar: user.avatar ?? '',
+      phone: user.phone,
+      phoneIsWhats: user.phoneIsWhats,
+      role: user.role,
+    });
   };
 
-  const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    const userToUpdate = users.find((user) => user.id === userId);
-    if (!userToUpdate) return;
+  const cancelEditing = () => {
+    setEditingUserId(null);
+    setEditForm(emptyEditForm);
+  };
 
-    if (newRole !== 'comunidade' && !isFatecEmail(userToUpdate.email)) {
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+
+    const email = editForm.email.trim();
+    const phone = editForm.phone.trim();
+
+    if (!email || !phone) {
       show({
         kind: 'error',
-        message: 'Apenas usuários com email @fatec.sp.gov.br podem ter perfis de estudante, mediador ou admin.',
+        message: 'Informe email e telefone do usuário.',
       });
       return;
     }
 
     try {
-      setUpdatingUserId(userId);
-      const response = await http.patch<ApiUser>(`/auth/register/${userId}`, {
-        role: apiRoleByUserRole[newRole],
+      await updateUser({
+        id: editingUser.id,
+        name: editForm.name.trim() || null,
+        email,
+        avatar: editForm.avatar.trim() || null,
+        phone,
+        phoneIsWhats: editForm.phoneIsWhats,
+        role: editForm.role,
       });
-      const updatedUser = mapApiUser(response.data);
-
-      setUsers((previousUsers) => previousUsers.map((user) => (
-        user.id === userId ? updatedUser : user
-      )));
+      cancelEditing();
 
       show({
         kind: 'success',
-        message: `Perfil de ${userToUpdate.name} alterado para ${roleLabels[newRole]}.`,
+        message: `Usuário ${editingUser.name} atualizado com sucesso.`,
       });
     } catch (updateError) {
       show({
         kind: 'error',
         message: updateError instanceof Error
           ? updateError.message
-          : 'Não foi possível alterar o perfil do usuário.',
+          : 'Não foi possível atualizar o usuário.',
       });
-    } finally {
-      setUpdatingUserId(null);
     }
   };
 
-  const handleDeleteUser = async (user: User) => {
+  const handleDeleteUser = async (user: AdminUser) => {
     if (!window.confirm(`Tem certeza que deseja excluir o usuário ${user.name}?`)) {
       return;
     }
 
     try {
-      setDeletingUserId(user.id);
-      await http.delete(`/auth/register/${user.id}`);
-      setUsers((previousUsers) => (
-        previousUsers.filter((currentUser) => currentUser.id !== user.id)
-      ));
+      await deleteUser(user.id);
 
       show({
         kind: 'success',
@@ -185,8 +140,6 @@ export function AdminUsersPanel() {
           ? deleteError.message
           : 'Não foi possível excluir o usuário.',
       });
-    } finally {
-      setDeletingUserId(null);
     }
   };
 
@@ -210,6 +163,14 @@ export function AdminUsersPanel() {
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  useEffect(() => {
+    const lastPage = Math.max(1, totalPages);
+
+    if (currentPage > lastPage) {
+      setCurrentPage(lastPage);
+    }
+  }, [currentPage, totalPages]);
 
   return (
     <div>
@@ -280,6 +241,9 @@ export function AdminUsersPanel() {
                   Telefone
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  WhatsApp
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Perfil
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -290,25 +254,24 @@ export function AdminUsersPanel() {
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                     Carregando usuários...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-red-600">
+                  <td colSpan={6} className="px-6 py-8 text-center text-red-600">
                     {error}
                   </td>
                 </tr>
               ) : currentUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                     Nenhum usuário encontrado
                   </td>
                 </tr>
               ) : (
                 currentUsers.map((user) => {
-                  const isUpdating = updatingUserId === user.id;
                   const isDeleting = deletingUserId === user.id;
 
                   return (
@@ -323,34 +286,31 @@ export function AdminUsersPanel() {
                         <div className="text-sm text-gray-600">{user.phone}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <select
-                          value={user.role}
-                          onChange={(event) => handleRoleChange(user.id, event.target.value as UserRole)}
-                          disabled={isUpdating}
-                          className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <option value="comunidade">Comunidade</option>
-                          <option value="estudante" disabled={!isFatecEmail(user.email)}>
-                            Estudante
-                          </option>
-                          <option value="mediador" disabled={!isFatecEmail(user.email)}>
-                            Mediador
-                          </option>
-                          <option value="admin" disabled={!isFatecEmail(user.email)}>
-                            Admin
-                          </option>
-                        </select>
+                        <span className="text-sm text-gray-600">{user.phoneIsWhats ? 'Sim' : 'Não'}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteUser(user)}
-                          disabled={isDeleting}
-                          className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Excluir usuário"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        <span className="text-sm text-gray-600">{roleLabels[user.role]}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => startEditing(user)}
+                            className="text-gray-600 hover:text-gray-800 transition-colors"
+                            title="Editar usuário"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteUser(user)}
+                            disabled={isDeleting}
+                            className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Excluir usuário"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -400,6 +360,143 @@ export function AdminUsersPanel() {
           </div>
         )}
       </div>
+
+      {editingUser && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-user-title"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !updatingUserId) {
+              cancelEditing();
+            }
+          }}
+        >
+          <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+              <div>
+                <h3 id="edit-user-title" className="text-lg font-semibold text-gray-900">
+                  Editar usuário
+                </h3>
+                <p className="text-sm text-gray-500">{editingUser.email}</p>
+              </div>
+              <button
+                type="button"
+                onClick={cancelEditing}
+                disabled={Boolean(updatingUserId)}
+                className="text-gray-500 hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                title="Fechar modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 px-6 py-5 md:grid-cols-2">
+              <div>
+                <label htmlFor="edit-user-name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Nome
+                </label>
+                <input
+                  id="edit-user-name"
+                  type="text"
+                  value={editForm.name}
+                  onChange={(event) => setEditForm((previous) => ({ ...previous, name: event.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="edit-user-email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  id="edit-user-email"
+                  type="email"
+                  value={editForm.email}
+                  onChange={(event) => setEditForm((previous) => ({ ...previous, email: event.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="edit-user-phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  Telefone
+                </label>
+                <input
+                  id="edit-user-phone"
+                  type="tel"
+                  value={editForm.phone}
+                  onChange={(event) => setEditForm((previous) => ({ ...previous, phone: event.target.value }))}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="edit-user-role" className="block text-sm font-medium text-gray-700 mb-2">
+                  Perfil
+                </label>
+                <select
+                  id="edit-user-role"
+                  value={editForm.role}
+                  onChange={(event) => setEditForm((previous) => ({ ...previous, role: event.target.value as AdminUserRole }))}
+                  disabled={Boolean(updatingUserId)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="comunidade">Comunidade</option>
+                  <option value="estudante">Estudante</option>
+                  <option value="mediador">Mediador</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+
+              <div className="md:col-span-2">
+                <label htmlFor="edit-user-avatar" className="block text-sm font-medium text-gray-700 mb-2">
+                  URL do avatar
+                </label>
+                <input
+                  id="edit-user-avatar"
+                  type="url"
+                  value={editForm.avatar}
+                  onChange={(event) => setEditForm((previous) => ({ ...previous, avatar: event.target.value }))}
+                  placeholder="https://..."
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                />
+              </div>
+
+              <label className="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={editForm.phoneIsWhats}
+                  onChange={(event) => setEditForm((previous) => ({ ...previous, phoneIsWhats: event.target.checked }))}
+                  className="h-4 w-4 rounded border-gray-300 text-[#CB2616] focus:ring-[#CB2616]"
+                />
+                Telefone é WhatsApp
+              </label>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={cancelEditing}
+                disabled={Boolean(updatingUserId)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveUser}
+                disabled={Boolean(updatingUserId)}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#CB2616] px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Save size={16} />
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
