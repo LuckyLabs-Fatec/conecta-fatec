@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from "next/link";
 import { Header, useToast } from "@/presentation/components";
-import { Filter, Search, Eye } from "lucide-react";
+import { Filter, Search, Eye, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { projectsFiltersSchema, type ProjectsFiltersFormValues } from "@/domain/projects/schemas/filters.schema";
@@ -155,13 +156,23 @@ export default function ProjectsPage() {
             <Header />
             <main className="min-h-screen bg-gray-50 py-8">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                            Acompanhar Projetos
-                        </h1>
-                        <p className="text-gray-600">
-                            Gerencie propostas e acompanhe o desenvolvimento dos projetos.
-                        </p>
+                    <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                                Acompanhar Projetos
+                            </h1>
+                            <p className="text-gray-600">
+                                Gerencie propostas e acompanhe o desenvolvimento dos projetos.
+                            </p>
+                        </div>
+
+                        <Link
+                            href="/submeter-proposta"
+                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--cps-blue-base)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--cps-blue-title-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--cps-blue-title-hover)] focus:ring-offset-2 md:mt-1"
+                        >
+                            <Plus size={18} />
+                            Nova proposta
+                        </Link>
                     </div>
 
                     <DashboardTabs
