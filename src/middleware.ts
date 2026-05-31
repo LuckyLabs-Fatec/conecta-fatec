@@ -7,6 +7,7 @@ const PROTECTED_PATHS = [
   '/acompanhar-projetos',
   '/configuracoes',
   '/mediador',
+  '/estudante',
   '/perfil',
   '/submeter-proposta',
 ];
