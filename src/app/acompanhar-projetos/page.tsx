@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { projectsFiltersSchema, type ProjectsFiltersFormValues } from "@/domain/projects/schemas/filters.schema";
 import { usePagination } from "@/presentation/hooks/usePagination";
-import http from '@/presentation/lib/http';
 import { Pagination } from "@/presentation/components";
 import { Project, ProjectStatus } from "@/domain/projects/types";
 import { ProjectCard } from "@/presentation/components/molecules/ProjectCard";
@@ -19,6 +18,25 @@ import { useAuth } from "@/presentation/hooks/useAuth";
 
 const API_PROJECTS = '/api/projetos';
 const API_PROPOSALS = '/api/ideias-simples';
+
+const requestLocalApi = async <T,>(path: string, init?: RequestInit): Promise<T> => {
+    const response = await fetch(path, {
+        ...init,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(init?.headers ?? {}),
+        },
+    });
+
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+        const message = payload?.error || payload?.message || `Request failed with status code ${response.status}`;
+        throw new Error(message);
+    }
+
+    return payload as T;
+};
 
 const statusConfig: Record<ProjectStatus, { label: string }> = {
     em_analise: { label: 'Em Análise' },
@@ -76,13 +94,11 @@ export default function ProjectsPage() {
                     if (filters.status) params.set('status', filters.status);
                     if (filters.search) params.set('search', filters.search);
 
-                    const res = await http.get(`${API_PROJECTS}?${params.toString()}`);
-                    const data = res.data;
+                    const data = await requestLocalApi<{ data: Project[]; total: number; totalPages: number }>(`${API_PROJECTS}?${params.toString()}`);
                     setProjects(data.data as Project[]);
                     setTotals(Number(data.total), Number(data.totalPages));
                 } else {
-                    const res = await http.get(API_PROPOSALS);
-                    const data = res.data;
+                    const data = await requestLocalApi<any[]>(API_PROPOSALS);
 
                     const mappedProposals: Proposal[] = data.map((item: any) => ({
                         id: item.id,
@@ -129,7 +145,10 @@ export default function ProjectsPage() {
     const handleUpdateStatus = async (newStatus: ProjectStatus) => {
         if (selectedProject) {
             try {
-                await http.put(API_PROJECTS, { id: selectedProject.id, status: newStatus });
+                await requestLocalApi(API_PROJECTS, {
+                    method: 'PUT',
+                    body: JSON.stringify({ id: selectedProject.id, status: newStatus }),
+                });
 
                 const updatedProject = { ...selectedProject, status: newStatus };
                 setSelectedProject(updatedProject);
@@ -163,10 +182,13 @@ export default function ProjectsPage() {
     const handleProposalStatusUpdate = async (status: ProposalStatus, message?: string) => {
         if (selectedProposal) {
             try {
-                await http.put(API_PROPOSALS, {
-                    id: selectedProposal.id,
-                    status,
-                    mediatorNotes: message,
+                await requestLocalApi(API_PROPOSALS, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        id: selectedProposal.id,
+                        status,
+                        mediatorNotes: message,
+                    }),
                 });
 
                 const updated = { ...selectedProposal, status, mediatorNotes: message };
@@ -183,10 +205,13 @@ export default function ProjectsPage() {
     const handleAssign = async (assignmentData: any) => {
         if (selectedProposal) {
             try {
-                await http.put(API_PROPOSALS, {
-                    id: selectedProposal.id,
-                    status: 'atribuida',
-                    assignedTo: assignmentData,
+                await requestLocalApi(API_PROPOSALS, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        id: selectedProposal.id,
+                        status: 'atribuida',
+                        assignedTo: assignmentData,
+                    }),
                 });
 
                 const updated = { ...selectedProposal, status: 'atribuida' as ProposalStatus, assignedTo: assignmentData };
