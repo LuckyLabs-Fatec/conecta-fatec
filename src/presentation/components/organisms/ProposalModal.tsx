@@ -25,6 +25,14 @@ const statusConfig: Record<ProposalStatus, { label: string; color: string }> = {
     atribuida: { label: 'Atribuída', color: 'bg-purple-100 text-purple-800' },
 };
 
+const fallbackStatusConfig = statusConfig.pendente;
+
+const resolveStatusConfig = (status: string) => {
+    return status in statusConfig
+        ? statusConfig[status as ProposalStatus]
+        : fallbackStatusConfig;
+};
+
 const reviewSchema = z.object({
     message: z.string().min(1, "Mensagem é obrigatória"),
 });
@@ -57,6 +65,8 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('pt-BR');
     };
+
+    const currentStatus = resolveStatusConfig(proposal.status);
 
     useEffect(() => {
         if (action === 'approve' || action === 'reject' || action === 'request_info') {
@@ -125,8 +135,8 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
                         <div>
                             <div className="mb-4">
                                 <h4 className="font-medium text-gray-700">Status</h4>
-                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${statusConfig[proposal.status].color}`}>
-                                    {statusConfig[proposal.status].label}
+                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${currentStatus.color}`}>
+                                    {currentStatus.label}
                                 </span>
                             </div>
 
