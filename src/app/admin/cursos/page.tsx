@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Header, useToast } from '@/presentation/components';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { AdminShell } from '../components/AdminShell';
-import { AdminUsersPanel } from './components/AdminUsersPanel';
+import { AdminCoursesPanel } from './components/AdminCoursesPanel';
 
-export default function AdminUsersPage() {
+export default function AdminCoursesPage() {
   const router = useRouter();
   const { user, isLoading, isAuthenticated, hasPermission } = useAuth();
   const { show } = useToast();
@@ -34,8 +34,8 @@ export default function AdminUsersPage() {
   return (
     <>
       <Header />
-      <AdminShell activeSection="users">
-        <AdminUsersPanel />
+      <AdminShell activeSection="courses">
+        <AdminCoursesPanel />
       </AdminShell>
     </>
   );

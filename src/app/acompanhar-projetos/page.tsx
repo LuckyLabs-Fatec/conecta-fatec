@@ -15,28 +15,7 @@ import { ProposalList } from "@/presentation/components/organisms/ProposalList";
 import { ProposalModal } from "@/presentation/components/organisms/ProposalModal";
 import { DashboardTabs } from "@/presentation/components/organisms/DashboardTabs";
 import { useAuth } from "@/presentation/hooks/useAuth";
-
-const API_PROJECTS = '/api/projetos';
-const API_PROPOSALS = '/api/ideias-simples';
-
-const requestLocalApi = async <T,>(path: string, init?: RequestInit): Promise<T> => {
-    const response = await fetch(path, {
-        ...init,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(init?.headers ?? {}),
-        },
-    });
-
-    const payload = await response.json().catch(() => null);
-
-    if (!response.ok) {
-        const message = payload?.error || payload?.message || `Request failed with status code ${response.status}`;
-        throw new Error(message);
-    }
-
-    return payload as T;
-};
+import { useProjectsDashboard } from "@/presentation/hooks/useProjectsDashboard";
 
 const statusConfig: Record<ProjectStatus, { label: string }> = {
     em_analise: { label: 'Em Análise' },
@@ -51,14 +30,16 @@ const statusConfig: Record<ProjectStatus, { label: string }> = {
 };
 
 export default function ProjectsPage() {
-    const { user } = useAuth();
+    const { user, isLoading: isAuthLoading, hasPermission } = useAuth();
     const { show } = useToast();
-    const [activeTab, setActiveTab] = useState<'proposals' | 'projects'>('projects');
+    const canListProjects = hasPermission('estudante');
+    const canListAllProposals = hasPermission('estudante');
+    const [activeTab, setActiveTab] = useState<'proposals' | 'projects'>(() =>
+        canListProjects ? 'projects' : 'proposals',
+    );
 
-    const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-    const [proposals, setProposals] = useState<Proposal[]>([]);
     const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
 
     const form = useForm<ProjectsFiltersFormValues>({
@@ -72,87 +53,48 @@ export default function ProjectsPage() {
         setPage,
         pageSize,
         setPageSize,
-        total,
-        totalPages,
         setTotals,
     } = usePagination({ initialPage: 1, initialPageSize: 6, pageSizeOptions: [6, 9, 12, 24] });
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const {
+        projects,
+        proposals,
+        total,
+        totalPages,
+        loading,
+        error,
+        updateProjectStatus,
+        updateProposalStatus,
+        assignProposal,
+    } = useProjectsDashboard({
+        activeTab,
+        canListProjects,
+        canListAllProposals,
+        enabled: !isAuthLoading,
+        hasUser: Boolean(user),
+        page,
+        pageSize,
+        search: filters.search,
+        status: filters.status,
+    });
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+        setTotals(total, totalPages);
+    }, [setTotals, total, totalPages]);
 
-                if (activeTab === 'projects') {
-                    const params = new URLSearchParams({
-                        page: String(page),
-                        pageSize: String(pageSize),
-                    });
-                    if (filters.status) params.set('status', filters.status);
-                    if (filters.search) params.set('search', filters.search);
-
-                    const data = await requestLocalApi<{ data: Project[]; total: number; totalPages: number }>(`${API_PROJECTS}?${params.toString()}`);
-                    setProjects(data.data as Project[]);
-                    setTotals(Number(data.total), Number(data.totalPages));
-                } else {
-                    const data = await requestLocalApi<any[]>(API_PROPOSALS);
-
-                    const mappedProposals: Proposal[] = data.map((item: any) => ({
-                        id: item.id,
-                        title: item.titulo,
-                        description: item.descricao,
-                        status: item.status,
-                        submittedBy: {
-                            name: item.autor || 'Anônimo',
-                            email: 'N/A',
-                        },
-                        submittedAt: item.created_at || new Date().toISOString(),
-                        images: item.anexos ? (Array.isArray(item.anexos) ? item.anexos.map((a: any) => a.url) : []) : [],
-                        mediatorNotes: '',
-                        coordinatorNotes: '',
-                    }));
-
-                    let filtered = mappedProposals;
-                    if (filters.search) {
-                        const q = filters.search.toLowerCase();
-                        filtered = filtered.filter(p =>
-                            p.title.toLowerCase().includes(q) ||
-                            p.description.toLowerCase().includes(q)
-                        );
-                    }
-                    if (filters.status) {
-                        filtered = filtered.filter(p => p.status === filters.status);
-                    }
-
-                    setProposals(filtered);
-                    setTotals(filtered.length, Math.ceil(filtered.length / pageSize));
-                }
-
-            } catch (e: unknown) {
-                if (e instanceof DOMException && e.name === 'AbortError') return;
-                const message = e instanceof Error ? e.message : 'Erro ao buscar dados';
-                setError(message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [page, pageSize, filters.status, filters.search, setTotals, activeTab]);
+    useEffect(() => {
+        if (!isAuthLoading && !canListProjects && activeTab === 'projects') {
+            setActiveTab('proposals');
+            setPage(1);
+        }
+    }, [activeTab, canListProjects, isAuthLoading, setPage]);
 
     const handleUpdateStatus = async (newStatus: ProjectStatus) => {
         if (selectedProject) {
             try {
-                await requestLocalApi(API_PROJECTS, {
-                    method: 'PUT',
-                    body: JSON.stringify({ id: selectedProject.id, status: newStatus }),
-                });
+                await updateProjectStatus({ projectId: selectedProject.id, status: newStatus });
 
                 const updatedProject = { ...selectedProject, status: newStatus };
                 setSelectedProject(updatedProject);
-                setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
                 show({ message: 'Status atualizado com sucesso!', kind: 'success' });
             } catch (error) {
                 console.error(error);
@@ -174,7 +116,6 @@ export default function ProjectsPage() {
                 updates: [newUpdate, ...selectedProject.updates]
             };
             setSelectedProject(updatedProject);
-            setProjects(projects.map(p => p.id === updatedProject.id ? updatedProject : p));
             show({ message: 'Atualização adicionada (localmente)', kind: 'success' });
         }
     };
@@ -182,18 +123,10 @@ export default function ProjectsPage() {
     const handleProposalStatusUpdate = async (status: ProposalStatus, message?: string) => {
         if (selectedProposal) {
             try {
-                await requestLocalApi(API_PROPOSALS, {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        id: selectedProposal.id,
-                        status,
-                        mediatorNotes: message,
-                    }),
-                });
+                await updateProposalStatus({ proposalId: selectedProposal.id, status, message });
 
                 const updated = { ...selectedProposal, status, mediatorNotes: message };
                 setSelectedProposal(updated);
-                setProposals(proposals.map(p => p.id === updated.id ? updated : p));
                 show({ message: 'Proposta atualizada com sucesso!', kind: 'success' });
             } catch (error) {
                 console.error(error);
@@ -205,18 +138,10 @@ export default function ProjectsPage() {
     const handleAssign = async (assignmentData: any) => {
         if (selectedProposal) {
             try {
-                await requestLocalApi(API_PROPOSALS, {
-                    method: 'PUT',
-                    body: JSON.stringify({
-                        id: selectedProposal.id,
-                        status: 'atribuida',
-                        assignedTo: assignmentData,
-                    }),
-                });
+                await assignProposal({ proposalId: selectedProposal.id, assignmentData });
 
                 const updated = { ...selectedProposal, status: 'atribuida' as ProposalStatus, assignedTo: assignmentData };
                 setSelectedProposal(updated);
-                setProposals(proposals.map(p => p.id === updated.id ? updated : p));
                 show({ message: 'Proposta atribuída com sucesso!', kind: 'success' });
             } catch (error) {
                 console.error(error);
@@ -242,6 +167,7 @@ export default function ProjectsPage() {
                     <DashboardTabs
                         activeTab={activeTab}
                         onTabChange={(tab) => { setActiveTab(tab); setPage(1); form.reset(); }}
+                        projectsDisabled={!canListProjects}
                     />
 
                     {/* Filters */}
@@ -281,7 +207,7 @@ export default function ProjectsPage() {
 
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">
-                                {activeTab === 'projects' ? total : proposals.length} item(s) encontrado(s)
+                                {total} item(s) encontrado(s)
                             </span>
                             <button
                                 onClick={() => { setPage(1); form.reset(); }}

@@ -25,7 +25,7 @@ client.interceptors.request.use((config) => {
       // standard Bearer header; server may also get cookie automatically
       (config.headers as Record<string, string>)['Authorization'] = `Bearer ${session.accessToken}`;
     }
-  } catch (e) {
+  } catch {
     // ignore
   }
 
