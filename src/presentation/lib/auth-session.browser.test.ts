@@ -4,7 +4,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   AUTH_COOKIE_KEY,
   AUTH_COOKIE_MAX_AGE,
+  AUTH_SESSION_EXPIRED_EVENT,
   clearAuthCookie,
+  expireAuthSession,
   readAuthCookie,
   writeAuthCookie,
 } from './auth-session';
@@ -37,6 +39,19 @@ describe('auth-session in the browser', () => {
   it('clears the auth cookie', () => {
     writeAuthCookie(session);
     clearAuthCookie();
+    expect(readAuthCookie()).toBeNull();
+  });
+
+  it('expires the browser session without redirecting from the target page', () => {
+    let dispatched = false;
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, () => {
+      dispatched = true;
+    }, { once: true });
+    writeAuthCookie(session);
+
+    expireAuthSession();
+
+    expect(dispatched).toBe(true);
     expect(readAuthCookie()).toBeNull();
   });
 });
