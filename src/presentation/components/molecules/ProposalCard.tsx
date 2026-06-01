@@ -16,8 +16,17 @@ const statusConfig: Record<ProposalStatus, { label: string; color: string; icon:
     atribuida: { label: 'Atribuída', color: 'bg-purple-100 text-purple-800', icon: BookOpen },
 };
 
+const fallbackStatusConfig = statusConfig.pendente;
+
+const resolveStatusConfig = (status: string) => {
+    return status in statusConfig
+        ? statusConfig[status as ProposalStatus]
+        : fallbackStatusConfig;
+};
+
 export const ProposalCard = ({ proposal, onViewDetails }: ProposalCardProps) => {
-    const StatusIcon = statusConfig[proposal.status].icon;
+    const currentStatus = resolveStatusConfig(proposal.status);
+    const StatusIcon = currentStatus.icon;
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('pt-BR');
     };
@@ -30,9 +39,9 @@ export const ProposalCard = ({ proposal, onViewDetails }: ProposalCardProps) => 
                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">{proposal.description}</p>
                 </div>
                 <div className="flex flex-col gap-2 ml-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${statusConfig[proposal.status].color}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${currentStatus.color}`}>
                         <StatusIcon size={12} />
-                        {statusConfig[proposal.status].label}
+                        {currentStatus.label}
                     </span>
                 </div>
             </div>

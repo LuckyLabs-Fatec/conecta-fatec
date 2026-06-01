@@ -362,18 +362,24 @@ export function AdminUsersPanel() {
       </div>
 
       {editingUser && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="edit-user-title"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget && !updatingUserId) {
-              cancelEditing();
-            }
-          }}
-        >
-          <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+          <button
+            type="button"
+            aria-label="Fechar modal de edição de usuário"
+            className="absolute inset-0 bg-black/40"
+            onClick={() => {
+              if (!updatingUserId) {
+                cancelEditing();
+              }
+            }}
+            disabled={Boolean(updatingUserId)}
+          />
+          <div
+            className="relative z-10 w-full max-w-2xl rounded-lg bg-white shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-user-title"
+          >
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
               <div>
                 <h3 id="edit-user-title" className="text-lg font-semibold text-gray-900">

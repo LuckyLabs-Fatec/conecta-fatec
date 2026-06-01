@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import http from '@/presentation/lib/http';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/presentation/hooks/useAuth';
 import { useForm } from 'react-hook-form';
@@ -8,6 +7,27 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { reviewSchema, type ReviewSchema } from '@/domain/ideas/schemas/review.schema';
 import { Header } from '@/presentation/components';
 import { Button } from '@/presentation/components';
+
+const API_IDEAS = '/api/ideias-simples';
+
+const requestLocalApi = async <T,>(path: string, init?: RequestInit): Promise<T> => {
+  const response = await fetch(path, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(init?.headers ?? {}),
+    },
+  });
+
+  const payload = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    const message = payload?.error || payload?.message || `Request failed with status code ${response.status}`;
+    throw new Error(message);
+  }
+
+  return payload as T;
+};
 
 interface Idea {
   id: string;
@@ -46,8 +66,7 @@ export default function MediatorReviewPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await http.get('/api/ideias-simples');
-        const list: Idea[] = res.data;
+        const list = await requestLocalApi<Idea[]>(API_IDEAS);
         const found = list.find((i) => i.id === ideaId) || null;
         if (!found) throw new Error('Ideia não encontrada');
         setIdea(found);
@@ -61,11 +80,30 @@ export default function MediatorReviewPage() {
     if (ideaId) load();
   }, [ideaId]);
 
-    const onSubmit = form.handleSubmit(async (values) => {
+  const actionToStatus = (action: ReviewSchema['action']) => {
+    switch (action) {
+      case 'approve':
+        return 'aprovada';
+      case 'reject':
+        return 'rejeitada';
+      case 'request_info':
+        return 'aguardando_info';
+      default:
+        return 'em_analise';
+    }
+  };
+
+  const onSubmit = form.handleSubmit(async (values) => {
     setResult(null);
     try {
-      const res = await http.post(`/api/ideias-simples/${ideaId}/review`, values);
-      const json: { id: string; status: Idea['status']; message: string | null } = res.data;
+      const json = await requestLocalApi<{ id: string; status: Idea['status']; message: string | null }>(API_IDEAS, {
+        method: 'PUT',
+        body: JSON.stringify({
+          id: ideaId,
+          status: actionToStatus(values.action),
+          mediatorNotes: values.message ?? '',
+        }),
+      });
       setResult(`Status atualizado para: ${json.status}${json.message ? ' | Feedback: ' + json.message : ''}`);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Erro ao enviar';

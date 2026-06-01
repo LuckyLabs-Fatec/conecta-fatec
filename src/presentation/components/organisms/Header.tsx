@@ -58,6 +58,16 @@ export const Header = () => {
               Acompanhar Projetos
             </Link>
           )}
+          {isAuthenticated && hasPermission('mediador') && (
+            <Link href="/mediador/atribuicoes" className="hover:text-red-200 transition-colors">
+              Atribuir Grupos
+            </Link>
+          )}
+          {isAuthenticated && hasPermission('estudante') && !hasPermission('mediador') && (
+            <Link href="/estudante/atribuicoes" className="hover:text-red-200 transition-colors">
+              Minhas Atribuições
+            </Link>
+          )}
           {isAuthenticated && hasPermission('admin') && (
             <Link href="/admin/usuarios" className="hover:text-red-200 transition-colors">
               Administração
