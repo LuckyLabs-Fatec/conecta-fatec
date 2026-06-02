@@ -9,6 +9,7 @@ import { useAuth } from "@/presentation/hooks/useAuth"
 import Link from "next/link";
 import { registerSchema, RegisterSchema } from '@/domain/auth/schemas/register.schema';
 import { useToast } from "@/presentation/components";
+import { LegalDocumentModal, type LegalDocumentType } from "@/presentation/components/legal/LegalDocumentModal";
 
 const phoneMaskConfig: MaskConfig = {
     pattern: (value: string) => {
@@ -23,6 +24,7 @@ export default function RegisterPage() {
     const { signup } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
+    const [legalDocument, setLegalDocument] = useState<LegalDocumentType | null>(null);
     const { show } = useToast();
 
     const { register, handleSubmit, control, formState: { errors } } = useForm({
@@ -63,12 +65,13 @@ export default function RegisterPage() {
                 description="Faça parte de uma comunidade que transforma problemas em soluções. Registre-se e comece a fazer a diferença hoje mesmo."
             />
 
-            <section className="w-full md:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+            <section className="w-full md:w-1/2 flex items-center justify-center p-8 bg-[var(--cps-silver-base)]">
                 <div className="w-full max-w-md">
-                    <div className="bg-white rounded-lg shadow-lg p-8">
+                    <div className="cps-card p-8">
                         <header className="mb-8">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">Criar Conta</h2>
-                            <p className="text-gray-600 mb-4">
+                            <p className="mb-2 text-sm font-medium uppercase tracking-wide text-[var(--cps-red-base)]">Cadastro institucional</p>
+                            <h2 className="text-2xl font-bold text-[var(--cps-blue-base)] mb-2">Criar Conta</h2>
+                            <p className="text-[var(--cps-gray-text)] mb-4">
                                 Já possui uma conta?{' '}
                                 <Link
                                     href="/autenticacao"
@@ -81,7 +84,7 @@ export default function RegisterPage() {
 
                         <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                             {authError && (
-                                <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3">
+                                <div className="bg-[var(--cps-feedback-cancelled-light)] border border-[var(--cps-feedback-cancelled-light)] text-[var(--cps-feedback-cancelled)] rounded-[30px] p-3">
                                     {authError}
                                 </div>
                             )}
@@ -143,33 +146,37 @@ export default function RegisterPage() {
                             />
 
                             <div className="space-y-4">
-                                <label className="flex items-start gap-3">
+                                <div className="flex items-start gap-3">
                                     <input
+                                        id="agreeToTerms"
                                         type="checkbox"
                                         {...register('agreeToTerms')}
-                                        className="h-4 w-4 text-[var(--cps-blue-base)] focus:ring-[var(--cps-blue-base)] border-gray-300 rounded mt-0.5"
+                                        className="h-4 w-4 text-[var(--cps-blue-base)] focus:ring-[var(--cps-blue-highlight)] border-[var(--cps-gray-light)] rounded mt-0.5"
                                     />
-                                    <span className="text-sm text-gray-600 leading-relaxed">
-                                        Eu aceito os{' '}
-                                        <Link
-                                            href="/termos"
+                                    <span className="text-sm text-[var(--cps-gray-text)] leading-relaxed">
+                                        <label htmlFor="agreeToTerms">
+                                            Eu aceito os
+                                        </label>
+                                        {' '}
+                                        <button
+                                            type="button"
+                                            onClick={() => setLegalDocument('terms')}
                                             className="text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] underline"
-                                            target="_blank"
                                         >
                                             termos e condições
-                                        </Link>
+                                        </button>
                                         {' '}e a{' '}
-                                        <Link
-                                            href="/privacidade"
+                                        <button
+                                            type="button"
+                                            onClick={() => setLegalDocument('privacy')}
                                             className="text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] underline"
-                                            target="_blank"
                                         >
                                             política de privacidade
-                                        </Link>
+                                        </button>
                                     </span>
-                                </label>
+                                </div>
                                 {errors.agreeToTerms && (
-                                    <p className="text-sm text-red-600" role="alert">
+                                    <p className="text-sm text-[var(--cps-feedback-cancelled)]" role="alert">
                                         {errors.agreeToTerms.message}
                                     </p>
                                 )}
@@ -182,27 +189,27 @@ export default function RegisterPage() {
                                     variant="primary"
                                     size="large"
                                     type="submit"
-                                    className="w-full rounded-md"
+                                    className="w-full"
                                 />
                             </div>
                         </Form>
 
-                        <footer className="mt-8 pt-6 border-t border-gray-200">
+                        <footer className="mt-8 pt-6 border-t border-[var(--cps-gray-light)]">
                             <div className="text-center">
-                                <p className="text-sm text-gray-600 mb-4">
+                                <p className="text-sm text-[var(--cps-gray-text)] mb-4">
                                     Ao criar uma conta, você se torna parte da solução para melhorar nossa comunidade
                                 </p>
-                                <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-                                    <span>🔒 Ambiente seguro</span>
+                                <div className="flex items-center justify-center gap-2 text-xs text-[var(--cps-gray-text)]">
+                                    <span>Ambiente seguro</span>
                                     <span>•</span>
-                                    <span>📋 Dados protegidos</span>
+                                    <span>Dados protegidos</span>
                                     <span>•</span>
-                                    <span>✅ LGPD compliant</span>
+                                    <span>LGPD compliant</span>
                                 </div>
                                 <div className="mt-4">
                                     <Link
                                         href="/"
-                                        className="inline-block px-6 py-2 text-sm font-medium text-gray-600 hover:text-[var(--cps-blue-base)] underline"
+                                        className="inline-block px-6 py-2 text-sm font-medium text-[var(--cps-gray-text)] hover:text-[var(--cps-blue-base)] underline"
                                     >
                                         Voltar para a página inicial
                                     </Link>
@@ -212,6 +219,13 @@ export default function RegisterPage() {
                     </div>
                 </div>
             </section>
+
+            {legalDocument && (
+                <LegalDocumentModal
+                    type={legalDocument}
+                    onClose={() => setLegalDocument(null)}
+                />
+            )}
         </main>
     );
 }
