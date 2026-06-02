@@ -49,7 +49,6 @@ export default function LoginPage () {
                 <div className="w-full max-w-md">
                     <div className="cps-card p-8">
                         <header className="mb-8">
-                            <p className="mb-2 text-sm font-medium uppercase tracking-wide text-[var(--cps-red-base)]">Acesso institucional</p>
                             <h2 className="text-2xl font-bold text-[var(--cps-blue-base)] mb-2">Login</h2>
                             <p className="text-[var(--cps-gray-text)] mb-4">
                                 Se você ainda não possui uma conta! Pode{' '}

@@ -69,7 +69,6 @@ export default function RegisterPage() {
                 <div className="w-full max-w-md">
                     <div className="cps-card p-8">
                         <header className="mb-8">
-                            <p className="mb-2 text-sm font-medium uppercase tracking-wide text-[var(--cps-red-base)]">Cadastro institucional</p>
                             <h2 className="text-2xl font-bold text-[var(--cps-blue-base)] mb-2">Criar Conta</h2>
                             <p className="text-[var(--cps-gray-text)] mb-4">
                                 Já possui uma conta?{' '}

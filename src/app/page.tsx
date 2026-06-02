@@ -57,9 +57,7 @@ export default function LandingPage() {
             </div>
 
             <div className="cps-card min-w-0 p-6 sm:p-8">
-              <p className="text-sm font-medium uppercase tracking-wide text-[var(--cps-red-base)]">
-                Fluxo institucional
-              </p>
+
               <h2 className="mt-3 text-xl font-bold text-[var(--cps-blue-base)] sm:text-2xl">
                 Da demanda local ao projeto aplicado
               </h2>
