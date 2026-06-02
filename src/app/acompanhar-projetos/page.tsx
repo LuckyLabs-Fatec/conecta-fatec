@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { Header, useToast } from "@/presentation/components";
 import { Filter, Search, Eye, Plus } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { projectsFiltersSchema, type ProjectsFiltersFormValues } from "@/domain/projects/schemas/filters.schema";
 import { usePagination } from "@/presentation/hooks/usePagination";
@@ -38,6 +38,7 @@ export default function ProjectsPage() {
     const [activeTab, setActiveTab] = useState<'proposals' | 'projects'>(() =>
         canListProjects ? 'projects' : 'proposals',
     );
+    const visibleActiveTab = canListProjects ? activeTab : 'proposals';
 
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
@@ -48,7 +49,7 @@ export default function ProjectsPage() {
         defaultValues: { status: '', search: '' },
         mode: 'onChange',
     });
-    const filters = form.watch();
+    const filters = useWatch({ control: form.control });
     const {
         page,
         setPage,
@@ -67,27 +68,20 @@ export default function ProjectsPage() {
         updateProposalStatus,
         assignProposal,
     } = useProjectsDashboard({
-        activeTab,
+        activeTab: visibleActiveTab,
         canListProjects,
         canListAllProposals,
         enabled: !isAuthLoading,
         hasUser: Boolean(user),
         page,
         pageSize,
-        search: filters.search,
-        status: filters.status,
+        search: filters.search ?? '',
+        status: filters.status ?? '',
     });
 
     useEffect(() => {
         setTotals(total, totalPages);
     }, [setTotals, total, totalPages]);
-
-    useEffect(() => {
-        if (!isAuthLoading && !canListProjects && activeTab === 'projects') {
-            setActiveTab('proposals');
-            setPage(1);
-        }
-    }, [activeTab, canListProjects, isAuthLoading, setPage]);
 
     const handleUpdateStatus = async (newStatus: ProjectStatus) => {
         if (selectedProject) {
@@ -154,21 +148,21 @@ export default function ProjectsPage() {
     return (
         <>
             <Header />
-            <main className="min-h-screen bg-gray-50 py-8">
+            <main className="min-h-screen bg-[var(--cps-silver-base)] py-8">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                            <h1 className="text-3xl font-bold text-[var(--cps-blue-base)] mb-2">
                                 Acompanhar Projetos
                             </h1>
-                            <p className="text-gray-600">
+                            <p className="text-[var(--cps-gray-text)]">
                                 Gerencie propostas e acompanhe o desenvolvimento dos projetos.
                             </p>
                         </div>
 
                         <Link
                             href="/submeter-proposta"
-                            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--cps-blue-base)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--cps-blue-title-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--cps-blue-title-hover)] focus:ring-offset-2 md:mt-1"
+                            className="inline-flex items-center justify-center gap-2 rounded-[30px] bg-[var(--cps-blue-base)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--cps-blue-title-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--cps-blue-title-hover)] focus:ring-offset-2 md:mt-1"
                         >
                             <Plus size={18} />
                             Nova proposta
@@ -176,37 +170,37 @@ export default function ProjectsPage() {
                     </div>
 
                     <DashboardTabs
-                        activeTab={activeTab}
+                        activeTab={visibleActiveTab}
                         onTabChange={(tab) => { setActiveTab(tab); setPage(1); form.reset(); }}
                         projectsDisabled={!canListProjects}
                     />
 
                     {/* Filters */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div className="bg-white rounded-[30px] shadow-[var(--cps-shadow-1)] p-6 mb-6">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                             <div className="md:col-span-2">
-                                <label htmlFor="search-input" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="search-input" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                                     <Search size={16} className="inline mr-1" />
                                     Pesquisar
                                 </label>
                                 <input
                                     id="search-input"
                                     type="text"
-                                    placeholder={activeTab === 'projects' ? "Buscar por projeto, estudante..." : "Buscar por título, descrição..."}
+                                    placeholder={visibleActiveTab === 'projects' ? "Buscar por projeto, estudante..." : "Buscar por título, descrição..."}
                                     {...form.register('search', { onChange: () => setPage(1) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
+                                    className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
                                 />
                             </div>
 
                             <div className="md:col-span-2">
-                                <label htmlFor="status-select" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="status-select" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                                     <Filter size={16} className="inline mr-1" />
                                     Status
                                 </label>
                                 <select
                                     id="status-select"
                                     {...form.register('status', { onChange: () => setPage(1) })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
+                                    className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-base)] focus:border-[var(--cps-blue-base)] outline-none"
                                 >
                                     <option value="">Todos os status</option>
                                     {Object.entries(statusConfig).map(([key, config]) => (
@@ -217,7 +211,7 @@ export default function ProjectsPage() {
                         </div>
 
                         <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-[var(--cps-gray-text)]">
                                 {total} item(s) encontrado(s)
                             </span>
                             <button
@@ -230,11 +224,11 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Content */}
-                    {activeTab === 'projects' ? (
+                    {visibleActiveTab === 'projects' ? (
                         loading ? (
-                            <div className="text-center py-12 text-gray-500">Carregando projetos...</div>
+                            <div className="text-center py-12 text-[var(--cps-gray-text)]">Carregando projetos...</div>
                         ) : error ? (
-                            <div className="text-center py-12 text-red-600">{error}</div>
+                            <div className="text-center py-12 text-[var(--cps-feedback-cancelled)]">{error}</div>
                         ) : projects.length > 0 ? (
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -260,10 +254,10 @@ export default function ProjectsPage() {
                             </>
                         ) : (
                             <div className="text-center py-12">
-                                <div className="text-gray-400 mb-4">
+                                <div className="text-[var(--cps-gray-text)] mb-4">
                                     <Eye size={64} className="mx-auto" />
                                 </div>
-                                <h3 className="text-lg font-medium text-gray-600 mb-2">
+                                <h3 className="text-lg font-medium text-[var(--cps-gray-text)] mb-2">
                                     Nenhum projeto encontrado
                                 </h3>
                             </div>

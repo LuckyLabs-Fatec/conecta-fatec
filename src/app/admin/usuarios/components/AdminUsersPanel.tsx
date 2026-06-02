@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pencil, Save, Search, Trash2, X } from 'lucide-react';
 import { useToast } from '@/presentation/components';
 import {
@@ -159,34 +159,28 @@ export function AdminUsersPanel() {
     });
   }, [users, searchField, searchQuery]);
 
-  const indexOfLastUser = currentPage * usersPerPage;
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const lastPage = Math.max(1, totalPages);
+  const visiblePage = Math.min(currentPage, lastPage);
+  const indexOfLastUser = visiblePage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-
-  useEffect(() => {
-    const lastPage = Math.max(1, totalPages);
-
-    if (currentPage > lastPage) {
-      setCurrentPage(lastPage);
-    }
-  }, [currentPage, totalPages]);
 
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-[var(--cps-blue-base)] mb-2">
           Administração de Usuários
         </h2>
-        <p className="text-gray-600">
+        <p className="text-[var(--cps-gray-text)]">
           Gerencie os usuários cadastrados no sistema
         </p>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
+      <div className="bg-white rounded-[30px] shadow-[var(--cps-shadow-1)] border border-[var(--cps-gray-light)] p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
-            <label htmlFor="search-field" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="search-field" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
               Buscar por
             </label>
             <select
@@ -196,7 +190,7 @@ export function AdminUsersPanel() {
                 setSearchField(event.target.value as SearchField);
                 setCurrentPage(1);
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+              className="w-full px-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
             >
               <option value="name">Nome</option>
               <option value="email">Email</option>
@@ -205,11 +199,11 @@ export function AdminUsersPanel() {
             </select>
           </div>
           <div className="flex-[2]">
-            <label htmlFor="search-input" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="search-input" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
               Pesquisar
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--cps-gray-text)]" size={20} />
               <input
                 id="search-input"
                 type="text"
@@ -219,34 +213,34 @@ export function AdminUsersPanel() {
                   setCurrentPage(1);
                 }}
                 placeholder={`Buscar por ${searchFieldLabels[searchField]}...`}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
               />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-[30px] shadow-[var(--cps-shadow-1)] border border-[var(--cps-gray-light)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-[var(--cps-silver-base)] border-b border-[var(--cps-gray-light)]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Nome
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Telefone
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   WhatsApp
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Perfil
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -254,19 +248,19 @@ export function AdminUsersPanel() {
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-[var(--cps-gray-text)]">
                     Carregando usuários...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-red-600">
+                  <td colSpan={6} className="px-6 py-8 text-center text-[var(--cps-feedback-cancelled)]">
                     {error}
                   </td>
                 </tr>
               ) : currentUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-[var(--cps-gray-text)]">
                     Nenhum usuário encontrado
                   </td>
                 </tr>
@@ -275,28 +269,28 @@ export function AdminUsersPanel() {
                   const isDeleting = deletingUserId === user.id;
 
                   return (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={user.id} className="hover:bg-[var(--cps-silver-base)]">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm font-medium text-[var(--cps-blue-base)]">{user.name}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">{user.email}</div>
+                        <div className="text-sm text-[var(--cps-gray-text)]">{user.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">{user.phone}</div>
+                        <div className="text-sm text-[var(--cps-gray-text)]">{user.phone}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-600">{user.phoneIsWhats ? 'Sim' : 'Não'}</span>
+                        <span className="text-sm text-[var(--cps-gray-text)]">{user.phoneIsWhats ? 'Sim' : 'Não'}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-600">{roleLabels[user.role]}</span>
+                        <span className="text-sm text-[var(--cps-gray-text)]">{roleLabels[user.role]}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <button
                             type="button"
                             onClick={() => startEditing(user)}
-                            className="text-gray-600 hover:text-gray-800 transition-colors"
+                            className="text-[var(--cps-gray-text)] hover:text-[var(--cps-blue-base)] transition-colors"
                             title="Editar usuário"
                           >
                             <Pencil size={18} />
@@ -305,7 +299,7 @@ export function AdminUsersPanel() {
                             type="button"
                             onClick={() => handleDeleteUser(user)}
                             disabled={isDeleting}
-                            className="text-red-600 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="text-[var(--cps-feedback-cancelled)] hover:text-[var(--cps-red-dark-10)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Excluir usuário"
                           >
                             <Trash2 size={18} />
@@ -321,8 +315,8 @@ export function AdminUsersPanel() {
         </div>
 
         {!isLoading && !error && totalPages > 1 && (
-          <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="text-sm text-gray-600">
+          <div className="bg-[var(--cps-silver-base)] px-6 py-4 border-t border-[var(--cps-gray-light)] flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="text-sm text-[var(--cps-gray-text)]">
               Mostrando {indexOfFirstUser + 1} a {Math.min(indexOfLastUser, filteredUsers.length)} de {filteredUsers.length} usuários
             </div>
             <div className="flex flex-wrap gap-2">
@@ -330,7 +324,7 @@ export function AdminUsersPanel() {
                 type="button"
                 onClick={() => setCurrentPage((previous) => Math.max(previous - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] text-sm font-medium text-[var(--cps-gray-text)] hover:bg-[var(--cps-gray-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Anterior
               </button>
@@ -339,10 +333,10 @@ export function AdminUsersPanel() {
                   key={page}
                   type="button"
                   onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-[30px] text-sm font-medium transition-colors ${
                     currentPage === page
-                      ? 'bg-[#CB2616] text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-[var(--cps-red-base)] text-white'
+                      : 'text-[var(--cps-gray-text)] hover:bg-[var(--cps-gray-hover)]'
                   }`}
                 >
                   {page}
@@ -352,7 +346,7 @@ export function AdminUsersPanel() {
                 type="button"
                 onClick={() => setCurrentPage((previous) => Math.min(previous + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] text-sm font-medium text-[var(--cps-gray-text)] hover:bg-[var(--cps-gray-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Próxima
               </button>
@@ -375,23 +369,23 @@ export function AdminUsersPanel() {
             disabled={Boolean(updatingUserId)}
           />
           <div
-            className="relative z-10 w-full max-w-2xl rounded-lg bg-white shadow-xl"
+            className="relative z-10 w-full max-w-2xl rounded-[30px] bg-white shadow-[var(--cps-shadow-2)]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-user-title"
           >
-            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+            <div className="flex items-center justify-between border-b border-[var(--cps-gray-light)] px-6 py-4">
               <div>
-                <h3 id="edit-user-title" className="text-lg font-semibold text-gray-900">
+                <h3 id="edit-user-title" className="text-lg font-semibold text-[var(--cps-blue-base)]">
                   Editar usuário
                 </h3>
-                <p className="text-sm text-gray-500">{editingUser.email}</p>
+                <p className="text-sm text-[var(--cps-gray-text)]">{editingUser.email}</p>
               </div>
               <button
                 type="button"
                 onClick={cancelEditing}
                 disabled={Boolean(updatingUserId)}
-                className="text-gray-500 hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-[var(--cps-gray-text)] hover:text-[var(--cps-blue-base)] disabled:cursor-not-allowed disabled:opacity-50"
                 title="Fechar modal"
               >
                 <X size={20} />
@@ -400,7 +394,7 @@ export function AdminUsersPanel() {
 
             <div className="grid grid-cols-1 gap-4 px-6 py-5 md:grid-cols-2">
               <div>
-                <label htmlFor="edit-user-name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="edit-user-name" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                   Nome
                 </label>
                 <input
@@ -408,12 +402,12 @@ export function AdminUsersPanel() {
                   type="text"
                   value={editForm.name}
                   onChange={(event) => setEditForm((previous) => ({ ...previous, name: event.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                  className="w-full rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 text-sm focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] outline-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="edit-user-email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="edit-user-email" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                   Email
                 </label>
                 <input
@@ -421,12 +415,12 @@ export function AdminUsersPanel() {
                   type="email"
                   value={editForm.email}
                   onChange={(event) => setEditForm((previous) => ({ ...previous, email: event.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                  className="w-full rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 text-sm focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] outline-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="edit-user-phone" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="edit-user-phone" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                   Telefone
                 </label>
                 <input
@@ -434,12 +428,12 @@ export function AdminUsersPanel() {
                   type="tel"
                   value={editForm.phone}
                   onChange={(event) => setEditForm((previous) => ({ ...previous, phone: event.target.value }))}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                  className="w-full rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 text-sm focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] outline-none"
                 />
               </div>
 
               <div>
-                <label htmlFor="edit-user-role" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="edit-user-role" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                   Perfil
                 </label>
                 <select
@@ -447,7 +441,7 @@ export function AdminUsersPanel() {
                   value={editForm.role}
                   onChange={(event) => setEditForm((previous) => ({ ...previous, role: event.target.value as AdminUserRole }))}
                   disabled={Boolean(updatingUserId)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 text-sm focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="comunidade">Comunidade</option>
                   <option value="estudante">Estudante</option>
@@ -457,7 +451,7 @@ export function AdminUsersPanel() {
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="edit-user-avatar" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="edit-user-avatar" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                   URL do avatar
                 </label>
                 <input
@@ -466,27 +460,27 @@ export function AdminUsersPanel() {
                   value={editForm.avatar}
                   onChange={(event) => setEditForm((previous) => ({ ...previous, avatar: event.target.value }))}
                   placeholder="https://..."
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                  className="w-full rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 text-sm focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] outline-none"
                 />
               </div>
 
-              <label className="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+              <label className="inline-flex items-center gap-2 text-sm font-medium text-[var(--cps-gray-text)]">
                 <input
                   type="checkbox"
                   checked={editForm.phoneIsWhats}
                   onChange={(event) => setEditForm((previous) => ({ ...previous, phoneIsWhats: event.target.checked }))}
-                  className="h-4 w-4 rounded border-gray-300 text-[#CB2616] focus:ring-[#CB2616]"
+                  className="h-4 w-4 rounded border-[var(--cps-gray-light)] text-[var(--cps-red-base)] focus:ring-[var(--cps-blue-highlight)]"
                 />
                 Telefone é WhatsApp
               </label>
             </div>
 
-            <div className="flex flex-col gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+            <div className="flex flex-col gap-3 border-t border-[var(--cps-gray-light)] px-6 py-4 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={cancelEditing}
                 disabled={Boolean(updatingUserId)}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-[30px] border border-[var(--cps-gray-light)] px-4 py-2 text-sm font-medium text-[var(--cps-gray-text)] hover:bg-[var(--cps-silver-base)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancelar
               </button>
@@ -494,7 +488,7 @@ export function AdminUsersPanel() {
                 type="button"
                 onClick={handleSaveUser}
                 disabled={Boolean(updatingUserId)}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#CB2616] px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 rounded-[30px] bg-[var(--cps-red-base)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--cps-red-dark-10)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Save size={16} />
                 Salvar

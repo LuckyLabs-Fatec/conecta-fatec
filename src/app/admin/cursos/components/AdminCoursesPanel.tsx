@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pencil, Save, Search, Trash2, X } from 'lucide-react';
 import { useToast } from '@/presentation/components';
 import { AdminCourse, useAdminCourses } from '@/presentation/hooks/useAdminCourses';
@@ -50,17 +50,11 @@ export function AdminCoursesPanel() {
   }, [courses, searchField, searchQuery]);
 
   const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
-  const indexOfLastCourse = currentPage * coursesPerPage;
+  const lastPage = Math.max(1, totalPages);
+  const visiblePage = Math.min(currentPage, lastPage);
+  const indexOfLastCourse = visiblePage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
-
-  useEffect(() => {
-    const lastPage = Math.max(1, totalPages);
-
-    if (currentPage > lastPage) {
-      setCurrentPage(lastPage);
-    }
-  }, [currentPage, totalPages]);
 
   const startEditing = (course: AdminCourse) => {
     setEditingCourseId(course.id);
@@ -134,18 +128,18 @@ export function AdminCoursesPanel() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-[var(--cps-blue-base)] mb-2">
           Administração de Cursos
         </h2>
-        <p className="text-gray-600">
+        <p className="text-[var(--cps-gray-text)]">
           Gerencie os cursos cadastrados no sistema
         </p>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
+      <div className="bg-white rounded-[30px] shadow-[var(--cps-shadow-1)] border border-[var(--cps-gray-light)] p-6 mb-6">
         <div className="flex flex-col gap-4 md:flex-row">
           <div className="flex-1">
-            <label htmlFor="course-search-field" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="course-search-field" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
               Buscar por
             </label>
             <select
@@ -155,7 +149,7 @@ export function AdminCoursesPanel() {
                 setSearchField(event.target.value as SearchField);
                 setCurrentPage(1);
               }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+              className="w-full px-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
             >
               <option value="name">Nome</option>
               <option value="description">Descrição</option>
@@ -163,11 +157,11 @@ export function AdminCoursesPanel() {
             </select>
           </div>
           <div className="flex-[2]">
-            <label htmlFor="course-search-input" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="course-search-input" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
               Pesquisar
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--cps-gray-text)]" size={20} />
               <input
                 id="course-search-input"
                 type="text"
@@ -177,28 +171,28 @@ export function AdminCoursesPanel() {
                   setCurrentPage(1);
                 }}
                 placeholder={`Buscar por ${searchField === 'name' ? 'nome' : searchField === 'description' ? 'descrição' : 'status'}...`}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
               />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-[30px] shadow-[var(--cps-shadow-1)] border border-[var(--cps-gray-light)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-[var(--cps-silver-base)] border-b border-[var(--cps-gray-light)]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Nome
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Descrição
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[var(--cps-gray-text)] uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -206,19 +200,19 @@ export function AdminCoursesPanel() {
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-[var(--cps-gray-text)]">
                     Carregando cursos...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-red-600">
+                  <td colSpan={4} className="px-6 py-8 text-center text-[var(--cps-feedback-cancelled)]">
                     {error}
                   </td>
                 </tr>
               ) : currentCourses.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-[var(--cps-gray-text)]">
                     Nenhum curso encontrado
                   </td>
                 </tr>
@@ -229,7 +223,7 @@ export function AdminCoursesPanel() {
                   const isDeleting = deletingCourseId === course.id;
 
                   return (
-                    <tr key={course.id} className="hover:bg-gray-50">
+                    <tr key={course.id} className="hover:bg-[var(--cps-silver-base)]">
                       <td className="px-6 py-4 align-top">
                         {isEditing ? (
                           <input
@@ -239,10 +233,10 @@ export function AdminCoursesPanel() {
                               ...previous,
                               name: event.target.value,
                             }))}
-                            className="w-full min-w-48 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                            className="w-full min-w-48 rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 text-sm focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] outline-none"
                           />
                         ) : (
-                          <div className="text-sm font-medium text-gray-900">{course.name}</div>
+                          <div className="text-sm font-medium text-[var(--cps-blue-base)]">{course.name}</div>
                         )}
                       </td>
                       <td className="px-6 py-4 align-top">
@@ -254,10 +248,10 @@ export function AdminCoursesPanel() {
                               description: event.target.value,
                             }))}
                             rows={2}
-                            className="w-full min-w-64 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#CB2616] focus:ring-2 focus:ring-[#CB2616] outline-none"
+                            className="w-full min-w-64 resize-none rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 text-sm focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] outline-none"
                           />
                         ) : (
-                          <div className="max-w-md text-sm text-gray-600">
+                          <div className="max-w-md text-sm text-[var(--cps-gray-text)]">
                             {course.description || 'Sem descrição'}
                           </div>
                         )}
@@ -265,8 +259,8 @@ export function AdminCoursesPanel() {
                       <td className="px-6 py-4 whitespace-nowrap align-top">
                         <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                           course.active
-                            ? 'bg-green-50 text-green-700'
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'bg-[var(--cps-feedback-done-light)] text-[var(--cps-feedback-done)]'
+                            : 'bg-[var(--cps-gray-hover)] text-[var(--cps-gray-text)]'
                         }`}
                         >
                           {course.active ? statusLabels.active : statusLabels.inactive}
@@ -279,7 +273,7 @@ export function AdminCoursesPanel() {
                               type="button"
                               onClick={() => handleSaveCourse(course.id)}
                               disabled={isSaving}
-                              className="text-green-700 transition-colors hover:text-green-900 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="text-[var(--cps-feedback-done)] transition-colors hover:text-[var(--cps-feedback-done)] disabled:cursor-not-allowed disabled:opacity-50"
                               title="Salvar curso"
                             >
                               <Save size={18} />
@@ -288,7 +282,7 @@ export function AdminCoursesPanel() {
                               type="button"
                               onClick={cancelEditing}
                               disabled={isSaving}
-                              className="text-gray-600 transition-colors hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="text-[var(--cps-gray-text)] transition-colors hover:text-[var(--cps-blue-base)] disabled:cursor-not-allowed disabled:opacity-50"
                               title="Cancelar edição"
                             >
                               <X size={18} />
@@ -299,7 +293,7 @@ export function AdminCoursesPanel() {
                             <button
                               type="button"
                               onClick={() => startEditing(course)}
-                              className="text-gray-600 transition-colors hover:text-gray-800"
+                              className="text-[var(--cps-gray-text)] transition-colors hover:text-[var(--cps-blue-base)]"
                               title="Editar curso"
                             >
                               <Pencil size={18} />
@@ -308,7 +302,7 @@ export function AdminCoursesPanel() {
                               type="button"
                               onClick={() => handleDeleteCourse(course)}
                               disabled={isDeleting}
-                              className="text-red-600 transition-colors hover:text-red-800 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="text-[var(--cps-feedback-cancelled)] transition-colors hover:text-[var(--cps-red-dark-10)] disabled:cursor-not-allowed disabled:opacity-50"
                               title="Excluir curso"
                             >
                               <Trash2 size={18} />
@@ -325,8 +319,8 @@ export function AdminCoursesPanel() {
         </div>
 
         {!isLoading && !error && totalPages > 1 && (
-          <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="text-sm text-gray-600">
+          <div className="bg-[var(--cps-silver-base)] px-6 py-4 border-t border-[var(--cps-gray-light)] flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="text-sm text-[var(--cps-gray-text)]">
               Mostrando {indexOfFirstCourse + 1} a {Math.min(indexOfLastCourse, filteredCourses.length)} de {filteredCourses.length} cursos
             </div>
             <div className="flex flex-wrap gap-2">
@@ -334,7 +328,7 @@ export function AdminCoursesPanel() {
                 type="button"
                 onClick={() => setCurrentPage((previous) => Math.max(previous - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] text-sm font-medium text-[var(--cps-gray-text)] hover:bg-[var(--cps-gray-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Anterior
               </button>
@@ -343,10 +337,10 @@ export function AdminCoursesPanel() {
                   key={page}
                   type="button"
                   onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-[30px] text-sm font-medium transition-colors ${
                     currentPage === page
-                      ? 'bg-[#CB2616] text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-[var(--cps-red-base)] text-white'
+                      : 'text-[var(--cps-gray-text)] hover:bg-[var(--cps-gray-hover)]'
                   }`}
                 >
                   {page}
@@ -356,7 +350,7 @@ export function AdminCoursesPanel() {
                 type="button"
                 onClick={() => setCurrentPage((previous) => Math.min(previous + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 border border-[var(--cps-gray-light)] rounded-[30px] text-sm font-medium text-[var(--cps-gray-text)] hover:bg-[var(--cps-gray-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Próxima
               </button>

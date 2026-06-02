@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 export interface MaskConfig {
   pattern: string | ((value: string) => string);
@@ -32,8 +32,6 @@ export const MaskedInput: React.FC<MaskedInputProps> = ({
   description,
   className = '',
 }) => {
-  const [displayValue, setDisplayValue] = useState('');
-
   const applyMask = useCallback((rawValue: string): string => {
     const cleanValue = rawValue.replace(/\D/g, '');
 
@@ -60,22 +58,13 @@ export const MaskedInput: React.FC<MaskedInputProps> = ({
     return maskedValue.replace(/\D/g, '');
   };
 
-  useEffect(() => {
-    if (value) {
-      setDisplayValue(applyMask(value));
-    } else {
-      setDisplayValue('');
-    }
-  }, [value, applyMask]);
+  const displayValue = value ? applyMask(value) : '';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const cleanValue = removeMask(inputValue);
 
     if (cleanValue === '' || maskConfig.charRegex.test(cleanValue)) {
-      const maskedValue = applyMask(cleanValue);
-      setDisplayValue(maskedValue);
-
       const syntheticEvent = {
         ...e,
         target: {
@@ -90,9 +79,9 @@ export const MaskedInput: React.FC<MaskedInputProps> = ({
 
   return (
     <div className={className}>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
+      <label htmlFor={id} className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span className="text-[var(--cps-red-base)] ml-1">*</span>}
       </label>
       <input
         id={id}
@@ -101,20 +90,20 @@ export const MaskedInput: React.FC<MaskedInputProps> = ({
         onChange={handleChange}
         disabled={disabled}
         placeholder={maskConfig.placeholder}
-        className={`w-full px-4 py-3 border rounded-lg outline-none transition-colors ${error
-          ? 'border-red-500 focus:ring-2 focus:ring-red-500'
-          : 'border-gray-300 focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616]'
-          } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+        className={`w-full px-4 py-3 border rounded-[30px] bg-white outline-none transition-colors ${error
+          ? 'border-[var(--cps-feedback-cancelled)] focus:ring-2 focus:ring-[var(--cps-feedback-cancelled)]'
+          : 'border-[var(--cps-gray-light)] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)]'
+          } ${disabled ? 'bg-[var(--cps-gray-hover)] cursor-not-allowed' : ''}`}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : description ? `${id}-description` : undefined}
       />
       {error && (
-        <p id={`${id}-error`} className="mt-1 text-sm text-red-600">
+        <p id={`${id}-error`} className="mt-1 text-sm text-[var(--cps-feedback-cancelled)]">
           {error}
         </p>
       )}
       {description && !error && (
-        <p id={`${id}-description`} className="mt-1 text-sm text-gray-500">
+        <p id={`${id}-description`} className="mt-1 text-sm text-[var(--cps-gray-text)]">
           {description}
         </p>
       )}

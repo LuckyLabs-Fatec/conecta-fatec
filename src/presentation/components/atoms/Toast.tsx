@@ -32,7 +32,7 @@ const Toast: React.FC<{ toast: ToastItem; onRemove: (id: string) => void }> = ({
   const [isPaused, setIsPaused] = useState(false);
   const [remainingTime, setRemainingTime] = useState(toast.remainingTime);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(0);
 
   useEffect(() => {
     if (isPaused) {
@@ -71,11 +71,11 @@ const Toast: React.FC<{ toast: ToastItem; onRemove: (id: string) => void }> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={[
-        'w-[350px] h-[100px] rounded-lg shadow-lg border px-4 py-1 text-lg flex items-center gap-3 cursor-pointer transition-transform hover:scale-105',
-        toast.kind === 'success' && 'bg-green-50 border-green-200 text-green-800',
-        toast.kind === 'error' && 'bg-red-50 border-red-200 text-red-800',
-        toast.kind === 'warning' && 'bg-yellow-50 border-yellow-200 text-yellow-800',
-        toast.kind === 'info' && 'bg-blue-50 border-blue-200 text-blue-800',
+        'w-[350px] h-[100px] rounded-[30px] shadow-[var(--cps-shadow-1)] border px-4 py-1 text-lg flex items-center gap-3 cursor-pointer transition-transform hover:scale-105',
+        toast.kind === 'success' && 'bg-[var(--cps-feedback-done-light)] border-[var(--cps-feedback-done-light)] text-[var(--cps-feedback-done)]',
+        toast.kind === 'error' && 'bg-[var(--cps-feedback-cancelled-light)] border-[var(--cps-feedback-cancelled-light)] text-[var(--cps-feedback-cancelled)]',
+        toast.kind === 'warning' && 'bg-[var(--cps-feedback-progress-light)] border-[var(--cps-feedback-progress-light)] text-[var(--cps-feedback-progress)]',
+        toast.kind === 'info' && 'bg-[var(--cps-silver-base)] border-[var(--cps-gray-light)] text-[var(--cps-blue-base)]',
       ].filter(Boolean).join(' ')}
     >
       <span className="mt-0.5">{toast.kind === 'success' ? '✅' : toast.kind === 'error' ? '⚠️' : toast.kind === 'warning' ? '⚠️' : 'ℹ️'}</span>

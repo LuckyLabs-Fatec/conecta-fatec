@@ -2,7 +2,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { useForm, type Resolver } from 'react-hook-form';
+import { useForm, useWatch, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from "@base-ui-components/react/form"
 import { Header, useToast } from "@/presentation/components"
@@ -13,6 +13,37 @@ import { suggestionSchema, SuggestionSchema } from '@/domain/ideas/schemas/sugge
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useCreateProposal } from '@/presentation/hooks/useCreateProposal';
 
+function ProgressBar({
+    currentStep,
+    totalSteps,
+    progress,
+}: {
+    currentStep: number;
+    totalSteps: number;
+    progress: number;
+}) {
+    return (
+        <div className="sticky top-0 z-40 bg-[var(--cps-silver-base)] py-4 mb-4 border-b border-[var(--cps-gray-light)]">
+            <div className="max-w-4xl mx-auto px-4">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-[var(--cps-gray-text)]">
+                        Etapa {currentStep} de {totalSteps}
+                    </span>
+                    <span className="text-sm text-[var(--cps-gray-text)]">
+                        {progress}% concluído
+                    </span>
+                </div>
+                <div className="w-full bg-[var(--cps-gray-hover)] rounded-full h-2">
+                    <div
+                        className="bg-[var(--cps-red-base)] h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function SuggestImprovementPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +52,7 @@ export default function SuggestImprovementPage() {
     const { show } = useToast();
     const createProposal = useCreateProposal();
 
-    const { handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<SuggestionSchema>({
+    const { control, handleSubmit, setValue, trigger, formState: { errors } } = useForm<SuggestionSchema>({
         resolver: zodResolver(suggestionSchema) as Resolver<SuggestionSchema>,
         defaultValues: {
             title: '',
@@ -39,7 +70,7 @@ export default function SuggestImprovementPage() {
         }
     });
 
-    const watchAll = watch();
+    const watchAll = useWatch({ control }) as SuggestionSchema;
 
     useEffect(() => {
         if (user?.email) {
@@ -157,38 +188,17 @@ export default function SuggestImprovementPage() {
 
     const progress = calculateProgress();
 
-    const ProgressBar = () => (
-        <div className="sticky top-0 z-40 bg-gray-50 py-4 mb-4 border-b border-gray-200">
-            <div className="max-w-4xl mx-auto px-4">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-600">
-                        Etapa {currentStep} de {totalSteps}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                        {progress}% concluído
-                    </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                        className="bg-[#CB2616] h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${progress}%` }}
-                    />
-                </div>
-            </div>
-        </div>
-    );
-
     return (
         <>
             <Header />
-            <ProgressBar />
-            <main className="min-h-screen bg-gray-50 py-8">
+            <ProgressBar currentStep={currentStep} totalSteps={totalSteps} progress={progress} />
+            <main className="min-h-screen bg-[var(--cps-silver-base)] py-8">
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                        <h1 className="text-3xl font-bold text-[var(--cps-blue-base)] mb-2">
                             Submeter uma proposta
                         </h1>
-                        <p className="text-gray-600">
+                        <p className="text-[var(--cps-gray-text)]">
                             Cadastre a sua proposta. Estudantes da Fatec Votorantim podem transformar sua proposta em um projeto real!
                         </p>
                     </div>
@@ -220,12 +230,12 @@ export default function SuggestImprovementPage() {
                             />
                         )}
 
-                        <div className="flex justify-between pt-6 border-t border-gray-200">
+                        <div className="flex justify-between pt-6 border-t border-[var(--cps-gray-light)]">
                             <button
                                 type="button"
                                 onClick={prevStep}
                                 disabled={currentStep === 1}
-                                className="flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+                                className="flex items-center gap-2 px-6 py-3 border border-[var(--cps-gray-light)] rounded-[30px] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--cps-silver-base)] transition-colors"
                             >
                                 <ChevronLeft size={16} />
                                 Anterior
@@ -236,7 +246,7 @@ export default function SuggestImprovementPage() {
                                     key="next-btn"
                                     type="button"
                                     onClick={nextStep}
-                                    className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors"
+                                    className="flex items-center gap-2 px-6 py-3 bg-[var(--cps-red-base)] text-white rounded-[30px] hover:bg-[var(--cps-red-dark-10)] transition-colors"
                                 >
                                     Próximo
                                     <ChevronRight size={16} />
@@ -246,7 +256,7 @@ export default function SuggestImprovementPage() {
                                     key="submit-btn"
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="flex items-center gap-2 px-6 py-3 bg-[#CB2616] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-2 px-6 py-3 bg-[var(--cps-red-base)] text-white rounded-[30px] hover:bg-[var(--cps-red-dark-10)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isSubmitting ? (
                                         <>

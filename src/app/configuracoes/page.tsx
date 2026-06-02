@@ -9,19 +9,16 @@ export default function ConfiguracoesPage() {
   const router = useRouter();
   const { isLoading, isAuthenticated } = useAuth();
   const { show } = useToast();
-  const [largeFont, setLargeFont] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
+  const [largeFont, setLargeFont] = useState(() => (
+    typeof document !== "undefined" && document.body.classList.contains("a11y-large-font")
+  ));
+  const [highContrast, setHighContrast] = useState(() => (
+    typeof document !== "undefined" && document.body.classList.contains("a11y-high-contrast")
+  ));
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace("/autenticacao");
   }, [isLoading, isAuthenticated, router]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setLargeFont(document.body.classList.contains("a11y-large-font"));
-      setHighContrast(document.body.classList.contains("a11y-high-contrast"));
-    }
-  }, []);
 
   if (isLoading || !isAuthenticated) return null;
 
@@ -65,7 +62,7 @@ export default function ConfiguracoesPage() {
         <div className="max-w-3xl mx-auto p-6">
           <h1 className="text-2xl font-bold mb-6">Configurações</h1>
 
-          <section className="bg-white border rounded-xl shadow-sm p-6">
+          <section className="bg-white border rounded-[30px] shadow-[var(--cps-shadow-1)] p-6">
             <h2 className="text-lg font-semibold mb-4">Acessibilidade</h2>
             <div className="flex flex-col gap-4">
               <label className="inline-flex items-center gap-2">
@@ -82,7 +79,7 @@ export default function ConfiguracoesPage() {
             <div className="mt-6">
               <button
                 onClick={restoreDefaults}
-                className="rounded px-4 py-2 border border-gray-300 hover:bg-gray-50"
+                className="rounded px-4 py-2 border border-[var(--cps-gray-light)] hover:bg-[var(--cps-silver-base)]"
               >
                 Restaurar padrão
               </button>

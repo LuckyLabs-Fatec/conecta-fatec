@@ -99,8 +99,13 @@ export default function MediatorAssignmentsPage() {
 
   useEffect(() => {
     if (!isMediator) return;
-    void loadProjects();
-    void loadStudents();
+
+    const timeoutId = window.setTimeout(() => {
+      void loadProjects();
+      void loadStudents();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [isMediator, loadProjects, loadStudents]);
 
   useEffect(() => {
@@ -171,26 +176,26 @@ export default function MediatorAssignmentsPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-[var(--cps-silver-base)] py-8">
         <section className="max-w-5xl mx-auto px-4 space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Atribuir Projetos a Grupos</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-[var(--cps-blue-base)]">Atribuir Projetos a Grupos</h1>
+            <p className="text-[var(--cps-gray-text)] mt-1">
               Selecione um projeto, defina o nome do grupo e escolha os estudantes que farão parte da equipe.
             </p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+          <div className="bg-white border border-[var(--cps-gray-light)] rounded-[30px] p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="projectId" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="projectId" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-1">
                   Projeto
                 </label>
                 <select
                   id="projectId"
                   value={projectId}
                   onChange={(event) => setProjectId(event.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                  className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
                   disabled={loadingProjects}
                 >
                   <option value="">Selecione um projeto</option>
@@ -203,7 +208,7 @@ export default function MediatorAssignmentsPage() {
               </div>
 
               <div>
-                <label htmlFor="groupName" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="groupName" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-1">
                   Nome do grupo
                 </label>
                 <input
@@ -211,13 +216,13 @@ export default function MediatorAssignmentsPage() {
                   value={groupName}
                   onChange={(event) => setGroupName(event.target.value)}
                   placeholder="Ex.: Grupo Alpha"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                  className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="searchStudents" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="searchStudents" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-1">
                 Buscar estudantes
               </label>
               <input
@@ -225,15 +230,15 @@ export default function MediatorAssignmentsPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Filtrar por nome ou email"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
               />
             </div>
 
-            <div className="border border-gray-200 rounded-lg max-h-80 overflow-auto">
+            <div className="border border-[var(--cps-gray-light)] rounded-[30px] max-h-80 overflow-auto">
               {loadingStudents ? (
-                <p className="p-4 text-sm text-gray-500">Carregando estudantes...</p>
+                <p className="p-4 text-sm text-[var(--cps-gray-text)]">Carregando estudantes...</p>
               ) : students.length === 0 ? (
-                <p className="p-4 text-sm text-gray-500">Nenhum estudante encontrado.</p>
+                <p className="p-4 text-sm text-[var(--cps-gray-text)]">Nenhum estudante encontrado.</p>
               ) : (
                 <ul className="divide-y divide-gray-100">
                   {students.map((student) => (
@@ -243,11 +248,11 @@ export default function MediatorAssignmentsPage() {
                         type="checkbox"
                         checked={selectedStudentIds.includes(student.id)}
                         onChange={() => toggleStudent(student.id)}
-                        className="h-4 w-4 rounded border-gray-300 text-[#CB2616] focus:ring-[#CB2616]"
+                        className="h-4 w-4 rounded border-[var(--cps-gray-light)] text-[var(--cps-red-base)] focus:ring-[var(--cps-blue-highlight)]"
                       />
                       <label htmlFor={`student-${student.id}`} className="cursor-pointer">
-                        <p className="text-sm font-medium text-gray-800">{student.name || 'Sem nome'}</p>
-                        <p className="text-xs text-gray-500">{student.email}</p>
+                        <p className="text-sm font-medium text-[var(--cps-blue-base)]">{student.name || 'Sem nome'}</p>
+                        <p className="text-xs text-[var(--cps-gray-text)]">{student.email}</p>
                       </label>
                     </li>
                   ))}
@@ -256,7 +261,7 @@ export default function MediatorAssignmentsPage() {
             </div>
 
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-[var(--cps-gray-text)]">
                 {selectedCount} estudante(s) selecionado(s)
                 {selectedStudentsPreview.length > 0 && (
                   <span>
@@ -270,7 +275,7 @@ export default function MediatorAssignmentsPage() {
               <button
                 onClick={handleAssign}
                 disabled={submitting || loadingProjects || loadingStudents}
-                className="px-4 py-2 rounded-lg bg-[#CB2616] text-white font-medium hover:bg-[#AE1E11] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-[30px] bg-[var(--cps-red-base)] text-white font-medium hover:bg-[var(--cps-red-dark-10)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? 'Salvando...' : 'Salvar atribuição'}
               </button>

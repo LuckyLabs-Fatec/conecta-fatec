@@ -20,11 +20,11 @@ export default function PerfilPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const { show } = useToast();
   const [avatarError, setAvatarError] = useState(false);
-  const [editingName, setEditingName] = useState('');
-  const [editingAvatar, setEditingAvatar] = useState('');
-  const [editingPhone, setEditingPhone] = useState('');
-  const [editingPhoneIsWhatsapp, setEditingPhoneIsWhatsapp] = useState(false);
-  const [editingRole, setEditingRole] = useState('');
+  const [editingName, setEditingName] = useState<string | null>(null);
+  const [editingAvatar, setEditingAvatar] = useState<string | null>(null);
+  const [editingPhone, setEditingPhone] = useState<string | null>(null);
+  const [editingPhoneIsWhatsapp, setEditingPhoneIsWhatsapp] = useState<boolean | null>(null);
+  const [editingRole, setEditingRole] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [largeFont, setLargeFont] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
@@ -35,16 +35,11 @@ export default function PerfilPage() {
     }
   }, [isLoading, isAuthenticated, router]);
 
-  useEffect(() => {
-    if (user) {
-      setEditingName(user.user_metadata.name ?? '');
-      setEditingAvatar(user.user_metadata.avatar ?? '');
-      setEditingPhone(user.user_metadata.phone ?? '');
-      setEditingPhoneIsWhatsapp(user.user_metadata.phone_is_whats ?? false);
-      setEditingRole(user.user_metadata.role ?? '');
-      setAvatarError(false);
-    }
-  }, [user]);
+  const editingNameValue = editingName ?? user?.user_metadata.name ?? '';
+  const editingAvatarValue = editingAvatar ?? user?.user_metadata.avatar ?? '';
+  const editingPhoneValue = editingPhone ?? user?.user_metadata.phone ?? '';
+  const editingPhoneIsWhatsappValue = editingPhoneIsWhatsapp ?? user?.user_metadata.phone_is_whats ?? false;
+  const editingRoleValue = editingRole ?? user?.user_metadata.role ?? '';
 
   if (isLoading || !isAuthenticated || !user) {
     return null;
@@ -90,11 +85,11 @@ export default function PerfilPage() {
     setIsSaving(true);
     try {
       await http.put(`/api/user-profile/${user?.id as string}`, {
-        name: editingName,
-        avatar: editingAvatar,
-        phone: editingPhone,
-        phone_is_whats: editingPhoneIsWhatsapp,
-        role: editingRole,
+        name: editingNameValue,
+        avatar: editingAvatarValue,
+        phone: editingPhoneValue,
+        phone_is_whats: editingPhoneIsWhatsappValue,
+        role: editingRoleValue,
       });
 
       show({ kind: 'success', message: 'Perfil atualizado com sucesso!' });
@@ -113,7 +108,7 @@ export default function PerfilPage() {
         <div className="max-w-3xl mx-auto p-6">
           <h1 className="text-2xl font-bold mb-6">Meu Perfil</h1>
 
-          <section className="bg-white border rounded-xl shadow-sm p-6 flex flex-col md:flex-row gap-6">
+          <section className="bg-white border rounded-[30px] shadow-[var(--cps-shadow-1)] p-6 flex flex-col md:flex-row gap-6">
             <div className="flex-shrink-0">
               {user.user_metadata.avatar && !avatarError ? (
                 <Image
@@ -125,27 +120,27 @@ export default function PerfilPage() {
                   onError={() => setAvatarError(true)}
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border">
-                  <User size={40} className="text-gray-500" />
+                <div className="w-24 h-24 rounded-full bg-[var(--cps-gray-hover)] flex items-center justify-center border">
+                  <User size={40} className="text-[var(--cps-gray-text)]" />
                 </div>
               )}
             </div>
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-1">
-                <label htmlFor="name" className="text-xs text-gray-500">Nome</label>
+                <label htmlFor="name" className="text-xs text-[var(--cps-gray-text)]">Nome</label>
                 <input
                   id="name"
-                  value={editingName}
+                  value={editingNameValue}
                   onChange={(e) => setEditingName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded-lg"
+                  className="mt-1 w-full px-3 py-2 border rounded-[30px]"
                 />
               </div>
               <div className="md:col-span-1">
-                <span className="text-xs text-gray-500">E-mail</span>
+                <span className="text-xs text-[var(--cps-gray-text)]">E-mail</span>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="font-medium text-gray-900 break-all">{user.email}</span>
-                  <button onClick={onCopyEmail} className="text-sm text-[#CB2616] hover:underline">Copiar</button>
+                  <span className="font-medium text-[var(--cps-blue-base)] break-all">{user.email}</span>
+                  <button onClick={onCopyEmail} className="text-sm text-[var(--cps-red-base)] hover:underline">Copiar</button>
                 </div>
               </div>
 
@@ -153,7 +148,7 @@ export default function PerfilPage() {
                 <MaskedInput
                   label="Telefone"
                   id="phone"
-                  value={editingPhone}
+                  value={editingPhoneValue}
                   onChange={(e) => setEditingPhone(e.target.value)}
                   maskConfig={phoneMaskConfig}
                 />
@@ -162,20 +157,20 @@ export default function PerfilPage() {
                 <input
                   type="checkbox"
                   id="phoneIsWhatsapp"
-                  checked={editingPhoneIsWhatsapp}
+                  checked={editingPhoneIsWhatsappValue}
                   onChange={(e) => setEditingPhoneIsWhatsapp(e.target.checked)}
-                  className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
+                  className="h-4 w-4 text-[var(--cps-red-base)] focus:ring-[var(--cps-blue-highlight)] border-[var(--cps-gray-light)] rounded"
                 />
-                <label htmlFor="phoneIsWhatsapp" className="ml-2 text-sm text-gray-600">WhatsApp</label>
+                <label htmlFor="phoneIsWhatsapp" className="ml-2 text-sm text-[var(--cps-gray-text)]">WhatsApp</label>
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="role" className="text-xs text-gray-500">Perfil(PROVISÓRIO)</label>
+                <label htmlFor="role" className="text-xs text-[var(--cps-gray-text)]">Perfil(PROVISÓRIO)</label>
                 <select
                   id="role"
-                  value={editingRole}
+                  value={editingRoleValue}
                   onChange={(e) => setEditingRole(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border rounded-lg bg-white"
+                  className="mt-1 w-full px-3 py-2 border rounded-[30px] bg-white"
                 >
                   <option value="comunidade">Comunidade</option>
                   <option value="estudante">Estudante</option>
@@ -186,13 +181,13 @@ export default function PerfilPage() {
               </div>
 
               <div className="md:col-span-2">
-                <label htmlFor="avatar" className="text-xs text-gray-500">URL do Avatar</label>
+                <label htmlFor="avatar" className="text-xs text-[var(--cps-gray-text)]">URL do Avatar</label>
                 <input
                   id="avatar"
-                  value={editingAvatar}
+                  value={editingAvatarValue}
                   onChange={(e) => setEditingAvatar(e.target.value)}
                   placeholder="https://..."
-                  className="mt-1 w-full px-3 py-2 border rounded-lg"
+                  className="mt-1 w-full px-3 py-2 border rounded-[30px]"
                 />
               </div>
               {user.department && <Info label="Departamento" value={user.department} />}
@@ -206,7 +201,7 @@ export default function PerfilPage() {
             </button>
           </div>
 
-          <section className="mt-8 bg-white border rounded-xl shadow-sm p-6">
+          <section className="mt-8 bg-white border rounded-[30px] shadow-[var(--cps-shadow-1)] p-6">
             <h2 className="text-lg font-semibold mb-4">Acessibilidade</h2>
             <div className="flex flex-col gap-3">
               <label className="inline-flex items-center gap-2">
@@ -220,7 +215,7 @@ export default function PerfilPage() {
             </div>
           </section>
 
-          <div className="mt-6 text-sm text-gray-600">
+          <div className="mt-6 text-sm text-[var(--cps-gray-text)]">
             Seus dados são armazenados localmente para fins de demonstração deste protótipo.
           </div>
         </div>
@@ -232,8 +227,8 @@ export default function PerfilPage() {
 function Info({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs text-gray-500">{label}</span>
-      <span className="font-medium text-gray-900">{value}</span>
+      <span className="text-xs text-[var(--cps-gray-text)]">{label}</span>
+      <span className="font-medium text-[var(--cps-blue-base)]">{value}</span>
     </div>
   );
 }

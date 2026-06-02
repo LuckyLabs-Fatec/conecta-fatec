@@ -1,11 +1,11 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import { LoginSchema } from '@/domain/auth/schemas/login.schema';
 import { RegisterSchema } from '@/domain/auth/schemas/register.schema';
 import {
     clearAuthCookie,
     AUTH_SESSION_EXPIRED_EVENT,
-    readAuthCookie,
+    AUTH_COOKIE_KEY,
     writeAuthCookie,
     type AuthSessionUser,
     type UserRole,
@@ -16,8 +16,71 @@ export type { UserRole } from '@/presentation/lib/auth-session';
 
 type AppUser = AuthSessionUser;
 
+const AUTH_SESSION_CHANGED_EVENT = 'conecta-fatec-auth-session-changed';
+let cachedAuthCookie: string | null = null;
+let cachedAuthUser: AppUser | null = null;
+
+const readRawAuthCookie = () => {
+    if (typeof document === 'undefined') {
+        return null;
+    }
+
+    return document.cookie
+        .split('; ')
+        .find((item) => item.startsWith(`${AUTH_COOKIE_KEY}=`)) ?? null;
+};
+
+const getAuthUserSnapshot = (): AppUser | null => {
+    const rawCookie = readRawAuthCookie();
+
+    if (rawCookie === cachedAuthCookie) {
+        return cachedAuthUser;
+    }
+
+    cachedAuthCookie = rawCookie;
+
+    if (!rawCookie) {
+        cachedAuthUser = null;
+        return cachedAuthUser;
+    }
+
+    const encodedValue = rawCookie.split('=').slice(1).join('=');
+
+    try {
+        const session = JSON.parse(decodeURIComponent(encodedValue)) as { user?: AppUser };
+        cachedAuthUser = session.user ?? null;
+    } catch {
+        cachedAuthUser = null;
+    }
+
+    return cachedAuthUser;
+};
+
+const getServerAuthUserSnapshot = () => null;
+
+const notifyAuthSessionChanged = () => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
+};
+
+const subscribeToAuthSession = (onStoreChange: () => void) => {
+    window.addEventListener(AUTH_SESSION_CHANGED_EVENT, onStoreChange);
+    window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, onStoreChange);
+
+    return () => {
+        window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, onStoreChange);
+        window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, onStoreChange);
+    };
+};
+
 const saveAuthSession = (accessToken: string, user: AppUser) => {
     writeAuthCookie({ accessToken, user });
+    cachedAuthCookie = null;
+    cachedAuthUser = null;
+    notifyAuthSessionChanged();
     return user;
 };
 
@@ -48,37 +111,12 @@ const mapApiRoleToAppRole = (apiRole: string): UserRole => {
 };
 
 export const useAuth = () => {
-    const [user, setUser] = useState<AppUser | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        try {
-            const session = readAuthCookie();
-
-            if (session?.user) {
-                setUser(session.user);
-            } else if (session) {
-                clearAuthCookie();
-            }
-        } catch (error) {
-            console.error('Error reading auth cookie:', error);
-            clearAuthCookie();
-        }
-
-        setIsLoading(false);
-    }, []);
-
-    useEffect(() => {
-        const handleAuthSessionExpired = () => {
-            setUser(null);
-        };
-
-        window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, handleAuthSessionExpired);
-
-        return () => {
-            window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, handleAuthSessionExpired);
-        };
-    }, []);
+    const user = useSyncExternalStore(
+        subscribeToAuthSession,
+        getAuthUserSnapshot,
+        getServerAuthUserSnapshot,
+    );
+    const isLoading = false;
 
     const login = async (credentials: LoginSchema) => {
         const res = await http.post('/auth/login', credentials);
@@ -112,7 +150,7 @@ export const useAuth = () => {
             },
         };
 
-        setUser(saveAuthSession(data.accessToken, sessionUser));
+        saveAuthSession(data.accessToken, sessionUser);
         return sessionUser;
     };
 
@@ -157,7 +195,9 @@ export const useAuth = () => {
         } catch (error) {
             console.error('Error during logout:', error);
         } finally {
-            setUser(null);
+            cachedAuthCookie = null;
+            cachedAuthUser = null;
+            notifyAuthSessionChanged();
         }
     };
 
