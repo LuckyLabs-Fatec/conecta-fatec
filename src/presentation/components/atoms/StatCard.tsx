@@ -5,9 +5,9 @@ interface StatCardProps {
 
 export const StatCard = ({ label, value }: StatCardProps) => {
   return (
-    <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-100">
-      <div className="text-sm text-gray-500">{label}</div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
+    <div className="rounded-[30px] bg-white p-4 shadow-[var(--cps-shadow-1)] ring-1 ring-[var(--cps-gray-light)]">
+      <div className="text-sm text-[var(--cps-gray-text)]">{label}</div>
+      <div className="text-2xl font-bold text-[var(--cps-blue-base)]">{value}</div>
     </div>
   );
 };

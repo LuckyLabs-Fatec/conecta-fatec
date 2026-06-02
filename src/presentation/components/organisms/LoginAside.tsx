@@ -9,12 +9,18 @@ export const LoginAside = ({
 }: LoginAsideProps) => {
   return (
     <aside 
-      className="h-auto hidden md:flex md:w-1/2 bg-[#b20000] p-8 text-white flex-col items-center justify-center gap-6"
+      className="h-auto hidden md:flex md:w-1/2 bg-[var(--cps-red-base)] p-10 text-white flex-col items-center justify-center gap-8"
       aria-label="Seção de identidade visual do Fatec Conecta"
     >
-      <div className="text-center">
-  <h1 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-montserrat), sans-serif', color: '#FCFCFC' }}>{title}</h1>
-        <p className="text-red-100 text-lg max-w-md leading-relaxed">
+      <div className="max-w-md text-center">
+        <p className="mb-3 text-sm font-medium uppercase tracking-wide text-white/80">
+          Centro Paula Souza
+        </p>
+        <h1 className="mb-4 text-4xl font-bold !text-white">
+          {title}
+        </h1>
+        <div className="mx-auto mb-6 h-1 w-24 rounded-full bg-[var(--cps-blue-highlight)]" aria-hidden="true" />
+        <p className="text-lg leading-relaxed text-white/90">
           {description}
         </p>
       </div>

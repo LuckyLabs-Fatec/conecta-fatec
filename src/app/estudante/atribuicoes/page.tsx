@@ -63,47 +63,47 @@ export default function StudentAssignmentsPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-[var(--cps-silver-base)] py-8">
         <section className="max-w-5xl mx-auto px-4 space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Minhas Atribuições</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-[var(--cps-blue-base)]">Minhas Atribuições</h1>
+            <p className="text-[var(--cps-gray-text)] mt-1">
               Veja os projetos em que voce foi incluído e os colegas do seu grupo.
             </p>
           </div>
 
           {loadingAssignments ? (
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-gray-500">Carregando atribuições...</div>
+            <div className="bg-white border border-[var(--cps-gray-light)] rounded-[30px] p-6 text-[var(--cps-gray-text)]">Carregando atribuições...</div>
           ) : assignments.length === 0 ? (
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-gray-600">
+            <div className="bg-white border border-[var(--cps-gray-light)] rounded-[30px] p-6 text-[var(--cps-gray-text)]">
               Nenhuma atribuição encontrada para seu usuário.
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {assignments.map((assignment) => (
-                <article key={assignment.projectId} className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+                <article key={assignment.projectId} className="bg-white border border-[var(--cps-gray-light)] rounded-[30px] p-5 space-y-3">
                   <div className="flex items-start justify-between gap-3">
-                    <h2 className="text-lg font-semibold text-gray-800">{assignment.projectTitle}</h2>
-                    <span className="inline-flex items-center rounded-full bg-blue-100 text-blue-800 text-xs px-2.5 py-1 font-medium">
+                    <h2 className="text-lg font-semibold text-[var(--cps-blue-base)]">{assignment.projectTitle}</h2>
+                    <span className="inline-flex items-center rounded-full bg-[var(--cps-silver-base)] text-[var(--cps-blue-base)] text-xs px-2.5 py-1 font-medium">
                       {assignment.projectStatus}
                     </span>
                   </div>
 
-                  <p className="text-sm text-gray-600">{assignment.projectDescription}</p>
+                  <p className="text-sm text-[var(--cps-gray-text)]">{assignment.projectDescription}</p>
 
-                  <div className="bg-gray-50 border border-gray-100 rounded-lg p-3">
-                    <p className="text-sm font-medium text-gray-700">
+                  <div className="bg-[var(--cps-silver-base)] border border-[var(--cps-gray-light)] rounded-[30px] p-3">
+                    <p className="text-sm font-medium text-[var(--cps-gray-text)]">
                       Grupo: {assignment.groupName || 'Nao informado'}
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Integrantes</h3>
+                    <h3 className="text-sm font-semibold text-[var(--cps-gray-text)] mb-2">Integrantes</h3>
                     <ul className="space-y-2">
                       {assignment.teammates.map((teammate) => (
-                        <li key={teammate.id} className="text-sm text-gray-700 border border-gray-100 rounded-lg p-2">
+                        <li key={teammate.id} className="text-sm text-[var(--cps-gray-text)] border border-[var(--cps-gray-light)] rounded-[30px] p-2">
                           <p className="font-medium">{teammate.name || 'Sem nome'}</p>
-                          <p className="text-xs text-gray-500">{teammate.email}</p>
+                          <p className="text-xs text-[var(--cps-gray-text)]">{teammate.email}</p>
                         </li>
                       ))}
                     </ul>

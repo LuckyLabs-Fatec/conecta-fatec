@@ -35,12 +35,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   ...props
 }, ref) => {
   const baseInputClasses = `
-    w-full px-4 py-3 border rounded-lg outline-none transition-all duration-200
-    focus:ring-2 focus:ring-[var(--cps-blue-hover-text)] focus:border-[var(--cps-blue-hover-text)]
-    disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500
+    w-full px-4 py-3 border rounded-[30px] bg-white outline-none transition-all duration-200
+    focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)]
+    disabled:bg-[var(--cps-gray-hover)] disabled:cursor-not-allowed disabled:text-[var(--cps-gray-text)]
     ${error 
-      ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
-      : 'border-gray-300 hover:border-gray-400'
+      ? 'border-[var(--cps-feedback-cancelled)] focus:ring-[var(--cps-feedback-cancelled)] focus:border-[var(--cps-feedback-cancelled)]' 
+      : 'border-[var(--cps-gray-light)] hover:border-[var(--cps-blue-base)]'
     }
     ${className}
   `.trim().replace(/\s+/g, ' ');
@@ -49,16 +49,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
     <Field.Root className="flex flex-col gap-2">
       <Field.Label 
         htmlFor={id} 
-        className="text-sm font-medium text-gray-700"
+        className="text-sm font-medium text-[var(--cps-blue-base)]"
       >
         {label}
         {required && (
-          <span className="text-red-500 ml-1" aria-label="obrigatório">*</span>
+          <span className="text-[var(--cps-red-base)] ml-1" aria-label="obrigatório">*</span>
         )}
       </Field.Label>
       
       {description && (
-        <Field.Description className="text-sm text-gray-600">
+        <Field.Description className="text-sm text-[var(--cps-gray-text)]">
           {description}
         </Field.Description>
       )}
@@ -83,7 +83,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       {error && (
         <Field.Error
           id={`${id}-error`}
-          className="text-sm text-red-600"
+          className="text-sm text-[var(--cps-feedback-cancelled)]"
           role="alert"
         >
           {error}

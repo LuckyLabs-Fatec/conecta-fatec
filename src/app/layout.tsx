@@ -1,24 +1,26 @@
 import type { Metadata } from "next";
-import { Noto_Sans, Montserrat } from "next/font/google";
+import { Roboto, Roboto_Slab } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/presentation/components";
 import { ReactQueryProvider } from "@/presentation/providers/ReactQueryProvider";
 
-const notoSans = Noto_Sans({
-  variable: "--font-noto-sans",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
 });
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+const robotoSlab = Roboto_Slab({
+  variable: "--font-roboto-slab",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: ["100", "400", "500", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Fatec Conecta",
-  description: "Fatec Conecta - Desenvolvido por LuckyLabs no Curso de DSM da Fatec Votorantim",
+  title: "Fatec Conecta | Centro Paula Souza",
+  description: "Fatec Conecta - plataforma acadêmica da Fatec Votorantim alinhada à identidade visual do Centro Paula Souza",
 };
 
 export default function RootLayout({
@@ -27,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${notoSans.variable} ${montserrat.variable} antialiased`}>
+    <html lang="pt-BR">
+      <body className={`${roboto.variable} ${robotoSlab.variable} antialiased`}>
         <ReactQueryProvider>
           <ToastProvider>
             {children}

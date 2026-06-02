@@ -118,7 +118,7 @@ export default function MediatorReviewPage() {
   if (isLoading || loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Carregando...</p>
+        <p className="text-[var(--cps-gray-text)]">Carregando...</p>
       </main>
     );
   }
@@ -126,7 +126,7 @@ export default function MediatorReviewPage() {
   if (error || !idea) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600">{error ?? 'Ideia não encontrada'}</p>
+        <p className="text-[var(--cps-feedback-cancelled)]">{error ?? 'Ideia não encontrada'}</p>
       </main>
     );
   }
@@ -134,15 +134,15 @@ export default function MediatorReviewPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 py-8">
+      <main className="min-h-screen bg-[var(--cps-silver-base)] py-8">
         <section className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl font-bold mb-4">Analisar Ideia</h1>
 
           <article className="bg-white border rounded p-4 mb-6">
             <h2 className="text-xl font-semibold">{idea.titulo}</h2>
-            <p className="text-gray-700 mt-2">{idea.descricao}</p>
-            <p className="text-sm text-gray-500 mt-2">Autor: {idea.autor}</p>
-            <p className="text-sm text-gray-500">Status atual: {idea.status}</p>
+            <p className="text-[var(--cps-gray-text)] mt-2">{idea.descricao}</p>
+            <p className="text-sm text-[var(--cps-gray-text)] mt-2">Autor: {idea.autor}</p>
+            <p className="text-sm text-[var(--cps-gray-text)]">Status atual: {idea.status}</p>
           </article>
 
           <div className="bg-white border rounded p-4">
@@ -155,16 +155,16 @@ export default function MediatorReviewPage() {
 
             <form onSubmit={onSubmit} className="space-y-3">
               <div>
-                <label htmlFor="review-message" className="block text-sm font-medium text-gray-700 mb-1">Mensagem ao usuário</label>
+                <label htmlFor="review-message" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-1">Mensagem ao usuário</label>
                 <textarea
                   id="review-message"
                   {...form.register('message')}
                   rows={4}
-                  className="w-full px-3 py-2 border rounded outline-none focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616]"
+                  className="w-full px-3 py-2 border rounded outline-none focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)]"
                   placeholder="Escreva um feedback curto ou solicite informações necessárias"
                 />
                 {form.formState.errors.message && (
-                  <p className="text-xs text-red-600 mt-1">{form.formState.errors.message.message}</p>
+                  <p className="text-xs text-[var(--cps-feedback-cancelled)] mt-1">{form.formState.errors.message.message}</p>
                 )}
               </div>
               <div className="flex gap-2">
@@ -175,7 +175,7 @@ export default function MediatorReviewPage() {
             </form>
 
             {result && (
-              <div className="mt-4 text-sm text-gray-700">{result}</div>
+              <div className="mt-4 text-sm text-[var(--cps-gray-text)]">{result}</div>
             )}
           </div>
         </section>

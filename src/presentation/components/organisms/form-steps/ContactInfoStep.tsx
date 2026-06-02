@@ -29,13 +29,13 @@ interface ContactInfoStepProps {
 
 export const ContactInfoStep = ({ formData, errors, onChange, onToggle, hasPhone = false }: ContactInfoStepProps) => (
     <div className="space-y-6" role="group" aria-labelledby="contact-info-heading">
-        <h2 id="contact-info-heading" className="text-xl font-semibold text-gray-800 mb-4">
+        <h2 id="contact-info-heading" className="text-xl font-semibold text-[var(--cps-blue-base)] mb-4">
             Informações de Contato
         </h2>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6" role="note">
-            <h3 className="font-medium text-amber-800 mb-2">🔒 Privacidade Garantida</h3>
-            <p className="text-sm text-amber-700">
+        <div className="bg-[var(--cps-feedback-progress-light)] border border-[var(--cps-feedback-progress-light)] rounded-[30px] p-4 mb-6" role="note">
+            <h3 className="font-medium text-[var(--cps-feedback-progress)] mb-2">Privacidade garantida</h3>
+            <p className="text-sm text-[var(--cps-feedback-progress)]">
                 Suas informações pessoais são protegidas e usadas apenas para contato sobre esta sugestão.
             </p>
         </div>
@@ -79,9 +79,9 @@ export const ContactInfoStep = ({ formData, errors, onChange, onToggle, hasPhone
                 type="checkbox"
                 checked={formData.contact.primaryPhoneIsWhatsapp}
                 onChange={(e) => onToggle('primaryPhoneIsWhatsapp', e.target.checked)}
-                className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
+                className="h-4 w-4 text-[var(--cps-red-base)] focus:ring-[var(--cps-blue-highlight)] border-[var(--cps-gray-light)] rounded"
             />
-            <label htmlFor="primaryPhoneIsWhatsapp" className="text-sm text-gray-600">
+            <label htmlFor="primaryPhoneIsWhatsapp" className="text-sm text-[var(--cps-gray-text)]">
                 WhatsApp
             </label>
         </div>
@@ -99,15 +99,15 @@ export const ContactInfoStep = ({ formData, errors, onChange, onToggle, hasPhone
                 type="checkbox"
                 checked={!!formData.contact.secondaryPhoneIsWhatsapp}
                 onChange={(e) => onToggle('secondaryPhoneIsWhatsapp', e.target.checked)}
-                className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
+                className="h-4 w-4 text-[var(--cps-red-base)] focus:ring-[var(--cps-blue-highlight)] border-[var(--cps-gray-light)] rounded"
             />
-            <label htmlFor="secondaryPhoneIsWhatsapp" className="text-sm text-gray-600">
+            <label htmlFor="secondaryPhoneIsWhatsapp" className="text-sm text-[var(--cps-gray-text)]">
                 WhatsApp
             </label>
         </div>
 
         <div>
-            <label htmlFor="contactDetails" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="contactDetails" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                 Detalhes adicionais de contato (opcional)
             </label>
             <textarea
@@ -116,7 +116,7 @@ export const ContactInfoStep = ({ formData, errors, onChange, onToggle, hasPhone
                 onChange={onChange('contact', 'details')}
                 placeholder="Preferências de horário, melhor meio de contato, etc."
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none transition-colors"
+                className="w-full px-4 py-3 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none transition-colors"
                 aria-describedby="contact-details-help"
             />
             <p id="contact-details-help" className="sr-only">

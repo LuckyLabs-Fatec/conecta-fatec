@@ -20,7 +20,7 @@ const meta = {
         },
     },
     args: {
-        icon: <Lightbulb size={32} color="#DA3115" />,
+        icon: <Lightbulb size={32} color="var(--cps-red-base)" />,
         title: 'Envie sua ideia',
         description: 'Compartilhe sua ideia ou sugestão para melhorar a comunidade acadêmica.',
     },

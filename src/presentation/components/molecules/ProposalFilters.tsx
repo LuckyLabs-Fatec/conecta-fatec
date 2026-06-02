@@ -22,10 +22,10 @@ export const ProposalFilters = ({
   resultCount,
 }: ProposalFiltersProps) => {
   return (
-    <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+    <div className="rounded-[30px] bg-white p-4 shadow-[var(--cps-shadow-1)] ring-1 ring-[var(--cps-gray-light)]">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_240px]">
         <div>
-          <label htmlFor="search-input" className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+          <label htmlFor="search-input" className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--cps-gray-text)]">
             <Search size={16} />
             Pesquisar
           </label>
@@ -35,12 +35,12 @@ export const ProposalFilters = ({
             placeholder="Buscar por título ou descrição"
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-base)]/20"
+            className="w-full rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 outline-none transition-colors focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-base)]/20"
           />
         </div>
 
         <div>
-          <label htmlFor="status-select" className="mb-2 flex items-center gap-2 text-sm font-medium text-gray-700">
+          <label htmlFor="status-select" className="mb-2 flex items-center gap-2 text-sm font-medium text-[var(--cps-gray-text)]">
             <Filter size={16} />
             Status
           </label>
@@ -48,7 +48,7 @@ export const ProposalFilters = ({
             id="status-select"
             value={statusFilter}
             onChange={(event) => onStatusChange(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none transition-colors focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-base)]/20"
+            className="w-full rounded-[30px] border border-[var(--cps-gray-light)] px-3 py-2 outline-none transition-colors focus:border-[var(--cps-blue-base)] focus:ring-2 focus:ring-[var(--cps-blue-base)]/20"
           >
             <option value="">Todos os status</option>
             <option value="pendente">Pendente</option>
@@ -62,7 +62,7 @@ export const ProposalFilters = ({
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-4">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-[var(--cps-gray-text)]">
           {resultCount} proposta(s) encontrada(s)
         </p>
 

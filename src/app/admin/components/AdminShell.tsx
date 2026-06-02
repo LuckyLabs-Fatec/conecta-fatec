@@ -36,19 +36,19 @@ const adminSections: Array<{
 
 export function AdminShell({ activeSection, children }: AdminShellProps) {
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
+    <main className="min-h-screen bg-[var(--cps-silver-base)] py-8">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          <h1 className="text-3xl font-bold text-[var(--cps-blue-base)] mb-2">
             Administração
           </h1>
-          <p className="text-gray-600">
+          <p className="text-[var(--cps-gray-text)]">
             Gerencie as áreas administrativas do Fatec Conecta
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <aside className="h-fit border border-gray-200 bg-white shadow-sm">
+          <aside className="h-fit border border-[var(--cps-gray-light)] bg-white shadow-[var(--cps-shadow-1)]">
             <nav className="p-3" aria-label="Menu administrativo">
               {adminSections.map((section) => {
                 const isActive = section.id === activeSection;
@@ -60,8 +60,8 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
                     href={section.href}
                     className={`flex w-full items-center gap-3 px-3 py-3 text-left transition-colors ${
                       isActive
-                        ? 'bg-red-50 text-[#CB2616]'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-[var(--cps-feedback-cancelled-light)] text-[var(--cps-red-base)]'
+                        : 'text-[var(--cps-gray-text)] hover:bg-[var(--cps-silver-base)]'
                     }`}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -70,7 +70,7 @@ export function AdminShell({ activeSection, children }: AdminShellProps) {
                       <span className="block text-sm font-semibold">
                         {section.label}
                       </span>
-                      <span className="block text-xs text-gray-500">
+                      <span className="block text-xs text-[var(--cps-gray-text)]">
                         {section.description}
                       </span>
                     </span>

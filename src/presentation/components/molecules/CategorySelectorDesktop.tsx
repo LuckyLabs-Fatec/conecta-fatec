@@ -14,8 +14,8 @@ export function CategorySelectorDesktop({ categories, value, onChange }: Categor
       {categories.map((category) => (
         <label
           key={category.value}
-          className={`relative flex flex-col p-4 border rounded-lg cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-[#CB2616] focus-within:border-[#CB2616] ${
-            value === category.value ? 'border-[#CB2616] bg-red-50' : 'border-gray-300 hover:border-gray-400'
+          className={`relative flex flex-col p-4 border rounded-[30px] cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-[var(--cps-blue-highlight)] focus-within:border-[var(--cps-blue-base)] ${
+            value === category.value ? 'border-[var(--cps-red-base)] bg-[var(--cps-feedback-cancelled-light)]' : 'border-[var(--cps-gray-light)] hover:border-[var(--cps-blue-base)]'
           }`}
         >
           <input
@@ -27,9 +27,9 @@ export function CategorySelectorDesktop({ categories, value, onChange }: Categor
             className="sr-only"
             aria-describedby={`category-${category.value}-desc`}
           />
-          <span className="font-medium text-gray-800">{category.label}</span>
+          <span className="font-medium text-[var(--cps-blue-base)]">{category.label}</span>
           {category.description && (
-            <span id={`category-${category.value}-desc`} className="text-sm text-gray-500">
+            <span id={`category-${category.value}-desc`} className="text-sm text-[var(--cps-gray-text)]">
               {category.description}
             </span>
           )}

@@ -46,7 +46,7 @@ export const MyProposalsContainer = ({
   onViewDetails,
 }: MyProposalsContainerProps) => {
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
+    <main className="min-h-screen bg-[var(--cps-silver-base)] py-8">
       <div className="mx-auto max-w-7xl px-4">
         <ProposalHeader 
           title={title} 

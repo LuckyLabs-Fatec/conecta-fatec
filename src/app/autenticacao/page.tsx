@@ -45,12 +45,13 @@ export default function LoginPage () {
     return (
         <main className="flex min-h-screen">
             <LoginAside />
-            <section className="w-full md:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+            <section className="w-full md:w-1/2 flex items-center justify-center p-8 bg-[var(--cps-silver-base)]">
                 <div className="w-full max-w-md">
-                    <div className="bg-white rounded-lg shadow-lg p-8">
+                    <div className="cps-card p-8">
                         <header className="mb-8">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">Login</h2>
-                            <p className="text-gray-600 mb-4">
+                            <p className="mb-2 text-sm font-medium uppercase tracking-wide text-[var(--cps-red-base)]">Acesso institucional</p>
+                            <h2 className="text-2xl font-bold text-[var(--cps-blue-base)] mb-2">Login</h2>
+                            <p className="text-[var(--cps-gray-text)] mb-4">
                                 Se você ainda não possui uma conta! Pode{' '}
                                 <Link href="/cadastro/usuario" className="text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] font-medium underline">
                                     se cadastrar aqui!
@@ -60,7 +61,7 @@ export default function LoginPage () {
 
                         <Form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                             {authError && (
-                                <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3">
+                                <div className="bg-[var(--cps-feedback-cancelled-light)] border border-[var(--cps-feedback-cancelled-light)] text-[var(--cps-feedback-cancelled)] rounded-[30px] p-3">
                                     {authError}
                                 </div>
                             )}
@@ -89,9 +90,9 @@ export default function LoginPage () {
                                 <label className="flex items-center">
                                     <input 
                                         type="checkbox" 
-                                        className="h-4 w-4 text-[#CB2616] focus:ring-[#CB2616] border-gray-300 rounded"
+                                        className="h-4 w-4 text-[var(--cps-red-base)] focus:ring-[var(--cps-blue-highlight)] border-[var(--cps-gray-light)] rounded"
                                     />
-                                    <span className="ml-2 text-sm text-gray-600">Lembre-se de mim</span>
+                                    <span className="ml-2 text-sm text-[var(--cps-gray-text)]">Lembre-se de mim</span>
                                 </label>
                                 <a href="/esqueci-senha" className="text-sm text-[var(--cps-blue-base)] hover:text-[var(--cps-blue-text-hover)] underline">
                                     Esqueceu a senha?
@@ -104,23 +105,23 @@ export default function LoginPage () {
                                 variant="primary"
                                 size="large"
                                 type="submit"
-                                className="w-full rounded-md"
+                                className="w-full"
                             />
                         </Form>
 
-                        <footer className="mt-8 pt-6 border-t border-gray-200">
+                        <footer className="mt-8 pt-6 border-t border-[var(--cps-gray-light)]">
                             <div className="text-center">
-                                <p className="text-sm text-gray-600 mb-4">Novo no Fatec Conecta?</p>
+                                <p className="text-sm text-[var(--cps-gray-text)] mb-4">Novo no Fatec Conecta?</p>
                                 <Link
                                     href="/cadastro/usuario"
-                                    className='inline-block px-6 py-2 border border-[var(--cps-blue-base)] text-[var(--cps-blue-base)] rounded-lg hover:bg-[var(--cps-blue-text-hover)] transition-colors font-medium'
+                                    className='inline-block rounded-[30px] border border-[var(--cps-blue-base)] px-6 py-2 font-medium text-[var(--cps-blue-base)] transition-colors hover:bg-[var(--cps-gray-hover)]'
                                 >
                                     Criar Conta
                                 </Link>
                                 <div className="mt-4">
                                     <Link
                                         href="/"
-                                        className="inline-block px-6 py-2 text-sm font-medium text-gray-600 hover:text-[var(--cps-blue-base)] underline"
+                                        className="inline-block px-6 py-2 text-sm font-medium text-[var(--cps-gray-text)] hover:text-[var(--cps-blue-base)] underline"
                                     >
                                         Voltar para a página inicial
                                     </Link>

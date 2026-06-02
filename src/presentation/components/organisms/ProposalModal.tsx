@@ -17,12 +17,12 @@ interface ProposalModalProps {
 }
 
 const statusConfig: Record<ProposalStatus, { label: string; color: string }> = {
-    pendente: { label: 'Pendente', color: 'bg-gray-100 text-gray-800' },
-    em_analise: { label: 'Em Análise', color: 'bg-blue-100 text-blue-800' },
-    aguardando_info: { label: 'Aguardando Info', color: 'bg-yellow-100 text-yellow-800' },
-    aprovada: { label: 'Aprovada', color: 'bg-green-100 text-green-800' },
-    rejeitada: { label: 'Rejeitada', color: 'bg-red-100 text-red-800' },
-    atribuida: { label: 'Atribuída', color: 'bg-purple-100 text-purple-800' },
+    pendente: { label: 'Pendente', color: 'bg-[var(--cps-gray-hover)] text-[var(--cps-blue-base)]' },
+    em_analise: { label: 'Em Análise', color: 'bg-[var(--cps-silver-base)] text-[var(--cps-blue-base)]' },
+    aguardando_info: { label: 'Aguardando Info', color: 'bg-[var(--cps-feedback-progress-light)] text-[var(--cps-feedback-progress)]' },
+    aprovada: { label: 'Aprovada', color: 'bg-[var(--cps-feedback-done-light)] text-[var(--cps-feedback-done)]' },
+    rejeitada: { label: 'Rejeitada', color: 'bg-[var(--cps-feedback-cancelled-light)] text-[var(--cps-feedback-cancelled)]' },
+    atribuida: { label: 'Atribuída', color: 'bg-[var(--cps-gray-hover)] text-[var(--cps-violeta-base-aux)]' },
 };
 
 const fallbackStatusConfig = statusConfig.pendente;
@@ -102,16 +102,16 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
             tabIndex={-1}
         >
             <div
-                className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl"
+                className="bg-white rounded-[30px] max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-[var(--cps-shadow-2)]"
                 onClick={(e) => e.stopPropagation()}
                 role="document"
             >
                 <div className="p-6">
                     <div className="flex justify-between items-start mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">{proposal.title}</h2>
+                        <h2 className="text-2xl font-bold text-[var(--cps-blue-base)]">{proposal.title}</h2>
                         <button
                             onClick={onClose}
-                            className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+                            className="text-[var(--cps-gray-text)] hover:text-[var(--cps-gray-text)] text-xl font-bold"
                         >
                             ×
                         </button>
@@ -119,53 +119,53 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <h3 className="font-semibold text-gray-800 mb-2">Descrição</h3>
-                            <p className="text-gray-600 mb-4">{proposal.description}</p>
+                            <h3 className="font-semibold text-[var(--cps-blue-base)] mb-2">Descrição</h3>
+                            <p className="text-[var(--cps-gray-text)] mb-4">{proposal.description}</p>
 
-                            <h3 className="font-semibold text-gray-800 mb-2">Submetida por</h3>
-                            <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                            <h3 className="font-semibold text-[var(--cps-blue-base)] mb-2">Submetida por</h3>
+                            <div className="bg-[var(--cps-silver-base)] p-3 rounded-[30px] mb-4">
                                 <p className="font-medium">{proposal.submittedBy.name}</p>
-                                <p className="text-sm text-gray-600">{proposal.submittedBy.email}</p>
+                                <p className="text-sm text-[var(--cps-gray-text)]">{proposal.submittedBy.email}</p>
                                 {proposal.submittedBy.phone && (
-                                    <p className="text-sm text-gray-600">{proposal.submittedBy.phone}</p>
+                                    <p className="text-sm text-[var(--cps-gray-text)]">{proposal.submittedBy.phone}</p>
                                 )}
                             </div>
                         </div>
 
                         <div>
                             <div className="mb-4">
-                                <h4 className="font-medium text-gray-700">Status</h4>
+                                <h4 className="font-medium text-[var(--cps-gray-text)]">Status</h4>
                                 <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${currentStatus.color}`}>
                                     {currentStatus.label}
                                 </span>
                             </div>
 
                             <div className="mb-4">
-                                <h4 className="font-medium text-gray-700 mb-2">Data de Submissão</h4>
-                                <p className="text-gray-600">{formatDate(proposal.submittedAt)}</p>
+                                <h4 className="font-medium text-[var(--cps-gray-text)] mb-2">Data de Submissão</h4>
+                                <p className="text-[var(--cps-gray-text)]">{formatDate(proposal.submittedAt)}</p>
                             </div>
 
                             {proposal.mediatorNotes && (
                                 <div className="mb-4">
-                                    <h4 className="font-medium text-gray-700 mb-2">Notas do Mediador</h4>
-                                    <p className="text-gray-600 bg-blue-50 p-3 rounded-lg">{proposal.mediatorNotes}</p>
+                                    <h4 className="font-medium text-[var(--cps-gray-text)] mb-2">Notas do Mediador</h4>
+                                    <p className="text-[var(--cps-gray-text)] bg-[var(--cps-silver-base)] p-3 rounded-[30px]">{proposal.mediatorNotes}</p>
                                 </div>
                             )}
 
                             {proposal.coordinatorNotes && (
                                 <div className="mb-4">
-                                    <h4 className="font-medium text-gray-700 mb-2">Notas da Coordenação</h4>
-                                    <p className="text-gray-600 bg-green-50 p-3 rounded-lg">{proposal.coordinatorNotes}</p>
+                                    <h4 className="font-medium text-[var(--cps-gray-text)] mb-2">Notas da Coordenação</h4>
+                                    <p className="text-[var(--cps-gray-text)] bg-[var(--cps-feedback-done-light)] p-3 rounded-[30px]">{proposal.coordinatorNotes}</p>
                                 </div>
                             )}
 
                             {proposal.assignedTo && (
                                 <div className="mb-4">
-                                    <h4 className="font-medium text-gray-700 mb-2">Atribuição</h4>
-                                    <div className="bg-purple-50 p-3 rounded-lg">
+                                    <h4 className="font-medium text-[var(--cps-gray-text)] mb-2">Atribuição</h4>
+                                    <div className="bg-[var(--cps-gray-hover)] p-3 rounded-[30px]">
                                         <p className="font-medium">{proposal.assignedTo.class}</p>
-                                        <p className="text-sm text-gray-600">{proposal.assignedTo.course}</p>
-                                        <p className="text-sm text-gray-600">Professor: {proposal.assignedTo.professor}</p>
+                                        <p className="text-sm text-[var(--cps-gray-text)]">{proposal.assignedTo.course}</p>
+                                        <p className="text-sm text-[var(--cps-gray-text)]">Professor: {proposal.assignedTo.professor}</p>
                                     </div>
                                 </div>
                             )}
@@ -174,14 +174,14 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
 
                     {proposal.images.length > 0 && (
                         <div className="mb-6">
-                            <h3 className="font-semibold text-gray-800 mb-3">Imagens</h3>
+                            <h3 className="font-semibold text-[var(--cps-blue-base)] mb-3">Imagens</h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {proposal.images.map((image, index) => (
                                     <Image
                                         key={index}
                                         src={image}
                                         alt={`Imagem ${index + 1} da proposta`}
-                                        className="w-full h-48 object-cover rounded-lg"
+                                        className="w-full h-48 object-cover rounded-[30px]"
                                         width={300}
                                         height={192}
                                     />
@@ -193,7 +193,7 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
                     {/* Action Section */}
                     {canReview && proposal.status !== 'atribuida' && (
                         <div className="border-t pt-6">
-                            <h3 className="font-semibold text-gray-800 mb-4">Ações</h3>
+                            <h3 className="font-semibold text-[var(--cps-blue-base)] mb-4">Ações</h3>
 
                             {!action && (
                                 <div className="flex gap-3 flex-wrap">
@@ -229,7 +229,7 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
                             {(action === 'approve' || action === 'reject' || action === 'request_info') && (
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">
                                             {action === 'approve'
                                                 ? 'Notas de Aprovação'
                                                 : action === 'reject'
@@ -238,12 +238,12 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
                                         </label>
                                         <textarea
                                             {...reviewForm.register('message')}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                            className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
                                             rows={4}
                                             placeholder={action === 'approve' ? 'Adicione observações sobre a aprovação...' : action === 'reject' ? 'Explique o motivo da rejeição...' : 'Descreva quais informações complementares são necessárias...'}
                                         />
                                         {reviewForm.formState.errors.message && (
-                                            <p className="mt-1 text-xs text-red-600">{reviewForm.formState.errors.message.message}</p>
+                                            <p className="mt-1 text-xs text-[var(--cps-feedback-cancelled)]">{reviewForm.formState.errors.message.message}</p>
                                         )}
                                     </div>
                                     <div className="flex gap-3">
@@ -267,12 +267,12 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label htmlFor="class-select" className="block text-sm font-medium text-gray-700 mb-2">Turma</label>
+                                            <label htmlFor="class-select" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">Turma</label>
                                             <select
                                                 id="class-select"
                                                 value={assignmentData.class}
                                                 onChange={(e) => setAssignmentData(prev => ({ ...prev, class: e.target.value }))}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                                className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
                                             >
                                                 <option value="">Selecione a turma</option>
                                                 <option value="3º DSM">3º DSM</option>
@@ -282,25 +282,25 @@ export const ProposalModal = ({ proposal, onClose, onUpdateStatus, onAssign }: P
                                             </select>
                                         </div>
                                         <div>
-                                            <label htmlFor="course-input" className="block text-sm font-medium text-gray-700 mb-2">Curso</label>
+                                            <label htmlFor="course-input" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">Curso</label>
                                             <input
                                                 id="course-input"
                                                 type="text"
                                                 value={assignmentData.course}
                                                 onChange={(e) => setAssignmentData(prev => ({ ...prev, course: e.target.value }))}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                                className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
                                                 placeholder="Ex: Desenvolvimento de Software Multiplataforma"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label htmlFor="professor-input" className="block text-sm font-medium text-gray-700 mb-2">Professor Responsável</label>
+                                        <label htmlFor="professor-input" className="block text-sm font-medium text-[var(--cps-gray-text)] mb-2">Professor Responsável</label>
                                         <input
                                             id="professor-input"
                                             type="text"
                                             value={assignmentData.professor}
                                             onChange={(e) => setAssignmentData(prev => ({ ...prev, professor: e.target.value }))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#CB2616] focus:border-[#CB2616] outline-none"
+                                            className="w-full px-3 py-2 border border-[var(--cps-gray-light)] rounded-[30px] focus:ring-2 focus:ring-[var(--cps-blue-highlight)] focus:border-[var(--cps-blue-base)] outline-none"
                                             placeholder="Ex: Prof. Dr. João Silva"
                                         />
                                     </div>

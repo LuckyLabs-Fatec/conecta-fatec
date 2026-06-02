@@ -1,35 +1,75 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-
-  --palette-red-50: #EFD5D7;
-  --palette-red-100: #EDB8BA;
-  --palette-red-200: #DB857F;
-  --palette-red-300: #D06059;
-  --palette-red-400: #D94234;
-  --palette-red-500: #DA3115;
-  --palette-red-600: #CB2616;
-  --palette-red-700: #B91611;
-  --palette-red-800: #AD0F0A;
-  --palette-red-900: #9F0000;
+  --background: #F8F8F8;
+  --foreground: #666666;
 
   --cps-red-base: #B20000;
+  --cps-red-dark-10: #7E0000;
   --red-dark-10: #7E0000;
 
   --cps-blue-base: #005C6D;
   --cps-blue-title-hover: #004854;
+  --cps-blue-highlight: #00C1CF;
+  --cps-blue-secondary-hover: #00D8E8;
+  --cps-blue-text-hover: #004854;
+  --cps-blue-hover-text: #004854;
 
   --cps-green-base-aux: #A0C340;
+  --cps-blueberry-base-aux: #4C7EFF;
+  --cps-crayola-base-aux: #FFC24C;
   --cps-violeta-base-aux: #8A29E6;
-  --cps-crayola-base-aux: #FFED4A;
+  --cps-coral-base-aux: #FF4C4D;
+  --cps-pink-base-aux: #FF4CA2;
+
+  --cps-gray-text: #666666;
+  --cps-gray-light: #DADADA;
+  --cps-gray-hover: #E6E6E6;
+  --cps-silver-base: #F8F8F8;
+  --cps-white: #FFFFFF;
+
+  --cps-feedback-cancelled: #D32719;
+  --cps-feedback-progress: #B78718;
+  --cps-feedback-done: #3ACF1F;
+  --cps-feedback-cancelled-light: #FDD5D1;
+  --cps-feedback-progress-light: #FFF5EA;
+  --cps-feedback-done-light: #E8FBE4;
+
+  --cps-shadow-1: 0px 0px 10px 0px rgba(0, 0, 0, 0.15);
+  --cps-shadow-2: 0px 4px 20px 0px rgba(0, 0, 0, 0.25);
+  --cps-radius-30: 30px;
+
+  --palette-red-50: #F7E6E6;
+  --palette-red-100: #F0CCCC;
+  --palette-red-200: #E8B3B3;
+  --palette-red-300: #D16666;
+  --palette-red-400: #C94D4D;
+  --palette-red-500: #C13333;
+  --palette-red-600: var(--cps-red-base);
+  --palette-red-700: #7E0000;
+  --palette-red-800: #540000;
+  --palette-red-900: #2A0000;
+
+  --font-sans: var(--font-roboto), Arial, sans-serif;
+  --font-heading: var(--font-roboto-slab), Georgia, serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 24px;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--cps-blue-base);
+  font-family: var(--font-heading);
+  line-height: 1.25;
 }
 
 button {
@@ -62,3 +102,15 @@ body.a11y-high-contrast a {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.cps-card {
+  background: var(--cps-white);
+  border: 1px solid var(--cps-gray-light);
+  border-radius: var(--cps-radius-30);
+  box-shadow: var(--cps-shadow-1);
+}
+
+.cps-focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 193, 207, 0.35);
+}
