@@ -18,7 +18,6 @@ export default function LandingPage() {
           aria-labelledby="hero-title"
           role="banner"
         >
-          <div className="absolute inset-y-0 left-0 w-2 bg-[var(--cps-red-base)]" aria-hidden="true" />
           <div className="mx-auto grid min-h-[520px] max-w-7xl grid-cols-1 items-center gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.1fr_0.9fr] md:px-10">
             <div className="flex min-w-0 flex-col items-start gap-6">
               <p className="max-w-full rounded-[30px] bg-[var(--cps-feedback-cancelled-light)] px-4 py-2 text-sm font-medium uppercase tracking-wide text-[var(--cps-red-base)]">
